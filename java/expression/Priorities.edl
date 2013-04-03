@@ -1,0 +1,105 @@
+module java/expression/Priorities
+imports
+  java/expression/Expressions
+
+exports
+  context-free priorities
+      Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+    > {right:
+        Expression "++" -> Expression
+        Expression "--" -> Expression
+      } 
+
+  context-free priorities
+      {right:
+        Expression "++" -> Expression
+        Expression "--" -> Expression
+      }
+    > {
+		"(" PrimType ")" Expression -> Expression
+		"(" ArrayType ")" Expression -> Expression 
+		"(" ClassifierType ")" Expression -> Expression 
+    }
+
+  context-free priorities
+      "(" PrimType ")" Expression -> Expression
+    > {left:
+        Expression "*" Expression -> Expression
+        Expression "/" Expression -> Expression
+        Expression "%" Expression -> Expression
+      } 
+
+  context-free priorities
+    {
+	  "(" ArrayType ")" Expression -> Expression 
+	  "(" ClassifierType ")" Expression -> Expression 
+    } > {
+        "++" Expression -> Expression
+        "--" Expression -> Expression
+        "+"  Expression -> Expression
+        "-"  Expression -> Expression
+      }
+
+  context-free priorities
+    {
+      Expression SubArrayAccess -> ArrayAccess
+      Expression "." Id -> FieldAccess
+      Expression "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
+    }
+  > {right:
+      Expression "++" -> Expression
+      Expression "--" -> Expression
+    }
+  > {
+      "++" Expression -> Expression
+      "--" Expression -> Expression
+      "+"  Expression -> Expression
+      "-"  Expression -> Expression
+      "~"  Expression -> Expression
+      "!"  Expression -> Expression
+    }
+  > {left:
+      Expression "*" Expression -> Expression
+      Expression "/" Expression -> Expression
+      Expression "%" Expression -> Expression
+    } 
+  > {left:
+      Expression "+" Expression -> Expression
+      Expression "-" Expression -> Expression
+    }
+  > {left:
+      Expression "<<"  Expression -> Expression
+      Expression ">>"  Expression -> Expression
+      Expression ">>>" Expression -> Expression
+    }
+  > {left:
+      Expression "instanceof" Type -> Expression
+      Expression "<"   Expression -> Expression
+      Expression ">"   Expression -> Expression
+      Expression "<="  Expression -> Expression
+      Expression ">="  Expression -> Expression
+    }
+  > {left:
+      Expression "=="  Expression -> Expression
+      Expression "!="  Expression -> Expression
+    }
+  >   Expression "&"   Expression -> Expression
+  >   Expression "^"   Expression -> Expression
+  >   Expression "|"   Expression -> Expression
+  >   Expression "&&"  Expression -> Expression
+  >   Expression "||"  Expression -> Expression
+  >   Expression CondMid Expression -> Expression
+  > {right:
+      LHS "="    Expression -> Expression
+      LHS "*="   Expression -> Expression
+      LHS "/="   Expression -> Expression
+      LHS "%="   Expression -> Expression
+      LHS "+="   Expression -> Expression
+      LHS "-="   Expression -> Expression
+      LHS "<<="  Expression -> Expression
+      LHS ">>="  Expression -> Expression
+      LHS ">>>=" Expression -> Expression
+      LHS "&="   Expression -> Expression
+      LHS "^="   Expression -> Expression
+      LHS "|="   Expression -> Expression
+    }

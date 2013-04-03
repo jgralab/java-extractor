@@ -1,0 +1,19 @@
+module java/expression/literals/EscapeSequences
+
+exports
+  sorts EscapeSeq NamedEscape OctaEscape LastOcta
+
+  lexical syntax
+    rule OctaEscape  -> EscapeSeq
+    rule NamedEscape -> EscapeSeq
+
+    rule "\\" [btnfr\"\'\\]        -> NamedEscape
+    rule "\\" LastOcta             -> OctaEscape
+    rule "\\" [0-3] LastOcta       -> OctaEscape
+    rule "\\" [4-7] LastOcta       -> OctaEscape
+    rule "\\" [0-3] [0-7] LastOcta -> OctaEscape
+
+    rule [0-7] -> LastOcta
+
+  lexical restrictions
+    LastOcta -/- [0-7]

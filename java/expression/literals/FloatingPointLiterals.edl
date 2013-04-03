@@ -1,0 +1,57 @@
+module java/expression/literals/FloatingPointLiterals
+exports
+  sorts FloatLiteral DeciFloatLiteral HexaFloatLiteral      
+  
+  context-free syntax
+    rule DeciFloatLiteral -> FloatLiteral
+    rule HexaFloatLiteral -> FloatLiteral
+
+  lexical syntax
+    rule DeciFloatNumeral [fFdD]? -> DeciFloatLiteral
+    rule HexaFloatNumeral [fFdD]? -> HexaFloatLiteral
+    
+    %% Reject plain integer literals as decimal float literals.
+    %% A similar rejection for hexadecimal float literals is not
+    %% required, since these always contain an exponent part.
+    rule [0-9]+ -> DeciFloatLiteral {reject}
+
+  lexical restrictions
+    DeciFloatLiteral -/- [fFdD]
+    HexaFloatLiteral -/- [fFdD]
+
+  %%%
+   %% Decimal Floating Point Numerals
+   %%%
+  sorts DeciFloatNumeral DeciFloatDigits DeciFloatExponentPart
+
+  lexical syntax
+    rule DeciFloatDigits DeciFloatExponentPart? -> DeciFloatNumeral
+
+    rule [0-9]* "." [0-9]* -> DeciFloatDigits
+    rule        "."        -> DeciFloatDigits {reject}
+    rule [0-9]+            -> DeciFloatDigits
+
+    rule [eE] SignedInteger -> DeciFloatExponentPart
+    
+    rule [\+\-]? [0-9]+ -> SignedInteger    
+
+  lexical restrictions
+    DeciFloatDigits  -/- [0-9]
+    DeciFloatExponentPart -/- [0-9]
+
+  %%%
+   %% Hexadecimal Floating Point Literals
+   %%%
+  sorts HexaFloatNumeral HexaSignificand BinaryExponent SignedInteger
+    
+  lexical syntax
+    rule HexaSignificand BinaryExponent -> HexaFloatNumeral
+
+    rule [0][xX] [0-9a-fA-F]+                  -> HexaSignificand
+    rule [0][xX] [0-9a-fA-F]* "." [0-9a-fA-F]* -> HexaSignificand
+    rule [0][xX]              "."              -> HexaSignificand {reject}
+
+    rule [pP] SignedInteger -> BinaryExponent
+  lexical restrictions
+    HexaSignificand -/- [0-9a-fA-F]
+    SignedInteger   -/- [0-9]

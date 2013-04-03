@@ -1,0 +1,18 @@
+module java/Main
+imports
+	java/program/CompilationUnits %% CompilationUnit
+	java/WhiteSpace
+	java/Comments
+import declarations
+	java.io.BufferedInputStream;
+	java.io.FileInputStream;
+	java.io.IOException;
+	de.uni_koblenz.jgralab.java_extractor.utilities.UnicodeEscapeAwareInputStream;
+user code {
+	@Override
+	protected String readInput(String inputFile, String encoding) throws IOException {
+		return super.readInput(new BufferedInputStream(new UnicodeEscapeAwareInputStream(new FileInputStream(inputFile), encoding)), encoding);
+	}
+}
+exports
+	context-free start-symbols CompilationUnit

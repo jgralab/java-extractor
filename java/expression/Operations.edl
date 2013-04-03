@@ -1,0 +1,79 @@
+module java/expression/Operations
+imports
+  java/expression/Expressions %% Expression ArrayAccess
+  java/type/Types %% Type ClassifierType PrimType ArrayType
+
+exports
+  sorts Expression
+  sorts CondMid LHS
+
+  context-free syntax
+	rule "+" Expression -> Expression
+    rule "-" Expression -> Expression
+
+    rule "++" Expression -> Expression
+    rule "--" Expression -> Expression
+
+    rule "~" Expression -> Expression
+    rule "!" Expression -> Expression
+
+	%% splitting in three rules is required because of priorities
+    rule "(" PrimType ")" Expression -> Expression
+    rule "(" ArrayType ")" Expression -> Expression
+    rule "(" ClassifierType ")" Expression -> Expression
+	
+    rule Expression "++" -> Expression
+    rule Expression "--" -> Expression
+	
+	rule Expression "instanceof" Type -> Expression
+
+    rule Expression "*"   Expression -> Expression  {left}
+    rule Expression "/"   Expression -> Expression  {left}
+    rule Expression "%"   Expression -> Expression  {left}
+
+    rule Expression "+"   Expression -> Expression  {left}
+    rule Expression "-"   Expression -> Expression  {left}
+
+    rule Expression "<<"  Expression -> Expression  {left}
+    rule Expression ">>"  Expression -> Expression  {left}
+    rule Expression ">>>" Expression -> Expression  {left}
+
+    rule Expression "<"   Expression -> Expression  {left}
+    rule Expression ">"   Expression -> Expression  {left}
+    rule Expression "<="  Expression -> Expression  {left}
+    rule Expression ">="  Expression -> Expression  {left}
+    rule Expression "=="  Expression -> Expression  {left}
+    rule Expression "!="  Expression -> Expression  {left}
+
+    rule Expression "&&"  Expression -> Expression  {left}
+    rule Expression "||"  Expression -> Expression  {left}
+
+    rule Expression "&" Expression -> Expression {left}
+    rule Expression "^" Expression -> Expression {left}
+    rule Expression "|" Expression -> Expression {left}
+
+    %% todo JFR-30
+    rule Expression CondMid Expression -> Expression {right}
+    rule "?" Expression ":" -> CondMid {bracket}
+	
+	rule LHS "="    Expression -> Expression
+    rule LHS "*="   Expression -> Expression
+    rule LHS "/="   Expression -> Expression
+    rule LHS "%="   Expression -> Expression
+    rule LHS "+="   Expression -> Expression
+    rule LHS "-="   Expression -> Expression
+    rule LHS "<<="  Expression -> Expression
+    rule LHS ">>="  Expression -> Expression
+    rule LHS ">>>=" Expression -> Expression
+    rule LHS "&="   Expression -> Expression
+    rule LHS "^="   Expression -> Expression
+    rule LHS "|="   Expression -> Expression
+
+    rule FieldAccess -> LHS
+    rule ArrayAccess -> LHS
+	rule "(" LHS ")" -> LHS %% javac accepts this
+	
+	lexical restrictions
+		"+" -/- [\+]
+		"-" -/- [\-]
+		"/" -/- [\/]

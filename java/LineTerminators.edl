@@ -1,0 +1,21 @@
+module java/LineTerminators
+exports
+  sorts LineTerminator CarriageReturn EndOfFile
+
+  lexical syntax
+    rule [\n]           -> LineTerminator
+    rule [\r][\n]       -> LineTerminator
+    rule CarriageReturn -> LineTerminator
+    rule EndOfFile      -> LineTerminator
+
+    rule [\r] -> CarriageReturn
+
+  lexical restrictions
+    CarriageReturn -/- [\n]
+
+  %% End of file is empty.
+  lexical syntax    
+    rule -> EndOfFile
+
+  lexical restrictions
+    EndOfFile -/- ~[]

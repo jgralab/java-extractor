@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="jex" basedir="." default="build">
+
+	<property name="projectname" value="java-extractor" />
+	<property name="main" value="" />
+	<property name="rsa2tg.n" value="true" />
+	<property name="rsa2tg.c" value="true" />
+
+	<import file="../jgralab/common.xml" />
+
+	<property name="schema.file" value="${project.dir}/java5schema.rsa.tg" />
+	<property name="xmi.schema.file" value="${project.dir}/Java5.xmi" />
+
+	<path id="classpath">
+	  <pathelement location="../jgralab/build/jar/jgralab.jar"/>
+	  <pathelement path="build/classes/"/>
+	  <pathelement location="../edl/lib/strategoxt.jar"/>
+	  <pathelement location="../edl/build/jar/edl.jar"/>
+	</path>
+	    
+	<target name="clean" depends="customAntTasks">
+	  <delete dir="src/de/uni_koblenz/jgralab/java_extractor/schema/" />
+	  <delete dir="src/de/uni_koblenz/jgralab/java_extractor/builder/" />
+	  <delete dir="${tmp.dir}" />
+	  <delete dir="${testclasses.dir}" />
+	  <antcall target="deleteGeneratedSchemaFiles" />
+	</target>
+
+
+	<target name="process-edl">
+	  <mkdir dir="src/de/uni_koblenz/jgralab/java_extractor/builder"/>
+	  <java fork="true"
+		classname="de.uni_koblenz.edl.preprocessor.EDLPreprocessor"
+		classpathref="classpath">
+	    <arg value="-i"/> <arg value="."/>
+	    <arg value="-m"/> <arg value="java/Main"/>
+	    <arg value="-o"/> <arg value="src/de/uni_koblenz/jgralab/java_extractor/builder"/>
+	    <arg value="-p"/> <arg value="de.uni_koblenz.jgralab.java_extractor.builder"/>
+	    <arg value="-s"/> <arg value="java5schema.rsa.tg"/>
+	    <arg value="-n"/> <!-- no default mappings -->
+	  </java>
+	  <javac includeantruntime="false" fork="true"
+		 classpathref="classpath" debug="true"
+		 srcdir="src" destdir="build/classes"/>
+	</target>
+
+	<target name="build" depends="jgralab,clean,compile,process-edl,jar" />
+
+</project>

@@ -1,0 +1,20 @@
+module java/Identifiers
+imports
+  java/Keywords
+
+exports
+  sorts Id ID
+
+  context-free syntax
+    rule ID -> Id
+
+  lexical syntax
+    rule [A-Za-z\_\$\128-\252\255\254\253] [A-Za-z0-9\_\$\128-\252\255\254\253]* -> ID
+    
+    rule Keyword -> ID {reject}
+    rule "true"  -> ID {reject}
+    rule "false" -> ID {reject}
+    rule "null"  -> ID {reject}
+
+  lexical restrictions
+    ID -/- [a-zA-Z0-9\_\$\128-\252\253\254\255]

@@ -1,0 +1,57 @@
+module java/type/Types
+
+imports
+  java/program/Packages          %% PackageName
+  java/Identifiers       %% Id
+
+exports
+  sorts PrimType ArrayType ClassifierType TypeArg TypeParam PlainClassifierType
+ 
+  context-free syntax
+
+    %% Type
+    rule PrimType       -> Type
+    rule ArrayType      -> Type
+    rule ClassifierType -> Type
+
+    %% Primitive types
+    rule "boolean"                        -> PrimType
+    rule "int"                            -> PrimType
+    rule "long"                           -> PrimType
+    rule "char"                           -> PrimType
+    rule "byte"                           -> PrimType
+    rule "short"                          -> PrimType
+    rule "float"                          -> PrimType
+    rule "double"                         -> PrimType
+    rule "void"                           -> PrimType
+
+    %% ArrayType
+    rule PrimType        -> NonArrayType
+    rule ClassifierType  -> NonArrayType
+    rule NonArrayType ("[" "]")+ -> ArrayType
+    rule Type "..." -> ArrayType
+
+    %% ClassifierType
+    rule Id                             -> ClassifierType %% This could be a simple name of a Classifier or a type parameter name.
+    rule PackageName "." Id             -> ClassifierType
+    rule Id "<" {TypeArg "," }+ ">" -> ClassifierType
+    rule PackageName "." Id "<" {TypeArg "," }+ ">" -> ClassifierType
+    rule ClassifierType "." ClassifierType -> ClassifierType {left, avoid}
+	
+	rule (PackageName ".")? Id -> PlainClassifierType
+
+    %% TypeArg
+    rule Type                         -> TypeArg
+    rule "?" (UpperWildcardBound | LowerWildcardBound)? -> TypeArg
+    rule "extends" Type     -> UpperWildcardBound
+    rule "super"   Type     -> LowerWildcardBound
+
+    %% TypeParam
+    rule Id ("extends" {Type "&"}+)?  -> TypeParam
+	
+	context-free priorities
+		ClassifierType "." ClassifierType -> ClassifierType {left, avoid}
+		<2>> {
+			PackageName "." Id             -> ClassifierType
+			PackageName "." Id "<" {TypeArg "," }+ ">" -> ClassifierType
+		}

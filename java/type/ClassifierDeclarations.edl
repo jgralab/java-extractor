@@ -1,0 +1,49 @@
+module java/type/ClassifierDeclarations
+imports
+  java/member/Modifiers     %% Modifier
+  java/Identifiers   %% Id
+  java/type/Types         %% ClassifierType, TypeParam
+  java/member/Members       %% Member, InitializerBlock, EnumConstants, AnnotationElementDecl
+
+exports
+  sorts ClassDeclaration InterfaceDeclaration EnumDeclaration AnnotationDeclaration ClassifierDeclaration
+
+  context-free syntax
+
+    %% Classes
+    rule (Modifier|Annotation)* "class" Id
+         ("<" {TypeParam ","}+ ">")?
+         ("extends" ClassifierType)?
+         ("implements" {ClassifierType ","}+)?
+         ClassifierBody -> ClassDeclaration
+
+    %% Enums
+    rule (Modifier|Annotation)* "enum" Id
+         ("implements" {ClassifierType ","}+)?
+         EnumBody -> EnumDeclaration
+    rule "{" EnumConstants (";"
+             %% All kinds of Members except for EnumConstants may follow
+             (FieldDeclaration |
+              MethodDeclaration | ConstructorDeclaration |
+              InitializerBlock |
+              ClassifierDeclaration ";"*)*)? "}" -> EnumBody
+
+    %% Interfaces
+    rule (Modifier|Annotation)* "interface" Id
+         ("<" {TypeParam ","}+ ">")?
+         ("extends" {ClassifierType ","}+)?
+         ClassifierBody -> InterfaceDeclaration
+
+    %% Annotations
+    rule (Modifier|Annotation)* "@interface" Id  AnnotationBody -> AnnotationDeclaration
+    %% Yes, there may be enums in annotations
+    rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"*)* "}" -> AnnotationBody
+
+    rule ClassDeclaration      -> ClassifierDeclaration
+    rule EnumDeclaration       -> ClassifierDeclaration
+    rule InterfaceDeclaration  -> ClassifierDeclaration
+    rule AnnotationDeclaration -> ClassifierDeclaration
+
+    rule ClassifierDeclaration -> Member
+
+    rule "{" (Member | InitializerBlock ";"*)* "}" -> ClassifierBody

@@ -1,0 +1,19 @@
+module java/annotation/Annotations
+imports
+  java/type/Types     %% PlainClassifierType
+  java/member/Members   %% ParenBlock
+  java/Identifiers %% Id
+  java/expression/Expressions %% Expression
+
+exports
+  sorts Annotation ElemValPair ElemVal
+
+  context-free syntax
+    rule "@" PlainClassifierType "(" {ElemValPair ","}* ","? ")" -> Annotation
+    rule "@" PlainClassifierType "(" ElemVal ","? ")"            -> Annotation {avoid}
+    rule "@" PlainClassifierType                            -> Annotation
+	
+    rule Id "=" ElemVal -> ElemValPair
+
+    rule Expression -> ElemVal
+    rule Annotation -> ElemVal

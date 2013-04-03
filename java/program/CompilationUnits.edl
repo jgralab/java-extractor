@@ -1,0 +1,21 @@
+module java/program/CompilationUnits
+
+imports
+  java/type/ClassifierDeclarations   %% ClassifierDeclaration
+  java/annotation/Annotations              %% Annotation
+  java/program/Packages                 %% PackageName
+  java/type/Types                    %% PlainClassifierType
+  java/Identifiers				%% Id
+
+exports
+  sorts CompilationUnit
+
+  context-free syntax
+    rule PackageDeclaration? ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit
+	
+    rule Annotation* "package" PackageName ";" -> PackageDeclaration
+	
+    rule "import" PlainClassifierType ";" -> ImportDeclaration
+    rule "import" PackageName "." "*" ";" -> ImportDeclaration
+    rule "import" "static" PlainClassifierType "." Id ";" -> ImportDeclaration
+    rule "import" "static" PlainClassifierType "." "*" ";" -> ImportDeclaration

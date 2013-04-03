@@ -1,0 +1,58 @@
+module java/expression/Expressions
+imports
+  java/expression/literals/IntegerLiterals %% IntLiteral
+  java/expression/literals/FloatingPointLiterals %% FloatLiteral
+  java/expression/literals/BooleanLiterals  %% BoolLiteral
+  java/expression/literals/CharacterLiterals  %% CharLiteral
+  java/expression/literals/StringLiterals %% StringLiteral
+  java/expression/literals/NullLiteral %% NullLiteral
+  java/type/Types %% Type ClassifierType
+  java/Identifiers %% Id
+  java/expression/Operations %% Expression
+  java/expression/MethodsAndObjectCreations %% Expression
+  java/expression/Priorities
+
+exports
+  sorts Expression ArrayAccess SubArrayAccess
+
+  context-free syntax
+	rule IntLiteral    -> Expression
+    rule FloatLiteral  -> Expression
+    rule BoolLiteral   -> Expression 
+    rule CharLiteral   -> Expression
+    rule StringLiteral -> Expression
+    rule NullLiteral   -> Expression
+	
+    rule Type   "." "class" -> Expression
+	
+	rule (ClassifierType ".")? "this" -> Expression
+
+	rule "(" Expression ")"          -> Expression
+	
+	rule FieldAccess -> Expression
+	
+    rule Id  -> FieldAccess %% variable, local field, type parameter, enum constant
+	
+	rule                 Expression "." Id -> FieldAccess
+    rule             Type "." Id -> FieldAccess {avoid}
+    rule              "super" "." Id -> FieldAccess
+    rule Type "." "super" "." Id -> FieldAccess
+	
+    %% todo: JFR-29
+	rule ArrayAccess -> Expression
+    rule Expression SubArrayAccess -> ArrayAccess
+	rule "[" Expression? "]" -> SubArrayAccess
+
+  context-free priorities
+	Expression SubArrayAccess -> ArrayAccess
+	<0>>
+	SubArrayExpression ArrayInit? -> Expression,
+	
+	Expression "." Id -> FieldAccess
+	<0>>{
+		IntLiteral    -> Expression
+		FloatLiteral  -> Expression
+		BoolLiteral   -> Expression 
+		CharLiteral   -> Expression
+		NullLiteral   -> Expression
+	}

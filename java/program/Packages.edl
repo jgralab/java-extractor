@@ -1,0 +1,12 @@
+module java/program/Packages
+imports
+  java/Identifiers %% Id
+
+exports
+  sorts PackageName
+
+  context-free syntax
+
+    %% PackageName
+    rule {Id "."}+ -> PackageName
+

@@ -1,0 +1,69 @@
+module java/statement/Statements
+
+imports
+	java/member/Members %% FieldDeclaration ParamDeclaration VariableDeclaration
+	java/type/ClassifierDeclarations %% ClassDeclaration EnumDeclaration
+	java/expression/Expressions %% Expression
+	java/Identifiers %% Id
+
+exports
+  sorts Statement Block
+  sorts SwitchGroup SwitchLabel CatchClause OpenStatement ClosedStatement
+
+  context-free syntax  
+    %% statements
+    rule OpenStatement -> Statement
+	rule ClosedStatement -> Statement
+  
+    %% statements without trailing substatements
+	rule Block		-> ClosedStatement
+	rule "{" Statement* "}"                     -> Block
+	
+	rule ";"        -> ClosedStatement
+	
+	rule FieldDeclaration -> ClosedStatement
+	rule ClassDeclaration -> ClosedStatement
+	rule EnumDeclaration -> ClosedStatement
+	
+	rule Expression ";"   -> ClosedStatement {avoid}
+	
+	rule "switch" "(" Expression ")" "{" SwitchGroup* SwitchLabel* "}" -> ClosedStatement
+    rule SwitchLabel+ Statement+ -> SwitchGroup
+    rule "case" Expression ":" -> SwitchLabel
+    rule "default"   ":" -> SwitchLabel
+	
+	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement
+	
+	rule "break"    Id? ";"   -> ClosedStatement
+	rule "continue" Id? ";"   -> ClosedStatement
+	rule "return"   Expression? ";" -> ClosedStatement
+	rule "throw"    Expression  ";" -> ClosedStatement
+	rule "synchronized" "(" Expression ")" Block -> ClosedStatement
+	
+    rule "assert" Expression (":" Expression)? ";" -> ClosedStatement
+	
+    rule "try" Block CatchClause* ("finally" Block)? -> ClosedStatement
+    rule "catch" "(" ParamDeclaration ")" Block -> CatchClause
+	
+    rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement
+	
+	rule Id ":" ClosedStatement -> ClosedStatement
+	
+	rule "while" "(" Expression ")" ClosedStatement -> ClosedStatement
+	
+	rule "for" "(" (VariableDeclaration | {Expression ","}*) ";" Expression? ";" {Expression ","}* ")" ClosedStatement -> ClosedStatement
+
+    rule "for" "(" ParamDeclaration ":" Expression ")" ClosedStatement -> ClosedStatement
+	
+	%% statements with trailing substatements
+	
+	rule Id ":" OpenStatement -> OpenStatement
+	
+	rule "while" "(" Expression ")" OpenStatement -> OpenStatement
+	
+	rule "for" "(" (VariableDeclaration | {Expression ","}*) ";" Expression? ";" {Expression ","}* ")" OpenStatement -> OpenStatement
+
+    rule "for" "(" ParamDeclaration ":" Expression ")" OpenStatement -> OpenStatement
+	
+    rule "if" "(" Expression ")" Statement -> OpenStatement
+    rule "if" "(" Expression ")" ClosedStatement "else" OpenStatement -> OpenStatement

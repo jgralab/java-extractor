@@ -1,0 +1,85 @@
+module java/member/Members
+imports
+  java/member/Modifiers         %% Modifier
+  java/Identifiers       %% Id
+  java/type/Types             %% Type, TypeParam
+  java/statement/Statements %% Statement Block
+  java/expression/Expressions    %% Expression
+  java/type/ClassifierDeclarations %% ClassifierBody
+  java/annotation/Annotations %% Annotation
+
+exports
+  sorts Member AnnotationElementDecl EnumConstants VariableDeclaration
+
+  context-free syntax
+
+    %% EnumConstant
+	rule {EnumConst ","}* ","? -> EnumConstants
+    rule Annotation* Id ("(" {Expression ","}* ")")? ClassifierBody?      -> EnumConst
+
+    %% AnnotationElementDecl
+    rule (Modifier| Annotation)*
+         Type Id
+         "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
+    rule (Modifier| Annotation)*
+         Type Id ("[" "]")+
+         "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
+
+    %% FieldDeclaration
+    rule (Modifier| Annotation)*
+         Type
+         {(Variable Initializer?) ","}+
+		 -> VariableDeclaration
+	rule Id -> Variable
+	rule Id ("[" "]")+ -> Variable
+	rule VariableDeclaration
+          ";"
+         -> FieldDeclaration
+    rule FieldDeclaration -> Member
+
+    %% MethodDeclaration
+    rule (Modifier| Annotation)*
+         ("<" {TypeParam ","}+ ">")?
+         Type Id
+         "(" {ParamDeclaration ","}* ")"
+         ("throws" {Type ","}+)?
+         (Block | ";")
+         -> MethodDeclaration
+    rule (Modifier| Annotation)*
+         ("<" {TypeParam ","}+ ">")?
+         Type Id
+         "(" {ParamDeclaration ","}* ")"
+		 ("[" "]")+
+         ("throws" {Type ","}+)?
+         (Block | ";")
+         -> MethodDeclaration
+
+    %% ParamDeclaration
+    rule (Modifier| Annotation)*
+         Type Id
+         -> ParamDeclaration
+    rule (Modifier| Annotation)*
+         Type Id ("[" "]")+
+         -> ParamDeclaration
+    rule MethodDeclaration -> Member
+
+    %% ConstructorDeclaration
+    rule (Modifier| Annotation)*
+         ("<" {TypeParam ","}+ ">")?
+         Id
+         "(" {ParamDeclaration ","}* ")"
+         ("throws" {Type ","}+)?
+         Block
+         -> ConstructorDeclaration
+    rule ConstructorDeclaration -> Member
+
+    %% StaticInitializer
+    rule "static" Block                            -> StaticInitializer
+    rule StaticInitializer                         -> InitializerBlock
+
+    %% InstanceInitializer
+    rule Block                                     -> InstanceInitializer
+    rule InstanceInitializer                       -> InitializerBlock
+
+    rule "default" Expression|Annotation          -> AnnoInitializer
+    rule "=" Expression                   -> Initializer

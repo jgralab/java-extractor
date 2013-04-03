@@ -1,0 +1,44 @@
+module java/Comments
+imports
+  java/LineTerminators
+  java/expression/literals/UnicodeEscapes
+
+exports
+  sorts Comment EOLCommentChars CommentPart UnicodeEscape BlockCommentChars Asterisk EscEscChar EscChar
+
+  lexical syntax
+    rule Comment -> LAYOUT
+
+    rule "//" EOLCommentChars LineTerminator -> Comment
+    rule ~[\n\r]* -> EOLCommentChars
+
+    rule "/*"  CommentPart* "*/" -> Comment
+    rule "/**" CommentPart* "*/" -> Comment
+    rule "/**/"                  -> Comment %% Strange javadoc comment
+
+    rule BlockCommentChars -> CommentPart
+    %% rule EscChar           -> CommentPart
+    %% rule EscEscChar        -> CommentPart
+    rule Asterisk          -> CommentPart
+    %% rule UnicodeEscape     -> CommentPart
+
+    %%rule ~[\*\\]+ -> BlockCommentChars
+    rule ~[\*]+ -> BlockCommentChars
+
+    rule "*"    -> Asterisk
+    %% rule "\\\\" -> EscEscChar
+    %% rule "\\"   -> EscChar
+
+  lexical restrictions
+    "/**"    -/- [\/]
+    "/*"     -/- [\*]
+    Asterisk -/- [\/]
+    %% EscChar  -/- [\\u]
+
+    %% BlockCommentChars -/- ~[\*\\]
+    BlockCommentChars -/- ~[\*]
+    EOLCommentChars   -/- ~[\n\13]
+
+  context-free restrictions
+    LAYOUT?  -/- [\/].[\*]
+    LAYOUT?  -/- [\/].[\/]

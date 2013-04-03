@@ -1,0 +1,29 @@
+module java/member/Modifiers
+exports
+  sorts Public Private Protected Abstract Final Static Native Transient Volatile Synchronized StrictFP Modifier
+
+  context-free syntax
+    rule "public"       -> Public
+    rule "private"      -> Private
+    rule "protected"    -> Protected
+
+    rule "abstract"     -> Abstract
+    rule "final"        -> Final
+    rule "static"       -> Static
+    rule "native"       -> Native
+    rule "transient"    -> Transient
+    rule "volatile"     -> Volatile
+    rule "synchronized" -> Synchronized
+    rule "strictfp"     -> StrictFP
+
+    rule Public       -> Modifier
+    rule Private      -> Modifier
+    rule Protected    -> Modifier
+    rule Abstract     -> Modifier
+    rule Final        -> Modifier
+    rule Static       -> Modifier
+    rule Native       -> Modifier
+    rule Transient    -> Modifier
+    rule Volatile     -> Modifier
+    rule Synchronized -> Modifier
+    rule StrictFP     -> Modifier

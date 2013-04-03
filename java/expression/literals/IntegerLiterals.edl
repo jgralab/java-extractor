@@ -1,0 +1,27 @@
+module java/expression/literals/IntegerLiterals
+exports
+  sorts IntLiteral DeciLiteral HexaLiteral OctaLiteral DeciNumeral HexaNumeral OctaNumeral
+
+  context-free syntax
+    rule DeciLiteral -> IntLiteral
+    rule HexaLiteral -> IntLiteral
+    rule OctaLiteral -> IntLiteral
+
+  lexical syntax
+    rule DeciNumeral [lL]? -> DeciLiteral
+    rule HexaNumeral [lL]? -> HexaLiteral
+    rule OctaNumeral [lL]? -> OctaLiteral
+
+    rule "0" -> DeciNumeral
+    rule [1-9][0-9]*  -> DeciNumeral
+    rule [0][xX] [0-9a-fA-F]+ -> HexaNumeral
+    rule [0]     [0-7]+       -> OctaNumeral
+
+  lexical restrictions
+    DeciNumeral -/- [0-9\.fFdD]
+    HexaNumeral -/- [0-9a-fA-F]
+    OctaNumeral -/- [0-7]
+
+    DeciLiteral -/- [lL]
+    HexaLiteral -/- [lL]
+    OctaLiteral -/- [lL]

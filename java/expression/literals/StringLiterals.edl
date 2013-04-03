@@ -1,0 +1,19 @@
+module java/expression/literals/StringLiterals
+imports
+  java/expression/literals/EscapeSequences %% EscapeSeq
+  java/expression/literals/UnicodeEscapes %% UnicodeEscape
+
+exports
+  sorts StringLiteral StringPart StringChars FooStringChars
+
+  lexical syntax
+    rule "\"" StringPart* "\"" -> StringLiteral
+    rule StringChars    -> StringPart
+    %% rule UnicodeEscape  -> StringPart
+    rule EscapeSeq      -> StringPart
+
+    rule FooStringChars -> StringChars
+    rule ~[\"\\\n\13]+  -> FooStringChars
+
+  lexical restrictions
+    StringChars -/- ~[\"\\\n\13]

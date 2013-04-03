@@ -1,0 +1,32 @@
+module java/expression/MethodsAndObjectCreations
+imports
+  java/type/Types %% Type ClassifierType TypeArg PlainClassifierType NonArrayType
+  java/Identifiers %% Id
+  java/type/ClassifierDeclarations %% ClassifierBody
+  java/annotation/Annotations %% Annotation
+
+exports
+  sorts Expression
+  sorts MethodSpec ArrayInit SubArrayExpression
+
+  context-free syntax
+	%% constructor call
+	%% duplicate method because of priorities
+    rule "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+    rule Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+	
+	%% method call
+	rule MethodSpec "(" {Expression ","}* ")" -> Expression
+
+	rule (PlainClassifierType ".")? ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
+	rule    (Type ".")? "super" "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
+	rule             Expression "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec {avoid}
+	
+	%% array creation
+    rule "new" NonArrayType ("[" Expression? "]")+ -> SubArrayExpression
+	rule SubArrayExpression ArrayInit? -> Expression
+	rule "{" {(Expression|Annotation) ","}* ","? "}" -> ArrayInit
+	rule ArrayInit -> Expression
+	
+  context-free restrictions
+	SubArrayExpression -/- [\[]
