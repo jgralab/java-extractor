@@ -10,11 +10,15 @@ public class SemanticActionUtilities {
 
 	private final Java5Builder graphBuilder;
 
-	private Program program;
-
 	public SemanticActionUtilities(Java5Builder java5Builder) {
 		graphBuilder = java5Builder;
 	}
+
+	/*
+	 * Programm
+	 */
+
+	private Program program;
 
 	public void setProgramName(String name) {
 		assert program != null;

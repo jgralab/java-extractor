@@ -48,7 +48,7 @@ user code {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot.main(new String[] { "-g", "output.tg", "-o", "output.png", "-t", "png", "-r", "-i", "-e" });
+		de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot.main(new String[] { "-g", "output.tg", "-o", "output.png", "-t", "png", "-i", "-e" });
 	
 		reset();
 	}

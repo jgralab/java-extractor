@@ -13,14 +13,19 @@ exports
   context-free syntax
     rule
 		#
-			$ = {return utilities.getProgram(currentElement.getPosition());};
-			$packDeclaration = list();
+			$program = {return utilities.getProgram(currentElement.getPosition());};
+			$translationUnit = TranslationUnit();
+			$translationUnit.name = file();
+			ConsistsOf($program, $translationUnit);
 		#
-		PackageDeclaration #$packDeclaration.add($0);# ?
+		PackageDeclaration
+			#
+			# 
+		?
+		ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit #
+			$translationUnit.lengthOfFile = length($);
+			$ = $program;
 		#
-			HasComment($, getWhitespaceBefore($0));
-		#
-		ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit
 	
     rule Annotation* "package" PackageName ";" -> PackageDeclaration
 	

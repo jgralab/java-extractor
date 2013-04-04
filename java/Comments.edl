@@ -7,7 +7,9 @@ exports
   sorts Comment EOLCommentChars CommentPart UnicodeEscape BlockCommentChars Asterisk EscEscChar EscChar
 
   lexical syntax
-    rule Comment -> LAYOUT
+    rule Comment -> LAYOUT #
+		$ = $0;
+	#
 
     rule "//" EOLCommentChars LineTerminator -> Comment #
 		$ = SingleLineComment();
@@ -19,14 +21,13 @@ exports
 		$ = MultiLineComment();
 		$.content = lexem($);
 	#
+    rule "/**/"                  -> Comment #
+		$ = MultiLineComment();
+		$.content = "/**/";
+	#
     rule "/**" CommentPart* "*/" -> Comment #
 		$ = JavaDocComment();
 		$.content = lexem($);
-	#
-	%% Strange javadoc comment
-    rule "/**/"                  -> Comment #
-		$ = JavaDocComment();
-		$.content = "/**/";
 	#
 
     rule BlockCommentChars -> CommentPart
