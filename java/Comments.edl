@@ -9,12 +9,25 @@ exports
   lexical syntax
     rule Comment -> LAYOUT
 
-    rule "//" EOLCommentChars LineTerminator -> Comment
+    rule "//" EOLCommentChars LineTerminator -> Comment #
+		$ = SingleLineComment();
+		$.content = lexem($0).concat(lexem($1));
+	#
     rule ~[\n\r]* -> EOLCommentChars
 
-    rule "/*"  CommentPart* "*/" -> Comment
-    rule "/**" CommentPart* "*/" -> Comment
-    rule "/**/"                  -> Comment %% Strange javadoc comment
+    rule "/*"  CommentPart* "*/" -> Comment #
+		$ = MultiLineComment();
+		$.content = lexem($);
+	#
+    rule "/**" CommentPart* "*/" -> Comment #
+		$ = JavaDocComment();
+		$.content = lexem($);
+	#
+	%% Strange javadoc comment
+    rule "/**/"                  -> Comment #
+		$ = JavaDocComment();
+		$.content = "/**/";
+	#
 
     rule BlockCommentChars -> CommentPart
     %% rule EscChar           -> CommentPart

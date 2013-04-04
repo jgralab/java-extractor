@@ -14,6 +14,7 @@
 
 	<path id="classpath">
 	  <pathelement location="../jgralab/build/jar/jgralab.jar"/>
+	  <pathelement location="../jgralab/lib/apache/commons/cli/commons-cli-1.2.jar"/>
 	  <pathelement path="build/classes/"/>
 	  <pathelement location="../edl/lib/strategoxt.jar"/>
 	  <pathelement location="../edl/build/jar/edl.jar"/>

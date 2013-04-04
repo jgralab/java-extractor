@@ -3,16 +3,67 @@ imports
 	java/program/CompilationUnits %% CompilationUnit
 	java/WhiteSpace
 	java/Comments
+schema de.uni_koblenz.jgralab.java_extractor.schema.Java5Schema
 import declarations
 	java.io.BufferedInputStream;
 	java.io.FileInputStream;
 	java.io.IOException;
+	org.apache.commons.cli.CommandLine;
+	org.apache.commons.cli.Option;
 	de.uni_koblenz.jgralab.java_extractor.utilities.UnicodeEscapeAwareInputStream;
+	de.uni_koblenz.jgralab.java_extractor.utilities.SemanticActionUtilities;
 user code {
+
+	private static String programName;
+	
+	static {
+		Option name = new Option("n", "name", true,
+				"(optional): defines the name of the parsed program."
+				+ " The default value is \"" + SemanticActionUtilities.DEFAULT_PROGRAM_NAME +"\".");
+		name.setRequired(false);
+		name.setArgName("name");
+		GraphBuilderBaseImpl.furtherCommandLineOptions.add(name);
+	}
+
+	@Override
+	protected void processFurtherCommandLineArguments(CommandLine commandLine) {
+		String name = SemanticActionUtilities.DEFAULT_PROGRAM_NAME;
+		if (commandLine.hasOption("n")) {
+			name = commandLine.getOptionValue("n");
+		}
+		programName = name;
+	}
+	
+	private SemanticActionUtilities utilities = new SemanticActionUtilities(this);
+
 	@Override
 	protected String readInput(String inputFile, String encoding) throws IOException {
 		return super.readInput(new BufferedInputStream(new UnicodeEscapeAwareInputStream(new FileInputStream(inputFile), encoding)), encoding);
 	}
+	
+	@Override
+	protected void finalize() {
+		try {
+			getGraph().save("output.tg");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot.main(new String[] { "-g", "output.tg", "-o", "output.png", "-t", "png", "-r", "-i", "-e" });
+	
+		reset();
+	}
+	
+	private void reset() {
+		GraphBuilderBaseImpl.furtherCommandLineOptions = new java.util.ArrayList<Option>();
+	}
 }
+default values
+	AttributedEdge.column = column(omega);
+	AttributedEdge.length = length(omega);
+	AttributedEdge.line = line(omega);
+	AttributedEdge.offset = offset(omega);
 exports
-	context-free start-symbols CompilationUnit
+	context-free start-symbols CompilationUnit #
+		HasComment($0, getSuffixWhitespace());
+		{utilities.setProgramName(programName);}
+	#

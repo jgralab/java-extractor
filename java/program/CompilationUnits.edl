@@ -11,7 +11,16 @@ exports
   sorts CompilationUnit
 
   context-free syntax
-    rule PackageDeclaration? ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit
+    rule
+		#
+			$ = {return utilities.getProgram(currentElement.getPosition());};
+			$packDeclaration = list();
+		#
+		PackageDeclaration #$packDeclaration.add($0);# ?
+		#
+			HasComment($, getWhitespaceBefore($0));
+		#
+		ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit
 	
     rule Annotation* "package" PackageName ";" -> PackageDeclaration
 	
