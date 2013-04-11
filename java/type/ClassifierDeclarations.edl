@@ -4,6 +4,11 @@ imports
   java/Identifiers   %% Id
   java/type/Types         %% ClassifierType, TypeParam
   java/member/Members       %% Member, InitializerBlock, EnumConstants, AnnotationElementDecl
+  
+global actions
+	pattern _ -> ClassifierDeclaration #
+		$ = $0;
+	#
 
 exports
   sorts ClassDeclaration InterfaceDeclaration EnumDeclaration AnnotationDeclaration ClassifierDeclaration
@@ -35,7 +40,7 @@ exports
          ClassifierBody -> InterfaceDeclaration
 
     %% Annotations
-    rule (Modifier|Annotation)* "@interface" Id  AnnotationBody -> AnnotationDeclaration
+    rule (Modifier|Annotation)* "@" "interface" Id  AnnotationBody -> AnnotationDeclaration
     %% Yes, there may be enums in annotations
     rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"*)* "}" -> AnnotationBody
 
@@ -44,6 +49,6 @@ exports
     rule InterfaceDeclaration  -> ClassifierDeclaration
     rule AnnotationDeclaration -> ClassifierDeclaration
 
-    rule ClassifierDeclaration -> Member
+    rule ClassifierDeclaration -> Member #$=$0;#
 
     rule "{" (Member | InitializerBlock ";"*)* "}" -> ClassifierBody

@@ -9,6 +9,8 @@ imports
 
 user code {
 	private boolean isPackageDeclaration = false;
+	
+	private boolean qualifiedNamePrefix = "";
 }
 
 global actions
@@ -79,6 +81,7 @@ exports
 					$identifier.name = $simpleName;
 					name2Identifier.declare($simpleName, $identifier);
 				#}
+				qualifiedNamePrefix = #$2#;
 			}
 			HasSimpleName($qualifiedName, $identifier);
 		#

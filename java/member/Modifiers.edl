@@ -1,20 +1,25 @@
 module java/member/Modifiers
 exports
   sorts Public Private Protected Abstract Final Static Native Transient Volatile Synchronized StrictFP Modifier
+  
+  global actions 
+	pattern _ -> Modifier #
+		$ = $0;
+	#
 
   context-free syntax
-    rule "public"       -> Public
-    rule "private"      -> Private
-    rule "protected"    -> Protected
+    rule "public"       -> Public #$ = Modifiers.PUBLIC;#
+    rule "private"      -> Private #$ = Modifiers.PRIVATE;#
+    rule "protected"    -> Protected #$ = Modifiers.PROTECTED;#
 
-    rule "abstract"     -> Abstract
-    rule "final"        -> Final
-    rule "static"       -> Static
-    rule "native"       -> Native
-    rule "transient"    -> Transient
-    rule "volatile"     -> Volatile
-    rule "synchronized" -> Synchronized
-    rule "strictfp"     -> StrictFP
+    rule "abstract"     -> Abstract #$ = Modifiers.ABSTRACT;#
+    rule "final"        -> Final #$ = Modifiers.FINAL;#
+    rule "static"       -> Static #$ = Modifiers.STATIC;#
+    rule "native"       -> Native #$ = Modifiers.NATIVE;#
+    rule "transient"    -> Transient #$ = Modifiers.TRANSIENT;#
+    rule "volatile"     -> Volatile #$ = Modifiers.VOLATILE;#
+    rule "synchronized" -> Synchronized #$ = Modifiers.SYNCHRONIZED;#
+    rule "strictfp"     -> StrictFP #$ = Modifiers.STRICTFP;#
 
     rule Public       -> Modifier
     rule Private      -> Modifier

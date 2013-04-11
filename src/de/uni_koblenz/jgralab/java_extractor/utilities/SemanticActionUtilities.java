@@ -40,9 +40,9 @@ public class SemanticActionUtilities {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(".") + 1);
 	}
 
-	/*
-	 * TODO link qualified names to types, packages, members (especially
-	 * imports)
-	 */
+	// TODO link qualified names to types, packages, members (especially
+	// imports)
+
+	// TODO add comments
 
 }
