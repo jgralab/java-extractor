@@ -7,29 +7,116 @@ imports
   java/type/Types                    %% PlainClassifierType
   java/Identifiers				%% Id
 
+user code {
+	private boolean isPackageDeclaration = false;
+}
+
+global actions
+	pattern "import" _(1..4) ";" -> ImportDeclaration #
+			$qualifiedName = QualifiedName();
+			$qualifiedName.fullyQualifiedName = $qName;
+			$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#}
+			}
+			HasSimpleName($qualifiedName, $identifier);
+	#
+
 exports
   sorts CompilationUnit
 
   context-free syntax
-    rule
-		#
+    rule #
 			$program = {return utilities.getProgram(currentElement.getPosition());};
 			$translationUnit = TranslationUnit();
 			$translationUnit.name = file();
 			ConsistsOf($program, $translationUnit);
+			%% create default packege if it does not exist
+			$currentPackage = qName2Package.use("");
+			{
+				if (#$currentPackage# == null) {#
+						$currentPackage = JavaPackage();
+						$currentPackage.fullyQualifiedName = "";
+						qName2Package.declare("", $currentPackage);
+						ContainsDefaultPackage($program, $currentPackage);
+				#}
+			}
 		#
-		PackageDeclaration
+		(
+			#{isPackageDeclaration = true;}#
+			PackageDeclaration #
+				{isPackageDeclaration = false;}
+				DeclaresExternalDeclaration($translationUnit, $0);
+				$currentPackage = qName2Package.use($0.get_qualifiedName().fullyQualifiedName);
 			#
-			# 
-		?
-		ImportDeclaration* (ClassifierDeclaration ";"*)* -> CompilationUnit #
+		 )?
+		 #
+			ContainsTranslationUnit($currentPackage, $translationUnit);
+		 #
+		ImportDeclaration #DeclaresExternalDeclaration($translationUnit, $0);#*
+		(ClassifierDeclaration #DeclaresExternalDeclaration($translationUnit, $0);# ";"*)* -> CompilationUnit #
 			$translationUnit.lengthOfFile = length($);
 			$ = $program;
 		#
 	
-    rule Annotation* "package" PackageName ";" -> PackageDeclaration
+    rule #$ = PackageDefinition();#
+		Annotation #HasPackageAnnotation($, $0);# *
+		"package"
+		PackageName #
+			$qualifiedName = QualifiedName();
+			$qualifiedName.fullyQualifiedName = $2;
+			HasPackageName($, $qualifiedName);
+			$simpleName = {return utilities.extractSimpleName((String) #$2#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#}
+			}
+			HasSimpleName($qualifiedName, $identifier);
+		#
+		";" -> PackageDeclaration
 	
-    rule "import" PlainClassifierType ";" -> ImportDeclaration
-    rule "import" PackageName "." "*" ";" -> ImportDeclaration
-    rule "import" "static" PlainClassifierType "." Id ";" -> ImportDeclaration
-    rule "import" "static" PlainClassifierType "." "*" ";" -> ImportDeclaration
+    rule "import" PlainClassifierType ";" #
+			$qName = $1;
+			$ = TypeImportDefinition();
+		# 
+		-> ImportDeclaration #
+			ImportsType($, $qualifiedName);
+		#
+    rule "import" PackageName "." "*" ";" #
+			$qName = $1;
+			$ = PackageImportDefinition();
+		# 
+		-> ImportDeclaration #
+			ImportsType($, $qualifiedName);
+		#
+    rule "import" "static" PlainClassifierType "." Id ";" #
+			$qName = $2;
+			$ = StaticImportDefinition();
+		# -> ImportDeclaration #
+			ImportsType($, $qualifiedName);
+			$simpleName = lexem($4);
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#}
+			}
+			ImportsStaticMember($, $identifier);
+		#
+    rule "import" "static" PlainClassifierType "." "*" ";" #
+			$qName = $2;
+			$ = StaticImportDefinition();
+		# -> ImportDeclaration #
+			ImportsType($, $qualifiedName);
+		#

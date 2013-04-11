@@ -8,5 +8,38 @@ exports
   context-free syntax
 
     %% PackageName
-    rule {Id "."}+ -> PackageName
+    rule #
+			$qualifiedName = "";
+			{
+				if (isPackageDeclaration) {
+					#$parentPackage = qName2Package.use($qualifiedName);#
+				}
+			}
+		#
+		{
+			Id #
+				$qualifiedName = $qualifiedName.concat(lexem($0));
+				{
+					if (isPackageDeclaration) {
+						#$currentPackage = qName2Package.use($qualifiedName);#
+						if (#$currentPackage# == null) {#
+								$currentPackage = JavaPackage();
+								$currentPackage.fullyQualifiedName = $qualifiedName;
+								qName2Package.declare($qualifiedName, $currentPackage);
+								ContainsSubPackage($parentPackage, $currentPackage);
+						#}
+					}
+				}
+			#
+			"." #
+				$qualifiedName = $qualifiedName.concat(".");
+				{
+					if (isPackageDeclaration) {
+						#$parentPackage = $currentPackage;#
+					}
+				}
+			#
+		}+ -> PackageName #
+			$ = $qualifiedName;
+		#
 

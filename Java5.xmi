@@ -392,7 +392,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fBc-oHBXEeKie9MLu0o9lQ" value="1"/>
       </ownedAttribute>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="ClassImportDefinition">
+    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="TypeImportDefinition">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ClassImportDefinition" general="ImportDefinition"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ImportDefinition" name="ImportDefinition" isAbstract="true">
@@ -449,9 +449,9 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="Program_name" name="name" visibility="private">
         <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
       </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_v94TQXBGEeKie9MLu0o9lQ" name="packages" visibility="private" type="JavaPackage" aggregation="composite" association="_v94TQHBGEeKie9MLu0o9lQ">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TQ3BGEeKie9MLu0o9lQ" value="*"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TQnBGEeKie9MLu0o9lQ"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_v94TQXBGEeKie9MLu0o9lQ" name="defaultPackage" visibility="private" type="JavaPackage" aggregation="composite" association="_v94TQHBGEeKie9MLu0o9lQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TQ3BGEeKie9MLu0o9lQ" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TQnBGEeKie9MLu0o9lQ" value="1"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_JvW30XBIEeKie9MLu0o9lQ" name="translationUnits" visibility="private" type="TranslationUnit" association="_JvW30HBIEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JvW303BIEeKie9MLu0o9lQ" value="*"/>
@@ -480,7 +480,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="JavaPackage_incidence_IsSubPackageOf_to_lowervalue"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_v94TQHBGEeKie9MLu0o9lQ" name="ContainsPackage" memberEnd="_v94TQXBGEeKie9MLu0o9lQ _v94TRHBGEeKie9MLu0o9lQ">
+    <packagedElement xmi:type="uml:Association" xmi:id="_v94TQHBGEeKie9MLu0o9lQ" name="ContainsDefaultPackage" memberEnd="_v94TQXBGEeKie9MLu0o9lQ _v94TRHBGEeKie9MLu0o9lQ">
       <ownedEnd xmi:type="uml:Property" xmi:id="_v94TRHBGEeKie9MLu0o9lQ" name="program" visibility="private" type="Program" association="_v94TQHBGEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TRnBGEeKie9MLu0o9lQ" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TRXBGEeKie9MLu0o9lQ" value="1"/>
@@ -883,11 +883,6 @@
       <packagedElement xmi:type="uml:Realization" xmi:id="_64i3YHdUEeKil48b18T7iA" name="" supplier="AttributedEdge" client="_n8WTIHdUEeKil48b18T7iA"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_dBj2UF_3EeKcZY0fjvOS6w" name="specification">
-      <ownedComment xmi:type="uml:Comment" xmi:id="_G_sBUGoNEeKSmMk9GImLQA">
-        <body>&lt;p>&#xD;
-    : IsArgumentOf&#xD;
-&lt;/p></body>
-      </ownedComment>
       <ownedComment xmi:type="uml:Comment" xmi:id="_ULrhgGoNEeKSmMk9GImLQA">
         <body>: AttributedEdge</body>
       </ownedComment>
@@ -1144,9 +1139,6 @@
     <packagedElement xmi:type="uml:Realization" xmi:id="_XtaS0IZcEeKpOY8hzLCoLg" name="" supplier="AttributedEdge" client="_7TkIYIZbEeKpOY8hzLCoLg"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_J1wjcGn1EeKSmMk9GImLQA" name="member">
-    <ownedComment xmi:type="uml:Comment" xmi:id="_8HfxwGxnEeKYs9kdGHEfww">
-      <body>: IsStatementOf</body>
-    </ownedComment>
     <ownedComment xmi:type="uml:Comment" xmi:id="_68bNoHdbEeKil48b18T7iA" annotatedElement="_sjqNwHdaEeKil48b18T7iA _pTrDsHdaEeKil48b18T7iA">
       <body>&lt;p>&#xD;
     : ContainsStatement&#xD;

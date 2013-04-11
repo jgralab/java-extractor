@@ -38,7 +38,15 @@ exports
     rule PackageName "." Id "<" {TypeArg "," }+ ">" -> ClassifierType
     rule ClassifierType "." ClassifierType -> ClassifierType {left, avoid}
 	
-	rule (PackageName ".")? Id -> PlainClassifierType
+	rule #$name = "";#
+		(
+			PackageName
+			"."
+			#$name = $name.concat($0).concat(".");#
+		)?
+		Id
+		#$ = $name.concat(lexem($1));#
+		-> PlainClassifierType
 
     %% TypeArg
     rule Type                         -> TypeArg

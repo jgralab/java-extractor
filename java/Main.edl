@@ -12,6 +12,9 @@ import declarations
 	org.apache.commons.cli.Option;
 	de.uni_koblenz.jgralab.java_extractor.utilities.UnicodeEscapeAwareInputStream;
 	de.uni_koblenz.jgralab.java_extractor.utilities.SemanticActionUtilities;
+symbol tables
+	qName2Package<JavaPackage>
+	name2Identifier<Identifier>
 user code {
 
 	private static String programName;

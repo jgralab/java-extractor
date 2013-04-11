@@ -1174,7 +1174,7 @@
           </children>
           <children xmi:id="_v-CEQXBGEeKie9MLu0o9lQ" type="FromRoleLabel" element="_v94TQXBGEeKie9MLu0o9lQ">
             <children xmi:id="_v-CEQ3BGEeKie9MLu0o9lQ" type="FromRole"/>
-            <layoutConstraint xmi:type="notation:Location" xmi:id="_v-CEQnBGEeKie9MLu0o9lQ" x="-817" y="337"/>
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_v-CEQnBGEeKie9MLu0o9lQ" x="-1305" y="337"/>
           </children>
           <children xmi:id="_v-CERHBGEeKie9MLu0o9lQ" type="ToQualifierLabel" element="_v94TRHBGEeKie9MLu0o9lQ">
             <children xmi:id="_v-CERnBGEeKie9MLu0o9lQ" type="QualifierCompartment">
@@ -2320,7 +2320,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fBc-oHBXEeKie9MLu0o9lQ" value="1"/>
       </ownedAttribute>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="ClassImportDefinition">
+    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="TypeImportDefinition">
       <generalization xmi:id="generalization_ClassImportDefinition" general="ImportDefinition"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ImportDefinition" name="ImportDefinition" isAbstract="true">
@@ -2373,9 +2373,9 @@
       <ownedAttribute xmi:id="Program_name" name="name" visibility="private">
         <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
       </ownedAttribute>
-      <ownedAttribute xmi:id="_v94TQXBGEeKie9MLu0o9lQ" name="packages" visibility="private" type="JavaPackage" aggregation="composite" association="_v94TQHBGEeKie9MLu0o9lQ">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TQ3BGEeKie9MLu0o9lQ" value="*"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TQnBGEeKie9MLu0o9lQ"/>
+      <ownedAttribute xmi:id="_v94TQXBGEeKie9MLu0o9lQ" name="defaultPackage" visibility="private" type="JavaPackage" aggregation="composite" association="_v94TQHBGEeKie9MLu0o9lQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TQ3BGEeKie9MLu0o9lQ" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TQnBGEeKie9MLu0o9lQ" value="1"/>
       </ownedAttribute>
       <ownedAttribute xmi:id="_JvW30XBIEeKie9MLu0o9lQ" name="translationUnits" visibility="private" type="TranslationUnit" association="_JvW30HBIEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JvW303BIEeKie9MLu0o9lQ" value="*"/>
@@ -2404,7 +2404,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="JavaPackage_incidence_IsSubPackageOf_to_lowervalue"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_v94TQHBGEeKie9MLu0o9lQ" name="ContainsPackage" memberEnd="_v94TQXBGEeKie9MLu0o9lQ _v94TRHBGEeKie9MLu0o9lQ">
+    <packagedElement xmi:type="uml:Association" xmi:id="_v94TQHBGEeKie9MLu0o9lQ" name="ContainsDefaultPackage" memberEnd="_v94TQXBGEeKie9MLu0o9lQ _v94TRHBGEeKie9MLu0o9lQ">
       <ownedEnd xmi:id="_v94TRHBGEeKie9MLu0o9lQ" name="program" visibility="private" type="Program" association="_v94TQHBGEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TRnBGEeKie9MLu0o9lQ" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_v94TRXBGEeKie9MLu0o9lQ" value="1"/>

@@ -31,4 +31,18 @@ public class SemanticActionUtilities {
 		}
 		return program;
 	}
+
+	/*
+	 * further helping methods
+	 */
+
+	public String extractSimpleName(String qualifiedName) {
+		return qualifiedName.substring(qualifiedName.lastIndexOf(".") + 1);
+	}
+
+	/*
+	 * TODO link qualified names to types, packages, members (especially
+	 * imports)
+	 */
+
 }
