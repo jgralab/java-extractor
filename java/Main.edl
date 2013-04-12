@@ -67,6 +67,6 @@ default values
 	AttributedEdge.offset = offset(omega);
 exports
 	context-free start-symbols CompilationUnit #
-		HasComment($0, getSuffixWhitespace());
+		%% HasComment($0, getSuffixWhitespace());
 		{utilities.setProgramName(programName);}
 	#
