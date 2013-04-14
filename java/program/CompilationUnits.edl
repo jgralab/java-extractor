@@ -10,12 +10,11 @@ imports
 user code {
 	private boolean isPackageDeclaration = false;
 	
-	private boolean qualifiedNamePrefix = "";
+	private String qualifiedNamePrefix = "";
 }
 
 global actions
 	pattern "import" _(1..4) ";" -> ImportDeclaration #
-			$qualifiedName = QualifiedName();
 			$qualifiedName.fullyQualifiedName = $qName;
 			$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
 			$identifier = name2Identifier.use($simpleName);
@@ -81,7 +80,7 @@ exports
 					$identifier.name = $simpleName;
 					name2Identifier.declare($simpleName, $identifier);
 				#}
-				qualifiedNamePrefix = #$2#;
+				qualifiedNamePrefix = #$2#.toString();
 			}
 			HasSimpleName($qualifiedName, $identifier);
 		#
@@ -90,6 +89,7 @@ exports
     rule "import" PlainClassifierType ";" #
 			$qName = $1;
 			$ = TypeImportDefinition();
+			$qualifiedName = QualifiedType();
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
@@ -97,6 +97,7 @@ exports
     rule "import" PackageName "." "*" ";" #
 			$qName = $1;
 			$ = PackageImportDefinition();
+			$qualifiedName = QualifiedName();
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
@@ -104,6 +105,7 @@ exports
     rule "import" "static" PlainClassifierType "." Id ";" #
 			$qName = $2;
 			$ = StaticImportDefinition();
+			$qualifiedName = QualifiedType();
 		# -> ImportDeclaration #
 			ImportsType($, $qualifiedName);
 			$simpleName = lexem($4);
@@ -120,6 +122,7 @@ exports
     rule "import" "static" PlainClassifierType "." "*" ";" #
 			$qName = $2;
 			$ = StaticImportDefinition();
+			$qualifiedName = QualifiedType();
 		# -> ImportDeclaration #
 			ImportsType($, $qualifiedName);
 		#

@@ -16,11 +16,17 @@ exports
   context-free syntax
 
     %% Classes
-    rule (Modifier|Annotation)* "class" Id
+	@Symboltable{name2TypeParameter}
+    rule #$ = AnnotationDefinition();#
+		 (
+			Modifier #HasTypeModifier($, $0);#
+			| (Annotation #HasTypeAnnotation($, $0);#)
+		 )* "class" Id
          ("<" {TypeParam ","}+ ">")?
          ("extends" ClassifierType)?
          ("implements" {ClassifierType ","}+)?
-         ClassifierBody -> ClassDeclaration
+         ClassifierBody #ContainsTypeMember($, $6);#
+		 -> ClassDeclaration
 
     %% Enums
     rule (Modifier|Annotation)* "enum" Id

@@ -10,34 +10,140 @@ exports
   context-free syntax
 
     %% Type
-    rule PrimType       -> Type
-    rule ArrayType      -> Type
-    rule ClassifierType -> Type
+    rule PrimType       -> Type #$ = $0;#
+    rule ArrayType      -> Type #$ = $0;#
+    rule ClassifierType -> Type #$ = $0;#
 
     %% Primitive types
-    rule "boolean"                        -> PrimType
-    rule "int"                            -> PrimType
-    rule "long"                           -> PrimType
-    rule "char"                           -> PrimType
-    rule "byte"                           -> PrimType
-    rule "short"                          -> PrimType
-    rule "float"                          -> PrimType
-    rule "double"                         -> PrimType
-    rule "void"                           -> PrimType
+    rule "boolean"                        -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.BOOLEAN#);};#
+    rule "int"                            -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.INT#);};#
+    rule "long"                           -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.LONG#);};#
+    rule "char"                           -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.CHAR#);};#
+    rule "byte"                           -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.BYTE#);};#
+    rule "short"                          -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.SHORT#);};#
+    rule "float"                          -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.FLOAT#);};#
+    rule "double"                         -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.DOUBLE#);};#
+    rule "void"                           -> PrimType #$ = {return utilities.getBuiltInType(currentElement.getPosition(), #BuiltInTypes.VOID#);};#
 
     %% ArrayType
-    rule PrimType        -> NonArrayType
-    rule ClassifierType  -> NonArrayType
-    rule NonArrayType ("[" "]")+ -> ArrayType
-    rule Type "..." -> ArrayType
+    rule PrimType        -> NonArrayType #$ = $0;#
+    rule ClassifierType  -> NonArrayType #$ = $0;#
+    rule NonArrayType
+		#
+			$result = $0;
+			$dimension = 0;
+		#
+		(
+			"[" "]" #
+				$dimension = {return ((Integer) #$dimension#) + 1;};
+				$arrayResult = ArrayType();
+				$arrayResult.dimensions = $dimension;
+				type.specification.HasElementType($arrayResult, $result);
+				$result = $arrayResult;
+			#
+		)+
+		-> ArrayType #
+			$ = $result;
+		#
 
     %% ClassifierType
-    rule Id                             -> ClassifierType %% This could be a simple name of a Classifier or a type parameter name.
-    rule PackageName "." Id             -> ClassifierType
-    rule Id "<" {TypeArg "," }+ ">" -> ClassifierType
-    rule PackageName "." Id "<" {TypeArg "," }+ ">" -> ClassifierType
-    rule ClassifierType "." ClassifierType -> ClassifierType {left, avoid}
+    rule Id                             -> ClassifierType #%% This could be a simple name of a Classifier or a type parameter name.
+		$typeParamDecl = name2TypeParameter.use(lexem($0));
+		{
+			if (#$typeParamDecl# == null) {#
+				$ = QualifiedType();
+				$.fullyQualifiedName = {return utilities.resolveQualifiedName(#lexem($0)#);};
+				$identifier = name2Identifier.use(lexem($0));
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = lexem($0);
+						name2Identifier.declare(lexem($0), $identifier);
+					#}
+				}
+				HasSimpleName($, $identifier);
+			#} else {#
+				$ = TypeParameterUsage();
+				IsDefinedByType($, $typeParamDecl);
+			#}
+		}
+	#
+    rule PackageName "." Id             -> ClassifierType #
+		$ = QualifiedType();
+		$.fullyQualifiedName = $0.concat(".").concat(lexem($2));
+		$identifier = name2Identifier.use(lexem($2));
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = lexem($0);
+				name2Identifier.declare(lexem($0), $identifier);
+			#}
+		}
+		HasSimpleName($, $identifier);
+	#
+    rule Id #
+			$ = QualifiedType();
+			$.fullyQualifiedName ={return utilities.resolveQualifiedName(#lexem($0)#);};
+			$identifier = name2Identifier.use(lexem($0));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($0);
+					name2Identifier.declare(lexem($0), $identifier);
+				#}
+			}
+			HasSimpleName($, $identifier);
+		#
+		"<" #
+			$typeArg = TypeArgument();
+			HasTypeArgument($, $0);
+		#
+		{
+			TypeArg #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("type.specification.SimpleArgument"))) {#
+					ContainsSimpleArgument($typeArg, $0);
+				#} else {#
+					ContainsWildcardArgument($typeArg, $0);
+				#}
+			}#
+			","
+		}+
+		">" -> ClassifierType
+    rule PackageName "." Id #
+			$ = QualifiedType();
+			$.fullyQualifiedName = $0.concat(".").concat(lexem($2));
+			$identifier = name2Identifier.use(lexem($2));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($0);
+					name2Identifier.declare(lexem($0), $identifier);
+				#}
+			}
+			HasSimpleName($, $identifier);
+		#
+		"<" #
+			$typeArg = TypeArgument();
+			HasTypeArgument($, $0);
+		#
+		{
+			TypeArg #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("type.specification.SimpleArgument"))) {#
+					ContainsSimpleArgument($typeArg, $0);
+				#} else {#
+					ContainsWildcardArgument($typeArg, $0);
+				#}
+			}#
+			","
+		}+
+		">" -> ClassifierType
+    rule ClassifierType "." ClassifierType -> ClassifierType {left, avoid} #
+		$ = EnclosedType();
+		HasEnclosingType($, $0);
+		HasEnclosedType($, $2);
+	#
 	
+	%% the name of a classifier type 
 	rule #$name = "";#
 		(
 			PackageName
@@ -45,17 +151,43 @@ exports
 			#$name = $name.concat($0).concat(".");#
 		)?
 		Id
-		#$ = $name.concat(lexem($1));#
+		#{
+			if (((String) #$name#).isEmpty()) {#
+				$ = {return utilities.resolveQualifiedName(#lexem($0)#);};
+			#} else {#
+				$ = $name.concat(lexem($1));
+			#}
+		}#
 		-> PlainClassifierType
 
     %% TypeArg
-    rule Type                         -> TypeArg
-    rule "?" (UpperWildcardBound | LowerWildcardBound)? -> TypeArg
-    rule "extends" Type     -> UpperWildcardBound
-    rule "super"   Type     -> LowerWildcardBound
+    rule Type                         -> TypeArg #
+		$ = SimpleArgument();
+		HasSimpleArgumentType($, $0);
+	#
+    rule #$ = WildcardArgument();#
+		"?"
+		(
+			UpperWildcardBound #HasUpperBound($, $0);#
+			| (LowerWildcardBound #HasLowerBound($, $0);#)
+		)? -> TypeArg
+    rule "extends" Type     -> UpperWildcardBound #$ = $1;#
+    rule "super"   Type     -> LowerWildcardBound #$ = $1;#
 
     %% TypeParam
-    rule Id ("extends" {Type "&"}+)?  -> TypeParam
+    rule #$ = TypeParameterDeclaration();#	
+		Id #
+			$identifier = name2Identifier.use(lexem($0));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($0);
+					name2Identifier.declare(lexem($0), $identifier);
+				#}
+			}
+			HasTypeParameterName($, $identifier);
+		#
+		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+)?  -> TypeParam
 	
 	context-free priorities
 		ClassifierType "." ClassifierType -> ClassifierType {left, avoid}

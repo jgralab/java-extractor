@@ -19,10 +19,7 @@ exports
 
     %% AnnotationElementDecl
     rule (Modifier| Annotation)*
-         Type Id
-         "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
-    rule (Modifier| Annotation)*
-         Type Id ("[" "]")+
+         Type Id ("[" "]")*
          "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
 
     %% FieldDeclaration
@@ -30,8 +27,7 @@ exports
          Type
          {(Variable Initializer?) ","}+
 		 -> VariableDeclaration
-	rule Id -> Variable
-	rule Id ("[" "]")+ -> Variable
+	rule Id ("[" "]")* -> Variable
 	rule VariableDeclaration
           ";"
          -> FieldDeclaration
@@ -42,24 +38,14 @@ exports
          ("<" {TypeParam ","}+ ">")?
          Type Id
          "(" {ParamDeclaration ","}* ")"
-         ("throws" {Type ","}+)?
-         (Block | ";")
-         -> MethodDeclaration
-    rule (Modifier| Annotation)*
-         ("<" {TypeParam ","}+ ">")?
-         Type Id
-         "(" {ParamDeclaration ","}* ")"
-		 ("[" "]")+
+		 ("[" "]")*
          ("throws" {Type ","}+)?
          (Block | ";")
          -> MethodDeclaration
 
     %% ParamDeclaration
     rule (Modifier| Annotation)*
-         Type Id
-         -> ParamDeclaration
-    rule (Modifier| Annotation)*
-         Type Id ("[" "]")+
+         Type "..."? Id ("[" "]")*
          -> ParamDeclaration
     rule MethodDeclaration -> Member
 

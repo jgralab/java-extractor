@@ -15,6 +15,7 @@ import declarations
 symbol tables
 	qName2Package<JavaPackage>
 	name2Identifier<Identifier>
+	name2TypeParameter<TypeParameterDeclaration>
 user code {
 
 	private static String programName;

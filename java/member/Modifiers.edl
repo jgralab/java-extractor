@@ -1,11 +1,13 @@
 module java/member/Modifiers
+  
+global actions 
+	pattern _ -> Modifier #
+		$ = Modifier();
+		$.type = $0;
+	#
+	
 exports
   sorts Public Private Protected Abstract Final Static Native Transient Volatile Synchronized StrictFP Modifier
-  
-  global actions 
-	pattern _ -> Modifier #
-		$ = $0;
-	#
 
   context-free syntax
     rule "public"       -> Public #$ = Modifiers.PUBLIC;#

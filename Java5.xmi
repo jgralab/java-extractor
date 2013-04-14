@@ -894,6 +894,9 @@
     : ContainsArgument&#xD;
 &lt;/p></body>
       </ownedComment>
+      <ownedComment xmi:type="uml:Comment" xmi:id="_QbEZYKUjEeKHdPRtQou79A" annotatedElement="_U4aj4KUiEeKHdPRtQou79A _87D9cKUiEeKHdPRtQou79A">
+        <body>: HasType</body>
+      </ownedComment>
       <packagedElement xmi:type="uml:Class" xmi:id="SimpleArgument" name="SimpleArgument">
         <generalization xmi:type="uml:Generalization" xmi:id="generalization_SimpleArgument" general="JavaVertex"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_hG8FoXBxEeKie9MLu0o9lQ" name="argumentType" visibility="private" type="TypeSpecification" association="_hG8FoHBxEeKie9MLu0o9lQ">
@@ -925,7 +928,7 @@
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_LIvI8XBxEeKie9MLu0o9lQ" name="elementType" visibility="private" type="TypeSpecification" association="_LIvI8HBxEeKie9MLu0o9lQ">
           <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LIvI83BxEeKie9MLu0o9lQ" value="1"/>
-          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LIvI8nBxEeKie9MLu0o9lQ"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_LIvI8nBxEeKie9MLu0o9lQ" value="1"/>
         </ownedAttribute>
       </packagedElement>
       <packagedElement xmi:type="uml:Enumeration" xmi:id="BuiltInTypes" name="BuiltInTypes">
@@ -1063,6 +1066,31 @@
         </ownedEnd>
       </packagedElement>
       <packagedElement xmi:type="uml:Realization" xmi:id="_Ds3RUHHyEeKMkawfmexbrA" name="" supplier="AttributedEdge" client="_6MiKkHHxEeKMkawfmexbrA"/>
+      <packagedElement xmi:type="uml:Class" xmi:id="_HwXvkKUiEeKHdPRtQou79A" name="EnclosedType">
+        <generalization xmi:type="uml:Generalization" xmi:id="_Khw5IKUiEeKHdPRtQou79A" general="TypeSpecification"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_U4aj4aUiEeKHdPRtQou79A" name="enclosedType" visibility="private" type="TypeSpecification" association="_U4aj4KUiEeKHdPRtQou79A">
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_U4jt0KUiEeKHdPRtQou79A" value="1"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_U4aj4qUiEeKHdPRtQou79A" value="1"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_87D9caUiEeKHdPRtQou79A" name="enclosingType" visibility="private" type="TypeSpecification" association="_87D9cKUiEeKHdPRtQou79A">
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_87D9c6UiEeKHdPRtQou79A" value="1"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_87D9cqUiEeKHdPRtQou79A" value="1"/>
+        </ownedAttribute>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="_U4aj4KUiEeKHdPRtQou79A" name="HasEnclosedType" memberEnd="_U4aj4aUiEeKHdPRtQou79A _U4jt0aUiEeKHdPRtQou79A">
+        <generalization xmi:type="uml:Generalization" xmi:id="_mi3zcKUiEeKHdPRtQou79A" general="_Vyu-wHB3EeKie9MLu0o9lQ"/>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_U4jt0aUiEeKHdPRtQou79A" name="" visibility="private" type="_HwXvkKUiEeKHdPRtQou79A" association="_U4aj4KUiEeKHdPRtQou79A">
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_U4jt06UiEeKHdPRtQou79A" value="*"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_U4jt0qUiEeKHdPRtQou79A"/>
+        </ownedEnd>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="_87D9cKUiEeKHdPRtQou79A" name="HasEnclosingType" memberEnd="_87D9caUiEeKHdPRtQou79A _87D9dKUiEeKHdPRtQou79A">
+        <generalization xmi:type="uml:Generalization" xmi:id="_K7OFgKUjEeKHdPRtQou79A" general="_Vyu-wHB3EeKie9MLu0o9lQ"/>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_87D9dKUiEeKHdPRtQou79A" name="" visibility="private" type="_HwXvkKUiEeKHdPRtQou79A" association="_87D9cKUiEeKHdPRtQou79A">
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_87D9dqUiEeKHdPRtQou79A" value="*"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_87D9daUiEeKHdPRtQou79A"/>
+        </ownedEnd>
+      </packagedElement>
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_ILEIkF_3EeKcZY0fjvOS6w" name="annotation">
