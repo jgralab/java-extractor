@@ -1,9 +1,20 @@
 module java/member/Modifiers
   
+symbol tables
+	modifiers2Modifier<Modifier>
+
 global actions 
 	pattern _ -> Modifier #
-		$ = Modifier();
-		$.type = $0;
+		$ = modifiers2Modifier.use($0);
+		{
+			if (#$# == null) {#
+				$ = Modifier();
+				$.type = $0;
+				modifiers2Modifier.declare($0, $);
+			#} else {
+				getPositionsMap().put((Vertex) #$#, currentElement.getPosition());
+			}
+		}
 	#
 	
 exports

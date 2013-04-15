@@ -23,7 +23,9 @@ global actions
 					$identifier = Identifier();
 					$identifier.name = $simpleName;
 					name2Identifier.declare($simpleName, $identifier);
-				#}
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild((Integer) #$idIndex#).getPosition());
+				}
 			}
 			HasSimpleName($qualifiedName, $identifier);
 	#
@@ -90,6 +92,7 @@ exports
 			$qName = $1;
 			$ = TypeImportDefinition();
 			$qualifiedName = QualifiedType();
+			$idIndex = 2;
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
@@ -98,6 +101,7 @@ exports
 			$qName = $1;
 			$ = PackageImportDefinition();
 			$qualifiedName = QualifiedName();
+			$idIndex = 2;
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
@@ -115,7 +119,9 @@ exports
 					$identifier = Identifier();
 					$identifier.name = $simpleName;
 					name2Identifier.declare($simpleName, $identifier);
-				#}
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(8).getPosition());
+				}
 			}
 			ImportsStaticMember($, $identifier);
 		#
@@ -123,6 +129,7 @@ exports
 			$qName = $2;
 			$ = StaticImportDefinition();
 			$qualifiedName = QualifiedType();
+			$idIndex = 4;
 		# -> ImportDeclaration #
 			ImportsType($, $qualifiedName);
 		#

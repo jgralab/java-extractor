@@ -17,14 +17,19 @@ exports
 
     %% Classes
 	@Symboltable{name2TypeParameter}
-    rule #$ = AnnotationDefinition();#
+    rule #$ = ClassDefinition();#
 		 (
 			Modifier #HasTypeModifier($, $0);#
 			| (Annotation #HasTypeAnnotation($, $0);#)
-		 )* "class" Id
-         ("<" {TypeParam ","}+ ">")?
-         ("extends" ClassifierType)?
-         ("implements" {ClassifierType ","}+)?
+		 )* "class" Id #
+			{qualifiedNamePrefix += "." + #lexem($2)#;}
+			$.name = lexem($2);
+			$.external = false;
+			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+		 #
+         ("<" {TypeParam #DeclaresClassTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+         ("extends" ClassifierType #ExtendsClass($, $1);#)?
+         ("implements" {ClassifierType #ImplementedInterfacesFromClass($, $0);# ","}+)?
          ClassifierBody #ContainsTypeMember($, $6);#
 		 -> ClassDeclaration
 
@@ -57,4 +62,4 @@ exports
 
     rule ClassifierDeclaration -> Member #$=$0;#
 
-    rule "{" (Member | InitializerBlock ";"*)* "}" -> ClassifierBody
+    rule "{" (Member | InitializerBlock ";"* #lift($0);#)* "}" -> ClassifierBody #$ = $1;#
