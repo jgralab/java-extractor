@@ -37,6 +37,7 @@ exports
 		 -> ClassDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Enums
+	@Symboltable{name2TypeParameter}
     rule (Modifier|Annotation)* "enum" Id
          ("implements" {ClassifierType ","}+)?
          EnumBody -> EnumDeclaration
@@ -48,6 +49,7 @@ exports
               ClassifierDeclaration ";"*)*)? "}" -> EnumBody
 
     %% Interfaces
+	@Symboltable{name2TypeParameter}
     rule #
 			$ = InterfaceDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -67,6 +69,7 @@ exports
 		 -> InterfaceDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Annotations
+	@Symboltable{name2TypeParameter}
     rule (Modifier|Annotation)* "@" "interface" Id  AnnotationBody -> AnnotationDeclaration
     %% Yes, there may be enums in annotations
     rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"*)* "}" -> AnnotationBody
