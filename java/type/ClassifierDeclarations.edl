@@ -17,7 +17,10 @@ exports
 
     %% Classes
 	@Symboltable{name2TypeParameter}
-    rule #$ = ClassDefinition();#
+    rule #
+			$ = ClassDefinition();
+			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+		 #
 		 (
 			Modifier #HasTypeModifier($, $0);#
 			| (Annotation #HasTypeAnnotation($, $0);#)
@@ -31,7 +34,7 @@ exports
          ("extends" ClassifierType #ExtendsClass($, $1);#)?
          ("implements" {ClassifierType #ImplementedInterfacesFromClass($, $0);# ","}+)?
          ClassifierBody #ContainsTypeMember($, $6);#
-		 -> ClassDeclaration
+		 -> ClassDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Enums
     rule (Modifier|Annotation)* "enum" Id
@@ -45,10 +48,23 @@ exports
               ClassifierDeclaration ";"*)*)? "}" -> EnumBody
 
     %% Interfaces
-    rule (Modifier|Annotation)* "interface" Id
-         ("<" {TypeParam ","}+ ">")?
-         ("extends" {ClassifierType ","}+)?
-         ClassifierBody -> InterfaceDeclaration
+    rule #
+			$ = InterfaceDefinition();
+			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+		 #
+		 (
+			Modifier #HasTypeModifier($, $0);#
+			| (Annotation #HasTypeAnnotation($, $0);#)
+		 )* "interface" Id #
+			{qualifiedNamePrefix += "." + #lexem($2)#;}
+			$.name = lexem($2);
+			$.external = false;
+			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+		 #
+         ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+         ("extends" {ClassifierType #ExtendsInterfaces($, $0);# ","}+)?
+         ClassifierBody #ContainsTypeMember($, $5);#
+		 -> InterfaceDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Annotations
     rule (Modifier|Annotation)* "@" "interface" Id  AnnotationBody -> AnnotationDeclaration
