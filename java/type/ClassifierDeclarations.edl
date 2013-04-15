@@ -38,15 +38,28 @@ exports
 
     %% Enums
 	@Symboltable{name2TypeParameter}
-    rule (Modifier|Annotation)* "enum" Id
-         ("implements" {ClassifierType ","}+)?
-         EnumBody -> EnumDeclaration
+    rule  #
+			$ = EnumDefinition();
+			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+		 #
+		 (
+			Modifier #HasTypeModifier($, $0);#
+			| (Annotation #HasTypeAnnotation($, $0);#)
+		 )* "enum" Id #
+			{qualifiedNamePrefix += "." + #lexem($2)#;}
+			$.name = lexem($2);
+			$.external = false;
+			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+		 #
+         ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
+         EnumBody  #ContainsTypeMember($, $4);#
+		 -> EnumDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
     rule "{" EnumConstants (";"
              %% All kinds of Members except for EnumConstants may follow
              (FieldDeclaration |
               MethodDeclaration | ConstructorDeclaration |
               InitializerBlock |
-              ClassifierDeclaration ";"*)*)? "}" -> EnumBody
+              ClassifierDeclaration ";"* #lift($0);#)*)? "}" -> EnumBody #$ = $1;#
 
     %% Interfaces
 	@Symboltable{name2TypeParameter}
@@ -70,14 +83,28 @@ exports
 
     %% Annotations
 	@Symboltable{name2TypeParameter}
-    rule (Modifier|Annotation)* "@" "interface" Id  AnnotationBody -> AnnotationDeclaration
+    rule  #
+			$ = AnnotationDefinition();
+			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+		 #
+		 (
+			Modifier #HasTypeModifier($, $0);#
+			| (Annotation #HasMetaAnnotation($, $0);#)
+		 )* "@" "interface" Id #
+			{qualifiedNamePrefix += "." + #lexem($3)#;}
+			$.name = lexem($3);
+			$.external = false;
+			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+		 #
+		 AnnotationBody #ContainsTypeMember($, $4);#
+		 -> AnnotationDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
     %% Yes, there may be enums in annotations
-    rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"*)* "}" -> AnnotationBody
+    rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"* #lift($0);#)* "}" -> AnnotationBody #$ = $1;#
 
-    rule ClassDeclaration      -> ClassifierDeclaration
-    rule EnumDeclaration       -> ClassifierDeclaration
-    rule InterfaceDeclaration  -> ClassifierDeclaration
-    rule AnnotationDeclaration -> ClassifierDeclaration
+    rule ClassDeclaration      -> ClassifierDeclaration  #$=$0;#
+    rule EnumDeclaration       -> ClassifierDeclaration #$=$0;#
+    rule InterfaceDeclaration  -> ClassifierDeclaration #$=$0;#
+    rule AnnotationDeclaration -> ClassifierDeclaration #$=$0;#
 
     rule ClassifierDeclaration -> Member #$=$0;#
 

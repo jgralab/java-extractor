@@ -180,6 +180,22 @@ public class SemanticActionUtilities {
 					.getFirstIncidence(HasEnclosingType.EC);
 			checkAndCorrectQualifiedTyps(name2TypeParameter, hasEnclosingType,
 					hasEnclosingType.getOmega());
+		} else if (possiblyWrongQualifiedType
+				.isInstanceOf(TypeParameterUsage.VC)) {
+			// public class TestClass<V> {
+			// public interface TestClass<W extends V, V> {
+			// }
+			// }
+			// In this case the "W extends V" uses the wrong V
+			IsDefinedByType idbt = (IsDefinedByType) possiblyWrongQualifiedType
+					.getFirstIncidence(IsDefinedByType.EC);
+			TypeParameterDeclaration usedTypeParamDecl = (TypeParameterDeclaration) idbt
+					.getOmega();
+			Vertex correctTypeParamDecl = name2TypeParameter
+					.use(usedTypeParamDecl.get_simpleName().get_name());
+			if (correctTypeParamDecl != usedTypeParamDecl) {
+				idbt.setOmega(correctTypeParamDecl);
+			}
 		}
 	}
 

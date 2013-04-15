@@ -179,7 +179,7 @@ exports
     %% TypeParam
     rule #$ = TypeParameterDeclaration();#	
 		Id #
-			$.name = lexem($0);
+			$.name = {return qualifiedNamePrefix;}.concat(".").concat(lexem($0));
 			$identifier = name2Identifier.use(lexem($0));
 			{
 				if (#$identifier# == null) {#
@@ -191,7 +191,7 @@ exports
 				}
 			}
 			HasTypeParameterName($, $identifier);
-			name2TypeParameter.declare($.name, $);
+			name2TypeParameter.declare(lexem($0), $);
 		#
 		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+)?  -> TypeParam
 	
