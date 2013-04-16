@@ -13,6 +13,7 @@ symbol tables
 	qName2Package<JavaPackage>
 	name2Identifier<Identifier>
 	name2TypeParameter<TypeParameterDeclaration> %% uses simple names as keys
+	name2VariableDeclaration<VariableDeclaration>
 user code {
 
 	private static String programName;

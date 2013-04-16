@@ -3,10 +3,14 @@ imports
   java/member/Modifiers         %% Modifier
   java/Identifiers       %% Id
   java/type/Types             %% Type, TypeParam
-  java/statement/Statements %% Statement Block
+  java/statement/Statements %% Statement
   java/expression/Expressions    %% Expression
   java/type/ClassifierDeclarations %% ClassifierBody
   java/annotation/Annotations %% Annotation
+ 
+user code {
+	private boolean isLocalVariable = false;
+}
 
 exports
   sorts Member AnnotationElementDecl EnumConstants VariableDeclaration
@@ -23,15 +27,64 @@ exports
          "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
 
     %% FieldDeclaration
-    rule (Modifier| Annotation)*
-         Type
-         {(Variable Initializer?) ","}+
+    rule #$modAndAnno = list();# 
+		(
+			Modifier
+			| Annotation
+			#$modAndAnno.add($0);#
+		)*
+        Type #
+			$baseType = $1;
+			$baseDimension = {return utilities.calculateDimensions((Vertex) #$1#);};
+			$ = list();
+		#
+        {
+			(
+				Id #
+					$type = $baseType;
+					$dimension = $baseDimension;
+				#
+				(
+					"[" "]" #
+						$dimension = {return ((Integer) #$dimension#) + 1;};
+						$newType = ArrayType();
+						$newType.dimensions = $dimension;
+						type.specification.HasElementType($newType, $type);
+						$type = $newType;
+					#
+				)* #
+					{
+						if (isLocalVariable) {#
+							$field = LocalVariableDeclaration();
+						#} else {#
+							$field = Field();
+						#}
+					}
+					$.add($field);
+					{utilities.createModifiersForVariableDeclaration(#$field#, #$modAndAnno#);}
+					HasVariableType($field, $type);
+					$identifier = name2Identifier.use(lexem($0));
+					{
+						if (#$identifier# == null) {#
+							$identifier = Identifier();
+							$identifier.name = lexem($0);
+							name2Identifier.declare(lexem($0), $identifier);
+						#} else {
+							getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+						}
+					}
+					HasVariableName($field, $identifier);
+					name2VariableDeclaration.declare($identifier.name, $field);
+				#
+				Initializer #ContainsVariableInitializer($field, $0);#?
+			) 
+			","
+		}+
 		 -> VariableDeclaration
-	rule Id ("[" "]")* -> Variable
 	rule VariableDeclaration
           ";"
-         -> FieldDeclaration
-    rule FieldDeclaration -> Member
+         -> FieldDeclaration #$ = $0;#
+    rule FieldDeclaration -> Member #$ = $0;#
 
     %% MethodDeclaration
     rule (Modifier| Annotation)*
@@ -40,7 +93,7 @@ exports
          "(" {ParamDeclaration ","}* ")"
 		 ("[" "]")*
          ("throws" {Type ","}+)?
-         (Block | ";")
+         ("{" Statement* "}" | ";")
          -> MethodDeclaration
 
     %% ParamDeclaration
@@ -55,17 +108,21 @@ exports
          Id
          "(" {ParamDeclaration ","}* ")"
          ("throws" {Type ","}+)?
-         Block
+         "{" Statement* "}"
          -> ConstructorDeclaration
     rule ConstructorDeclaration -> Member
 
     %% StaticInitializer
-    rule "static" Block                            -> StaticInitializer
-    rule StaticInitializer                         -> InitializerBlock
+	@Symboltable{name2VariableDeclaration}
+    rule #$ = StaticInitializer();#
+		"static" "{" (Statement #ContainsStaticInitializerStatement($, $0);# )* "}"  -> StaticInitializer
+    rule StaticInitializer                         -> InitializerBlock #$ = $0;#
 
     %% InstanceInitializer
-    rule Block                                     -> InstanceInitializer
-    rule InstanceInitializer                       -> InitializerBlock
+	@Symboltable{name2VariableDeclaration}
+    rule #$ = InstanceInitializer();#
+		"{" (Statement #ContainsInstanceInitializerStatement($, $0);# )* "}" -> InstanceInitializer
+    rule InstanceInitializer                       -> InitializerBlock #$ = $0;#
 
     rule "default" Expression|Annotation          -> AnnoInitializer
-    rule "=" Expression                   -> Initializer
+    rule "=" Expression                   -> Initializer #$ = $1;#

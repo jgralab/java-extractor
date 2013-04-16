@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.edl.parser.Position;
@@ -14,11 +15,17 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.java_extractor.builder.Java5Builder;
+import de.uni_koblenz.jgralab.java_extractor.schema.annotation.Annotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.common.AttributedEdge;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableAnnotation;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableModifier;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.ArrayType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.BuiltInType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.BuiltInTypes;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.EnclosedType;
@@ -78,7 +85,6 @@ public class SemanticActionUtilities {
 				pbr.close();
 			}
 		}
-		System.out.println(sb.toString());
 		return sb.toString();
 	}
 
@@ -333,6 +339,32 @@ public class SemanticActionUtilities {
 		}
 		assert wrongQualifiedType.getDegree() == 0;
 		wrongQualifiedType.delete();
+	}
+
+	public int calculateDimensions(Vertex typeSpecification) {
+		int dimension = 0;
+		for (Vertex current = typeSpecification; current
+				.isInstanceOf(ArrayType.VC); current = ((ArrayType) current)
+				.get_elementType()) {
+			dimension++;
+		}
+		return dimension;
+	}
+
+	public void createModifiersForVariableDeclaration(Object field,
+			Object modAndAnno) {
+		VariableDeclaration field_ = (VariableDeclaration) field;
+		@SuppressWarnings("unchecked")
+		List<Vertex> modAndAnno_ = (List<Vertex>) modAndAnno;
+		for (Vertex vertex : modAndAnno_) {
+			if (vertex.isInstanceOf(Modifier.VC)) {
+				graphBuilder.createEdge(HasVariableModifier.EC, field_, vertex);
+			} else {
+				assert vertex.isInstanceOf(Annotation.VC);
+				graphBuilder.createEdge(HasVariableAnnotation.EC, field_,
+						vertex);
+			}
+		}
 	}
 
 	// TODO link qualified names to types, packages, members (especially

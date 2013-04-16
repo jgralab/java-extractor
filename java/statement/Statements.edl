@@ -12,8 +12,8 @@ exports
 
   context-free syntax  
     %% statements
-    rule OpenStatement -> Statement
-	rule ClosedStatement -> Statement
+    rule OpenStatement -> Statement #$ = $0;#
+	rule ClosedStatement -> Statement #$ = $0;#
   
     %% statements without trailing substatements
 	rule Block		-> ClosedStatement
@@ -21,7 +21,14 @@ exports
 	
 	rule ";"        -> ClosedStatement
 	
-	rule FieldDeclaration -> ClosedStatement
+	rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = true;}
+		#
+		FieldDeclaration -> ClosedStatement #
+			{isLocalVariable = (Boolean) #$isLocalVariable#;}
+			$ = $0;
+		#
 	rule ClassDeclaration -> ClosedStatement
 	rule EnumDeclaration -> ClosedStatement
 	

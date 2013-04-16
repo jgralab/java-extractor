@@ -16,7 +16,7 @@ exports
   context-free syntax
 
     %% Classes
-	@Symboltable{name2TypeParameter}
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule #
 			$ = ClassDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -37,7 +37,7 @@ exports
 		 -> ClassDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Enums
-	@Symboltable{name2TypeParameter}
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule  #
 			$ = EnumDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -54,15 +54,21 @@ exports
          ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
          EnumBody  #ContainsTypeMember($, $4);#
 		 -> EnumDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
-    rule "{" EnumConstants (";"
+    rule "{" #$ = list();#  EnumConstants #$.addAll($1);# (";"
              %% All kinds of Members except for EnumConstants may follow
              (FieldDeclaration |
               MethodDeclaration | ConstructorDeclaration |
               InitializerBlock |
-              ClassifierDeclaration ";"* #lift($0);#)*)? "}" -> EnumBody #$ = $1;#
+              ClassifierDeclaration ";"* #{
+			if (#$0# instanceof java.util.List) {#
+				$.addAll($0);
+			#} else {#
+				$.add($0);
+			#}
+		}#)*)? "}" -> EnumBody
 
     %% Interfaces
-	@Symboltable{name2TypeParameter}
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule #
 			$ = InterfaceDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -82,7 +88,7 @@ exports
 		 -> InterfaceDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
 
     %% Annotations
-	@Symboltable{name2TypeParameter}
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule  #
 			$ = AnnotationDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -99,7 +105,13 @@ exports
 		 AnnotationBody #ContainsTypeMember($, $4);#
 		 -> AnnotationDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
     %% Yes, there may be enums in annotations
-    rule "{" (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"* #lift($0);#)* "}" -> AnnotationBody #$ = $1;#
+    rule "{" #$ = list();# (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"* #{
+			if (#$0# instanceof java.util.List) {#
+				$.addAll($0);
+			#} else {#
+				$.add($0);
+			#}
+		}#)* "}" -> AnnotationBody
 
     rule ClassDeclaration      -> ClassifierDeclaration  #$=$0;#
     rule EnumDeclaration       -> ClassifierDeclaration #$=$0;#
@@ -108,4 +120,10 @@ exports
 
     rule ClassifierDeclaration -> Member #$=$0;#
 
-    rule "{" (Member | InitializerBlock ";"* #lift($0);#)* "}" -> ClassifierBody #$ = $1;#
+    rule "{" #$ = list();# (Member | InitializerBlock ";"* #{
+			if (#$0# instanceof java.util.List) {#
+				$.addAll($0);
+			#} else {#
+				$.add($0);
+			#}
+		}#)* "}" -> ClassifierBody
