@@ -1,5 +1,10 @@
 package de.uni_koblenz.jgralab.java_extractor.utilities;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PushbackReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +44,104 @@ public class SemanticActionUtilities {
 
 	public SemanticActionUtilities(Java5Builder java5Builder) {
 		graphBuilder = java5Builder;
+	}
+
+	public String readInput(String inputFile, String encoding)
+			throws IOException {
+		StringBuilder sb = new StringBuilder();
+		PushbackReader pbr = null;
+		try {
+			pbr = new PushbackReader(new BufferedReader(new InputStreamReader(
+					new FileInputStream(inputFile), encoding)), 5);
+			boolean evenNumberOfBackslashes = true;
+			for (int current = pbr.read(); current != -1; current = pbr.read()) {
+				if (current == '\\') {
+					evenNumberOfBackslashes = !evenNumberOfBackslashes;
+				} else {
+					evenNumberOfBackslashes = true;
+				}
+				if (!evenNumberOfBackslashes) {
+					try {
+						current = readUnicodeEscape(pbr);
+						// if a correct unicode escape was read, the counter for
+						// backslaches can be reset
+						evenNumberOfBackslashes = true;
+					} catch (NumberFormatException e) {
+						// this was no unicode escape. Corresponding chars ar
+						// already back in the pushback reader
+					}
+				}
+				sb.append((char) current);
+			}
+		} finally {
+			if (pbr != null) {
+				pbr.close();
+			}
+		}
+		System.out.println(sb.toString());
+		return sb.toString();
+	}
+
+	private int readUnicodeEscape(PushbackReader reader) throws IOException {
+		int firstHex, secondHex, thirdHex, fourthHex;
+		int numberOfReadChars = 0;
+		do {
+			firstHex = reader.read();
+			numberOfReadChars++;
+		} while (firstHex == 'u');
+		if (numberOfReadChars == 1) {
+			// only one char was read which was no 'u'
+			reader.unread(firstHex);
+			throw new NumberFormatException();
+		}
+		if (isNotHexDigit(firstHex)) {
+			if (firstHex == -1) {
+				reader.unread(new char[] { 'u' });
+			} else {
+				reader.unread(new char[] { 'u', (char) firstHex });
+			}
+			throw new NumberFormatException();
+		}
+		secondHex = reader.read();
+		if (isNotHexDigit(secondHex)) {
+			if (secondHex == -1) {
+				reader.unread(new char[] { 'u', (char) firstHex });
+			} else {
+				reader.unread(new char[] { 'u', (char) firstHex,
+						(char) secondHex });
+			}
+			throw new NumberFormatException();
+		}
+		thirdHex = reader.read();
+		if (isNotHexDigit(thirdHex)) {
+			if (thirdHex == -1) {
+				reader.unread(new char[] { 'u', (char) firstHex,
+						(char) secondHex });
+			} else {
+				reader.unread(new char[] { 'u', (char) firstHex,
+						(char) secondHex, (char) thirdHex });
+			}
+			throw new NumberFormatException();
+		}
+		fourthHex = reader.read();
+		if (isNotHexDigit(fourthHex)) {
+			if (fourthHex == -1) {
+				reader.unread(new char[] { 'u', (char) firstHex,
+						(char) secondHex, (char) thirdHex });
+			} else {
+				reader.unread(new char[] { 'u', (char) firstHex,
+						(char) secondHex, (char) thirdHex, (char) fourthHex });
+			}
+			throw new NumberFormatException();
+		}
+		return Integer.parseInt("" + ((char) firstHex) + ((char) secondHex)
+				+ ((char) thirdHex) + ((char) fourthHex), 16);
+	}
+
+	private boolean isNotHexDigit(int firstHex) {
+		return firstHex == -1
+				|| !((firstHex >= 'a' && firstHex <= 'f')
+						|| (firstHex >= 'A' && firstHex <= 'F') || (firstHex >= '0' && firstHex <= '9'));
 	}
 
 	/*
