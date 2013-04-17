@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://schema.omg.org/spec/UML/2.1.1" xsi:schemaLocation="http://schema.omg.org/spec/UML/2.1.1 http://www.eclipse.org/uml2/2.1.0/UML" xmi:id="de.uni_koblenz.jgralab.grabaja.java5schema.Java5Schema" name="de.uni_koblenz.jgralab.java_extractor.schema.Java5Schema">
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://schema.omg.org/spec/UML/2.2" xsi:schemaLocation="http://schema.omg.org/spec/UML/2.2 http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="de.uni_koblenz.jgralab.grabaja.java5schema.Java5Schema" name="de.uni_koblenz.jgralab.java_extractor.schema.Java5Schema">
   <packagedElement xmi:type="uml:Class" xmi:id="Java5" name="Java5">
     <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="Java5_eAnnotations" source="http://www.eclipse.org/uml2/2.0.0/UML">
@@ -7,10 +7,10 @@
       </eAnnotations>
     </xmi:Extension>
     <ownedAttribute xmi:type="uml:Property" xmi:id="Java5_name" name="name" visibility="private">
-      <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+      <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
     </ownedAttribute>
     <ownedAttribute xmi:type="uml:Property" xmi:id="Java5_version" name="version" visibility="private">
-      <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+      <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
     </ownedAttribute>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="PrimitiveTypes" name="PrimitiveTypes">
@@ -21,7 +21,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="Identifier" name="Identifier">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_Identifier" general="JavaVertex"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="Identifier_name" name="name" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="JavaVertex" name="JavaVertex" isAbstract="true">
@@ -97,16 +97,16 @@
         </eAnnotations>
       </xmi:Extension>
       <ownedAttribute xmi:type="uml:Property" xmi:id="AttributedEdge_column" name="column" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="AttributedEdge_length" name="length" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="AttributedEdge_line" name="line" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="AttributedEdge_offset" name="offset" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
       <ownedEnd xmi:type="uml:Property" xmi:id="JavaVertex_incidence_AttributedEdge_to" name="alphas" visibility="private" type="JavaVertex" association="AttributedEdge">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="JavaVertex_incidence_AttributedEdge_to_uppervalue" value="*"/>
@@ -421,7 +421,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="Comment" name="Comment">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_Comment" general="JavaVertex"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_VFBacHBGEeKie9MLu0o9lQ" name="content" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="JavaDocComment" name="JavaDocComment">
@@ -430,7 +430,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="JavaPackage" name="JavaPackage">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_JavaPackage" general="JavaVertex"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="JavaPackage_fullyQualifiedName" name="fullyQualifiedName" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="JavaPackage_incidence_IsSubPackageOf_from" name="subPackages" visibility="private" type="JavaPackage" aggregation="composite" association="IsSubPackageOf">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="JavaPackage_incidence_IsSubPackageOf_from_uppervalue" value="*"/>
@@ -447,7 +447,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="Program" name="Program">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_Program" general="JavaVertex"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="Program_name" name="name" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_v94TQXBGEeKie9MLu0o9lQ" name="defaultPackage" visibility="private" type="JavaPackage" aggregation="composite" association="_v94TQHBGEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v94TQ3BGEeKie9MLu0o9lQ" value="1"/>
@@ -464,10 +464,10 @@
     <packagedElement xmi:type="uml:Class" xmi:id="TranslationUnit" name="TranslationUnit">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_TranslationUnit" general="JavaVertex"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="SourceFile_name" name="name" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="FoldGraphReference_lengthOfFile" name="lengthOfFile" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_o6jIgXBIEeKie9MLu0o9lQ" name="declaredExternalDeclaration" visibility="private" type="ExternalDeclaration" association="_o6jIgHBIEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_o6jIg3BIEeKie9MLu0o9lQ" value="*"/>
@@ -604,7 +604,7 @@
         </xmi:Extension>
         <generalization xmi:type="uml:Generalization" xmi:id="_DXrbgHUTEeKifMVNH3xezA" general="Member"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="Type_name" name="name" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
         </ownedAttribute>
       </packagedElement>
       <packagedElement xmi:type="uml:Association" xmi:id="_JYhtAHT6EeKifMVNH3xezA" name="HasMetaAnnotation" memberEnd="_JYreAHT6EeKifMVNH3xezA _JY0n8nT6EeKifMVNH3xezA">
@@ -678,10 +678,10 @@
         <generalization xmi:type="uml:Generalization" xmi:id="_m1ChcHUSEeKifMVNH3xezA" general="Type"/>
         <generalization xmi:type="uml:Generalization" xmi:id="_ny7GAHUSEeKifMVNH3xezA" general="ExternalDeclaration"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="Type_external" name="external" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Boolean"/>
+          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Boolean"/>
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="Type_fullyQualifiedName" name="fullyQualifiedName" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_fl3Q0XXJEeKzucOdrv90nw" name="superTypes" visibility="private" type="TypeSpecification" association="_fl3Q0HXJEeKzucOdrv90nw">
           <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fl3Q03XJEeKzucOdrv90nw" value="*"/>
@@ -924,7 +924,7 @@
       <packagedElement xmi:type="uml:Class" xmi:id="ArrayType" name="ArrayType">
         <generalization xmi:type="uml:Generalization" xmi:id="generalization_ArrayType" general="TypeSpecification"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="ArrayType_dimensions" name="dimensions" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_LIvI8XBxEeKie9MLu0o9lQ" name="elementType" visibility="private" type="TypeSpecification" association="_LIvI8HBxEeKie9MLu0o9lQ">
           <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LIvI83BxEeKie9MLu0o9lQ" value="1"/>
@@ -949,7 +949,7 @@
       <packagedElement xmi:type="uml:Class" xmi:id="QualifiedName" name="QualifiedName">
         <generalization xmi:type="uml:Generalization" xmi:id="generalization_QualifiedName" general="TypeSpecification"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="QualifiedName_fullyQualifiedName" name="fullyQualifiedName" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
         </ownedAttribute>
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="QualifiedType" name="QualifiedType">
@@ -1201,7 +1201,7 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="AnnotationField" name="AnnotationField">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_AnnotationField" general="Field"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_TXT9QXdeEeKil48b18T7iA" name="defaultValue" visibility="private" type="Expression" aggregation="composite" association="_TXT9QHdeEeKil48b18T7iA">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_TXT9QXdeEeKil48b18T7iA" name="defaultValue" visibility="private" type="_iXrSkIZbEeKpOY8hzLCoLg" aggregation="composite" association="_TXT9QHdeEeKil48b18T7iA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_TXduQXdeEeKil48b18T7iA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_TXduQHdeEeKil48b18T7iA"/>
       </ownedAttribute>
@@ -1322,12 +1322,11 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_sjz-wXdaEeKil48b18T7iA"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_TXT9QHdeEeKil48b18T7iA" name="ContainsDefaultValue" memberEnd="_TXT9QXdeEeKil48b18T7iA _TXduQndeEeKil48b18T7iA">
+    <packagedElement xmi:type="uml:Association" xmi:id="_TXT9QHdeEeKil48b18T7iA" name="ContainsDefaultValue" clientDependency="_QiTN8KdAEeKglYlCn7HbrA" memberEnd="_TXT9QXdeEeKil48b18T7iA _TXduQndeEeKil48b18T7iA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_1RKzoHdeEeKil48b18T7iA" annotatedElement="_TXT9QHdeEeKil48b18T7iA">
-        <body>: ContainsVariableInitializer</body>
+        <body>&lt;p>:&amp;nbsp;AtrributedEdge&lt;/p></body>
       </ownedComment>
-      <generalization xmi:type="uml:Generalization" xmi:id="_WeqvwHdeEeKil48b18T7iA" general="__h-xkHddEeKil48b18T7iA"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_TXduQndeEeKil48b18T7iA" name="" visibility="private" type="AnnotationField" association="_TXT9QHdeEeKil48b18T7iA">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_TXduQndeEeKil48b18T7iA" name="initializedAnnotationField" visibility="private" type="AnnotationField" association="_TXT9QHdeEeKil48b18T7iA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_TXduRHdeEeKil48b18T7iA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_TXduQ3deEeKil48b18T7iA"/>
       </ownedEnd>
@@ -1346,7 +1345,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fQ22wndhEeKil48b18T7iA"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_l6OiAHdiEeKil48b18T7iA" name="ContainsEnumConstantArguments" memberEnd="_l6OiAXdiEeKil48b18T7iA _l6OiBHdiEeKil48b18T7iA">
+    <packagedElement xmi:type="uml:Association" xmi:id="_l6OiAHdiEeKil48b18T7iA" name="ContainsEnumConstantArgument" memberEnd="_l6OiAXdiEeKil48b18T7iA _l6OiBHdiEeKil48b18T7iA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_W_JxAHwcEeKsa4FpHvZurA" annotatedElement="_l6OiAHdiEeKil48b18T7iA">
         <body>: ContainsArgument</body>
       </ownedComment>
@@ -1373,7 +1372,7 @@
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_pYVroXwYEeKsa4FpHvZurA" name="variableType" visibility="private" type="TypeSpecification" association="_pYVroHwYEeKsa4FpHvZurA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_pYVro3wYEeKsa4FpHvZurA" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_pYVronwYEeKsa4FpHvZurA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_pYVronwYEeKsa4FpHvZurA"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_umUeUHwWEeKsa4FpHvZurA" name="HasVariableName" memberEnd="_umUeUXwWEeKsa4FpHvZurA _umUeVHwWEeKsa4FpHvZurA">
@@ -1605,6 +1604,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_M9MtRYDlEeKnI79eddblXg"/>
       </ownedEnd>
     </packagedElement>
+    <packagedElement xmi:type="uml:Realization" xmi:id="_QiTN8KdAEeKglYlCn7HbrA" supplier="AttributedEdge" client="_TXT9QHdeEeKil48b18T7iA"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_oJ8BsGn3EeKSmMk9GImLQA" name="statement">
     <ownedComment xmi:type="uml:Comment" xmi:id="_YLDWsIDuEeKnI79eddblXg" annotatedElement="_S_TEIHHzEeKMkawfmexbrA _Wbg6cIDoEeKnI79eddblXg">
@@ -2355,43 +2355,43 @@
     <packagedElement xmi:type="uml:Class" xmi:id="BooleanConstant" name="BooleanConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_BooleanConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="BooleanConstant_value" name="value" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Boolean"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Boolean"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="CharConstant" name="CharConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_CharConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="CharConstant_literal" name="literal" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="CharConstant_value" name="value" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#Integer"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="DoubleConstant" name="DoubleConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_DoubleConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="DoubleConstant_literal" name="literal" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="DoubleConstant_value" name="value" visibility="private" type="Double"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="FloatConstant" name="FloatConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_FloatConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="FloatConstant_literal" name="literal" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="FloatConstant_value" name="value" visibility="private" type="Double"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="IntegerConstant" name="IntegerConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_IntegerConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="IntegerConstant_literal" name="literal" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="IntegerConstant_value" name="value" visibility="private" type="Long"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="LongConstant" name="LongConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_LongConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="LongConstant_literal" name="literal" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="LongConstant_value" name="value" visibility="private" type="Long"/>
     </packagedElement>
@@ -2401,7 +2401,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="StringConstant" name="StringConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_StringConstant" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="StringConstant_value" name="value" visibility="private">
-        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.1.1/uml.xml#String"/>
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="Expression" name="Expression" isAbstract="true">
@@ -2765,9 +2765,9 @@
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="profileApplication1358335121250">
     <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="eAnnotations1358335121250" source="http://www.eclipse.org/uml2/2.0.0/UML">
-        <references xmi:type="ecore:EPackage" href="http://schema.omg.org/spec/UML/2.1.1/StandardProfileL2.xmi#_yzU58YinEdqtvbnfB2L_5w"/>
+        <references xmi:type="ecore:EPackage" href="http://schema.omg.org/spec/UML/2.2/StandardProfileL2.xmi#_yzU58YinEdqtvbnfB2L_5w"/>
       </eAnnotations>
     </xmi:Extension>
-    <appliedProfile xmi:type="uml:Profile" href="http://schema.omg.org/spec/UML/2.1.1/StandardProfileL2.xmi#_0"/>
+    <appliedProfile xmi:type="uml:Profile" href="http://schema.omg.org/spec/UML/2.2/StandardProfileL2.xmi#_0"/>
   </profileApplication>
 </uml:Model>

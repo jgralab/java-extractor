@@ -18,13 +18,62 @@ exports
   context-free syntax
 
     %% EnumConstant
-	rule {EnumConst ","}* ","? -> EnumConstants
-    rule Annotation* Id ("(" {Expression ","}* ")")? ClassifierBody?      -> EnumConst
+	rule {EnumConst #lift($0);# ","}* ","? -> EnumConstants #$ = $0;#
+    rule #$ = EnumConstant();# 
+		Annotation #HasVariableAnnotation($, $0);#* 
+		Id #
+			$identifier = name2Identifier.use(lexem($1));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($1);
+					name2Identifier.declare(lexem($1), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());
+				}
+			}
+			HasVariableName($, $identifier);
+			name2VariableDeclaration.declare($identifier.name, $);
+		#
+		("(" {Expression #ContainsEnumConstantArgument($, $0);# ","}* ")")?
+		ClassifierBody #ContainsEnumMember($, $0);#?      -> EnumConst
 
     %% AnnotationElementDecl
-    rule (Modifier| Annotation)*
-         Type Id ("[" "]")*
-         "(" ")" AnnoInitializer? ";" -> AnnotationElementDecl
+    rule #$ = AnnotationField();#
+		(
+			Modifier #HasVariableModifier($, $0);#
+			| (Annotation #HasVariableAnnotation($, $0);#)
+		)*
+        Type #
+			$type = $1;
+			$dimension = {return utilities.calculateDimensions((Vertex) #$1#);};
+		#
+		Id #
+			$identifier = name2Identifier.use(lexem($2));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($2);
+					name2Identifier.declare(lexem($2), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
+				}
+			}
+			name2VariableDeclaration.declare($identifier.name, $);
+		#
+		(
+			"[" "]"#
+				$dimension = {return ((Integer) #$dimension#) + 1;};
+				$newType = ArrayType();
+				$newType.dimensions = $dimension;
+				type.specification.HasElementType($newType, $type);
+				$type = $newType;
+			#
+		)* #
+			HasVariableType($, $type);
+			HasVariableName($, $identifier);
+		#
+         "(" ")" AnnoInitializer #ContainsDefaultValue($, $0);# ? ";" -> AnnotationElementDecl
 
     %% FieldDeclaration
     rule #$modAndAnno = list();# 
@@ -124,5 +173,5 @@ exports
 		"{" (Statement #ContainsInstanceInitializerStatement($, $0);# )* "}" -> InstanceInitializer
     rule InstanceInitializer                       -> InitializerBlock #$ = $0;#
 
-    rule "default" Expression|Annotation          -> AnnoInitializer
+    rule "default" Expression|Annotation          -> AnnoInitializer #$ = $1;#
     rule "=" Expression                   -> Initializer #$ = $1;#
