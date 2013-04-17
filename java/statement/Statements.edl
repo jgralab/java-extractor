@@ -6,6 +6,9 @@ imports
 	java/expression/Expressions %% Expression
 	java/Identifiers %% Id
 
+symbol tables
+	name2Label<Label> %% may not be pushed or popped!!
+
 exports
   sorts Statement Block
   sorts SwitchGroup SwitchLabel CatchClause OpenStatement ClosedStatement
@@ -47,8 +50,8 @@ exports
 	
 	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement
 	
-	rule "break"    Id? ";"   -> ClosedStatement
-	rule "continue" Id? ";"   -> ClosedStatement
+	rule #$ = Break();# "break"    Id #BreaksTo($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
+	rule #$ = Continue();# "continue" Id #ContinuesAt($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
 	rule "return"   Expression? ";" -> ClosedStatement
 	rule "throw"    Expression  ";" -> ClosedStatement
 	rule "synchronized" "(" Expression ")" Block -> ClosedStatement
@@ -66,7 +69,25 @@ exports
 	
     rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement
 	
-	rule Id ":" ClosedStatement -> ClosedStatement
+	rule Id ":" # 
+			$identifier = name2Identifier.use(lexem($0));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($0);
+					name2Identifier.declare(lexem($0), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+				}
+			}
+			$ = Label();
+			HasLabelName($, $identifier);
+			name2Label.declare(lexem($0), $);
+		#
+		ClosedStatement -> ClosedStatement #
+			ContainsLabelStatement($, $2);
+			name2Label.getTop().getMap().remove(lexem($0));
+		#
 	
 	rule "while" "(" Expression ")" ClosedStatement -> ClosedStatement
 	
@@ -76,7 +97,25 @@ exports
 	
 	%% statements with trailing substatements
 	
-	rule Id ":" OpenStatement -> OpenStatement
+	rule Id ":" # 
+			$identifier = name2Identifier.use(lexem($0));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($0);
+					name2Identifier.declare(lexem($0), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+				}
+			}
+			$ = Label();
+			HasLabelName($, $identifier);
+			name2Label.declare(lexem($0), $);
+		#
+		OpenStatement -> OpenStatement #
+			ContainsLabelStatement($, $2);
+			name2Label.getTop().getMap().remove(lexem($0));
+		#
 	
 	rule "while" "(" Expression ")" OpenStatement -> OpenStatement
 	
