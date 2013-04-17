@@ -1711,7 +1711,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="TraditionalForClause" name="TraditionalFor">
       <generalization xmi:type="uml:Generalization" xmi:id="_H8EYoIGIEeKtQfbmXovTzA" general="For"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_VIhWYYGJEeKtQfbmXovTzA" name="iteratorStatement" visibility="private" type="Expression" aggregation="composite" association="_VIhWYIGJEeKtQfbmXovTzA">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_VIhWY4GJEeKtQfbmXovTzA" value="1"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_VIhWY4GJEeKtQfbmXovTzA" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_VIhWYoGJEeKtQfbmXovTzA"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_IsKt8YGKEeKtQfbmXovTzA" name="runVariableInitializer" visibility="private" type="Statement" aggregation="composite" association="_IsKt8IGKEeKtQfbmXovTzA">

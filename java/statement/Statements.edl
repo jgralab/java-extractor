@@ -15,8 +15,22 @@ exports
 
   context-free syntax  
     %% statements
-    rule OpenStatement -> Statement #$ = $0;#
-	rule ClosedStatement -> Statement #$ = $0;#
+    rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = true;}
+		#
+		OpenStatement -> Statement #
+			$ = $0;
+			{isLocalVariable = (Boolean) #$isLocalVariable#;}
+		#
+	rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = true;}
+		#
+		ClosedStatement -> Statement #
+			$ = $0;
+			{isLocalVariable = (Boolean) #$isLocalVariable#;}
+		#
   
     %% statements without trailing substatements
 	rule Block		-> ClosedStatement #
@@ -35,13 +49,23 @@ exports
 			{isLocalVariable = (Boolean) #$isLocalVariable#;}
 			$ = $0;
 		#
-	rule ClassDeclaration -> ClosedStatement #
+	rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = false;}
+		#
+		ClassDeclaration -> ClosedStatement #
 		$ = TypeDefinitionStatement();
 		ContainsDefinedType($, $0);
+		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
-	rule EnumDeclaration -> ClosedStatement #
+	rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = false;}
+		#
+		EnumDeclaration -> ClosedStatement #
 		$ = TypeDefinitionStatement();
 		ContainsDefinedType($, $0);
+		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
@@ -142,15 +166,41 @@ exports
 			name2Label.getTop().getMap().remove(lexem($0));
 		#
 	
-    rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement
+    rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement #
+		$ = If();
+		ContainsIfCondition($, $2);
+		ContainsThen($, $4);
+		ContainsElse($, $6);
+	#
 	
-	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement
+	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement #
+		$ = DoWhile();
+		ContainsDoWhileBody($, $1);
+		ContainsDoWhileCondition($, $4);
+	#
 	
-	rule "while" "(" Expression ")" ClosedStatement -> ClosedStatement
+	rule "while" "(" Expression ")" ClosedStatement -> ClosedStatement #
+		$ = While();
+		ContainsWhileCondition($, $2);
+		ContainsWhileBody($, $4);
+	#
 	
-	rule "for" "(" (VariableDeclaration | {Expression ","}*) ";" Expression? ";" {Expression ","}* ")" ClosedStatement -> ClosedStatement
+	rule #$ = TraditionalFor();#
+		"for" "("
+		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
+		";" Expression #ContainsForCondition($, $0);# ? 
+		";" {Expression #ContainsIterator($, $0);# ","}*
+		")"
+		ClosedStatement #ContainsForBody($, $8);#
+		-> ClosedStatement
 
-    rule "for" "(" ParamDeclaration ":" Expression ")" ClosedStatement -> ClosedStatement
+    rule "for" "(" ParamDeclaration ":" Expression ")" ClosedStatement -> ClosedStatement #
+		$ = ForEach();
+		$2 = LocalVariableDeclaration();
+		DeclaresRunVariable($, $2);
+		ContainsIterableOrArrayDefinition($, $4);
+		ContainsForBody($, $6);
+	#
 	
 	%% statements with trailing substatements
 	
@@ -174,11 +224,37 @@ exports
 			name2Label.getTop().getMap().remove(lexem($0));
 		#
 	
-	rule "while" "(" Expression ")" OpenStatement -> OpenStatement
+	rule "while" "(" Expression ")" OpenStatement -> OpenStatement #
+		$ = While();
+		ContainsWhileCondition($, $2);
+		ContainsWhileBody($, $4);
+	#
 	
-	rule "for" "(" (VariableDeclaration | {Expression ","}*) ";" Expression? ";" {Expression ","}* ")" OpenStatement -> OpenStatement
+	rule #$ = TraditionalFor();#
+		"for" "("
+		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
+		";" Expression #ContainsForCondition($, $0);# ? 
+		";" {Expression #ContainsIterator($, $0);# ","}*
+		")"
+		OpenStatement #ContainsForBody($, $8);#
+		-> OpenStatement
 
-    rule "for" "(" ParamDeclaration ":" Expression ")" OpenStatement -> OpenStatement
+    rule "for" "(" ParamDeclaration ":" Expression ")" OpenStatement -> OpenStatement #
+		$ = ForEach();
+		$2 = LocalVariableDeclaration();
+		DeclaresRunVariable($, $2);
+		ContainsIterableOrArrayDefinition($, $4);
+		ContainsForBody($, $6);
+	#
 	
-    rule "if" "(" Expression ")" Statement -> OpenStatement
-    rule "if" "(" Expression ")" ClosedStatement "else" OpenStatement -> OpenStatement
+    rule "if" "(" Expression ")" Statement -> OpenStatement #
+		$ = If();
+		ContainsIfCondition($, $2);
+		ContainsThen($, $4);
+	#
+    rule "if" "(" Expression ")" ClosedStatement "else" OpenStatement -> OpenStatement #
+		$ = If();
+		ContainsIfCondition($, $2);
+		ContainsThen($, $4);
+		ContainsElse($, $6);
+	#
