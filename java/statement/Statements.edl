@@ -43,12 +43,49 @@ exports
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
 	
-	rule "switch" "(" Expression ")" "{" SwitchGroup* SwitchLabel* "}" -> ClosedStatement
-    rule SwitchLabel+ Statement+ -> SwitchGroup
-    rule "case" Expression ":" -> SwitchLabel
-    rule "default"   ":" -> SwitchLabel
-	
-	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement
+	rule #$ = Switch();#
+		"switch"
+		"(" Expression ")" #ContainsSwitchArgument($, $2);#
+		"{" 
+		SwitchGroup #$ = $0;# *
+		SwitchLabel #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("statement.Case"))) {#
+					ContainsCase($, $0);
+				#} else {#
+					ContainsDefaultCase($, $0);
+				#}
+			}#
+		*
+		"}" -> ClosedStatement
+    rule #
+			$ = Switch();
+			$isLastLabelDefault = false;
+		#
+		SwitchLabel #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("statement.Case"))) {#
+					$isLastLabelDefault = false;
+					ContainsCase($, $0);
+				#} else {#
+					$isLastLabelDefault = true;
+					ContainsDefaultCase($, $0);
+				#}
+			}
+				$lastLabel = $0;
+			#
+		+
+		Statement #{
+				if ((Boolean) #$isLastLabelDefault#) {#
+					ContainsDefaultStatement($lastLabel, $0);
+				#} else {#
+					ContainsCaseStatement($lastLabel, $0);
+				#}
+			}#
+		+ -> SwitchGroup
+    rule "case" Expression ":" -> SwitchLabel #
+		$ = Case();
+		ContainsCaseCondition($, $1);
+	#
+    rule "default"   ":" -> SwitchLabel #$ = Default();#
 	
 	rule #$ = Break();# "break"    Id #BreaksTo($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
 	rule #$ = Continue();# "continue" Id #ContinuesAt($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
@@ -74,8 +111,6 @@ exports
     rule "try" Block CatchClause* ("finally" Block)? -> ClosedStatement
     rule "catch" "(" ParamDeclaration ")" Block -> CatchClause
 	
-    rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement
-	
 	rule Id ":" # 
 			$identifier = name2Identifier.use(lexem($0));
 			{
@@ -95,6 +130,10 @@ exports
 			ContainsLabelStatement($, $2);
 			name2Label.getTop().getMap().remove(lexem($0));
 		#
+	
+    rule "if" "(" Expression ")" ClosedStatement "else" ClosedStatement -> ClosedStatement
+	
+	rule "do" Statement "while" "(" Expression ")" ";" -> ClosedStatement
 	
 	rule "while" "(" Expression ")" ClosedStatement -> ClosedStatement
 	
