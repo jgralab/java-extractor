@@ -19,8 +19,11 @@ exports
 	rule ClosedStatement -> Statement #$ = $0;#
   
     %% statements without trailing substatements
-	rule Block		-> ClosedStatement #$ = $0;#
-	rule #$ = Block();# "{" Statement #ContainsBlockStatement($, $0);# * "}" -> Block
+	rule Block		-> ClosedStatement #
+		$ = Block();
+		ContainsBlockStatement($, $0);
+	#
+	rule "{" Statement #lift($0);# * "}" -> Block #$ = $1;#
 	
 	rule ";"        -> ClosedStatement #$ = {return utilities.getEmptyStatement(currentElement.getPosition());};#
 	
@@ -97,7 +100,7 @@ exports
 	rule #$ = Synchronized();#
 		"synchronized" 
 		"(" Expression ")" #ContainsMonitor($, $2);#
-		"{" Statement #ContainsSynchronizedStatement($, $0);# * "}"
+		Block #ContainsSynchronizedStatement($, $4);#
 		-> ClosedStatement
 	
     rule #$ = Assert();# 
@@ -108,8 +111,16 @@ exports
 		)?
 		";" -> ClosedStatement
 	
-    rule "try" Block CatchClause* ("finally" Block)? -> ClosedStatement
-    rule "catch" "(" ParamDeclaration ")" Block -> CatchClause
+    rule #$ = Try();#
+		"try" Block #ContainsTryBlockStatement($, $1);#
+		CatchClause #ContainsExceptionHandler($, $0);# *
+		("finally" Block #ContainsFinallyBlockStatement($, $1);#)?
+		-> ClosedStatement
+    rule "catch" "(" ParamDeclaration ")" Block -> CatchClause #
+		$ = Catch();
+		DeclaresCaughtException($, $2);
+		ContainsCatchBlockStatement($, $4);
+	#
 	
 	rule Id ":" # 
 			$identifier = name2Identifier.use(lexem($0));
