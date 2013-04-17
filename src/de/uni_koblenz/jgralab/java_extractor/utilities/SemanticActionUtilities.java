@@ -23,6 +23,7 @@ import de.uni_koblenz.jgralab.java_extractor.schema.member.Member;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
+import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
@@ -167,6 +168,22 @@ public class SemanticActionUtilities {
 			program = (Program) graphBuilder.createVertex(Program.VC, position);
 		}
 		return program;
+	}
+
+	/*
+	 * Programm
+	 */
+
+	private EmptyStatement emptyStatement;
+
+	public EmptyStatement getEmptyStatement(Position position) {
+		if (emptyStatement == null) {
+			emptyStatement = (EmptyStatement) graphBuilder.createVertex(
+					EmptyStatement.VC, position);
+		} else {
+			graphBuilder.getPositionsMap().put(emptyStatement, position);
+		}
+		return emptyStatement;
 	}
 
 	/*

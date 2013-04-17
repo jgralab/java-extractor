@@ -16,10 +16,10 @@ exports
 	rule ClosedStatement -> Statement #$ = $0;#
   
     %% statements without trailing substatements
-	rule Block		-> ClosedStatement
-	rule "{" Statement* "}"                     -> Block
+	rule Block		-> ClosedStatement #$ = $0;#
+	rule #$ = Block();# "{" Statement #ContainsBlockStatement($, $0);# * "}" -> Block
 	
-	rule ";"        -> ClosedStatement
+	rule ";"        -> ClosedStatement #$ = {return utilities.getEmptyStatement(currentElement.getPosition());};#
 	
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
@@ -29,10 +29,16 @@ exports
 			{isLocalVariable = (Boolean) #$isLocalVariable#;}
 			$ = $0;
 		#
-	rule ClassDeclaration -> ClosedStatement
-	rule EnumDeclaration -> ClosedStatement
+	rule ClassDeclaration -> ClosedStatement #
+		$ = TypeDefinitionStatement();
+		ContainsDefinedType($, $0);
+	#
+	rule EnumDeclaration -> ClosedStatement #
+		$ = TypeDefinitionStatement();
+		ContainsDefinedType($, $0);
+	#
 	
-	rule Expression ";"   -> ClosedStatement {avoid}
+	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
 	
 	rule "switch" "(" Expression ")" "{" SwitchGroup* SwitchLabel* "}" -> ClosedStatement
     rule SwitchLabel+ Statement+ -> SwitchGroup
@@ -47,7 +53,13 @@ exports
 	rule "throw"    Expression  ";" -> ClosedStatement
 	rule "synchronized" "(" Expression ")" Block -> ClosedStatement
 	
-    rule "assert" Expression (":" Expression)? ";" -> ClosedStatement
+    rule #$ = Assert();# 
+		"assert" Expression #ContainsAssertCondition($, $1);#
+		(
+			":"
+			Expression #ContainsMessage($, $1);#
+		)?
+		";" -> ClosedStatement
 	
     rule "try" Block CatchClause* ("finally" Block)? -> ClosedStatement
     rule "catch" "(" ParamDeclaration ")" Block -> CatchClause

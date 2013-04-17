@@ -2193,6 +2193,23 @@
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Realization" xmi:id="_LNurwIGKEeKtQfbmXovTzA" name="" supplier="AttributedEdge" client="_IsKt8IGKEeKtQfbmXovTzA"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_hrc5sKdgEeKglYlCn7HbrA" name="TypeDefinitionStatement">
+      <generalization xmi:type="uml:Generalization" xmi:id="_mvxvMKdgEeKglYlCn7HbrA" general="Statement"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_-6HzUKdgEeKglYlCn7HbrA" name="definedType" visibility="private" type="Type" aggregation="composite" association="_-5FRgKdgEeKglYlCn7HbrA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-6auQadgEeKglYlCn7HbrA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-6auQKdgEeKglYlCn7HbrA" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_-5FRgKdgEeKglYlCn7HbrA" name="ContainsDefinedType" clientDependency="_xyeLIKdhEeKglYlCn7HbrA" memberEnd="_-6HzUKdgEeKglYlCn7HbrA _-6auQqdgEeKglYlCn7HbrA">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_yvUN4KdhEeKglYlCn7HbrA" annotatedElement="_-5FRgKdgEeKglYlCn7HbrA">
+        <body>&lt;p>:&amp;nbsp;AttributedEdge&lt;/p></body>
+      </ownedComment>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_-6auQqdgEeKglYlCn7HbrA" name="definingStatement" visibility="private" type="_hrc5sKdgEeKglYlCn7HbrA" association="_-5FRgKdgEeKglYlCn7HbrA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-6auRKdgEeKglYlCn7HbrA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-6auQ6dgEeKglYlCn7HbrA"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Realization" xmi:id="_xyeLIKdhEeKglYlCn7HbrA" supplier="AttributedEdge" client="_-5FRgKdgEeKglYlCn7HbrA"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_p35i4Gn4EeKSmMk9GImLQA" name="expression">
     <ownedComment xmi:type="uml:Comment" xmi:id="_RVfXYIGOEeKtQfbmXovTzA" annotatedElement="_ATlVkIGOEeKtQfbmXovTzA _jaVSUIGNEeKtQfbmXovTzA">
