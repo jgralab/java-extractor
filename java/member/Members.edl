@@ -62,7 +62,7 @@ exports
 			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		(
-			"[" "]"#
+			"[" "]" #
 				$dimension = {return ((Integer) #$dimension#) + 1;};
 				$newType = ArrayType();
 				$newType.dimensions = $dimension;
@@ -74,6 +74,8 @@ exports
 			HasVariableName($, $identifier);
 		#
          "(" ")" AnnoInitializer #ContainsDefaultValue($, $0);# ? ";" -> AnnotationElementDecl
+
+    rule "default" Expression|Annotation          -> AnnoInitializer #$ = $1;#
 
     %% FieldDeclaration
     rule #$modAndAnno = list();# 
@@ -134,32 +136,116 @@ exports
           ";"
          -> FieldDeclaration #$ = $0;#
     rule FieldDeclaration -> Member #$ = $0;#
-
-    %% MethodDeclaration
-    rule (Modifier| Annotation)*
-         ("<" {TypeParam ","}+ ">")?
-         Type Id
-         "(" {ParamDeclaration ","}* ")"
-		 ("[" "]")*
-         ("throws" {Type ","}+)?
-         ("{" Statement* "}" | ";")
-         -> MethodDeclaration
+	
+    rule "=" Expression                   -> Initializer #$ = $1;#
 
     %% ParamDeclaration
-    rule (Modifier| Annotation)*
-         Type "..."? Id ("[" "]")*
+    rule #$ = ParameterDeclaration();#
+		(
+			Modifier #HasVariableModifier($, $0);#
+			| (Annotation #HasVariableAnnotation($, $0);#)
+		)*
+        Type #
+			$type = $1;
+			$dimension = {return utilities.calculateDimensions((Vertex) #$1#);};
+		#
+		 "..." #$ = VariableLengthDeclaration();# ?
+		Id #
+			$identifier = name2Identifier.use(lexem($3));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($3);
+					name2Identifier.declare(lexem($3), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(6).getPosition());
+				}
+			}
+			name2VariableDeclaration.declare($identifier.name, $);
+		#
+		(
+			"[" "]" #
+				$dimension = {return ((Integer) #$dimension#) + 1;};
+				$newType = ArrayType();
+				$newType.dimensions = $dimension;
+				type.specification.HasElementType($newType, $type);
+				$type = $newType;
+			#
+		)* #
+			HasVariableType($, $type);
+			HasVariableName($, $identifier);
+		#
          -> ParamDeclaration
-    rule MethodDeclaration -> Member
+
+    %% MethodDeclaration
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+    rule #$ = MethodDefinition();# 
+		(
+			Modifier #HasMethodModifier($, $0);#
+			| (Annotation #HasMemberAnnotation($, $0);#)
+		)*
+        ("<" {TypeParam #DeclaresMethodTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+        Type  #
+			$type = $2;
+			$dimension = {return utilities.calculateDimensions((Vertex) #$2#);};
+		#
+		Id #
+			$identifier = name2Identifier.use(lexem($3));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($3);
+					name2Identifier.declare(lexem($3), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(6).getPosition());
+				}
+			}
+		#
+        "(" {ParamDeclaration #lift($0);# ","}* ")"
+		(
+			"[" "]" #
+				$dimension = {return ((Integer) #$dimension#) + 1;};
+				$newType = ArrayType();
+				$newType.dimensions = $dimension;
+				type.specification.HasElementType($newType, $type);
+				$type = $newType;
+			#
+		)* #
+			HasReturnType($, $type);
+			HasMethodName($, $identifier);
+			DeclaresMethodParameter($, $5);
+		#
+        ("throws" {Type #ThrowsMethodException($, $0);# ","}+)?
+        (("{" Statement #ContainsMethodBodyStatement($, $0);# * "}") | #$ = MethodDeclaration();# ";")
+        -> MethodDeclaration
+    rule MethodDeclaration -> Member #$ = $0;#
 
     %% ConstructorDeclaration
-    rule (Modifier| Annotation)*
-         ("<" {TypeParam ","}+ ">")?
-         Id
-         "(" {ParamDeclaration ","}* ")"
-         ("throws" {Type ","}+)?
-         "{" Statement* "}"
-         -> ConstructorDeclaration
-    rule ConstructorDeclaration -> Member
+	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+    rule #$ = ConstructorDefinition();#
+		(
+			Modifier #HasConstructorModifier($, $0);#
+			| (Annotation #HasMemberAnnotation($, $0);#)
+		)*
+        ("<" {TypeParam #DeclaresConstructorTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+        Id #
+			$identifier = name2Identifier.use(lexem($2));
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = lexem($2);
+					name2Identifier.declare(lexem($2), $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
+				}
+			}
+			HasConstructorName($, $identifier);
+		#
+        "(" {ParamDeclaration #DeclaresConstructorParameter($, $0);# ","}* ")"
+        ("throws" {Type #ThrowsConstructorException($, $0);# ","}+)?
+        "{" Statement #ContainsConstructorBodyStatement($, $0);# * "}"
+        -> ConstructorDeclaration
+    rule ConstructorDeclaration -> Member #$ = $0;# 
 
     %% StaticInitializer
 	@Symboltable{name2VariableDeclaration}
@@ -172,6 +258,3 @@ exports
     rule #$ = InstanceInitializer();#
 		"{" (Statement #ContainsInstanceInitializerStatement($, $0);# )* "}" -> InstanceInitializer
     rule InstanceInitializer                       -> InitializerBlock #$ = $0;#
-
-    rule "default" Expression|Annotation          -> AnnoInitializer #$ = $1;#
-    rule "=" Expression                   -> Initializer #$ = $1;#

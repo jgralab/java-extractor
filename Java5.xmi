@@ -1290,6 +1290,12 @@
     : HasAnnotation&#xD;
 &lt;/p></body>
       </ownedComment>
+      <ownedComment xmi:type="uml:Comment" xmi:id="_TZf00KdREeKglYlCn7HbrA" annotatedElement="_v_IBUHdVEeKil48b18T7iA">
+        <body>&lt;p>:&amp;nbsp;HasAnnotation&lt;/p></body>
+      </ownedComment>
+      <ownedComment xmi:type="uml:Comment" xmi:id="_Byaz8KdSEeKglYlCn7HbrA" annotatedElement="_v_IBUHdVEeKil48b18T7iA">
+        <body>&lt;p>:&amp;nbsp;HasAnnotation&lt;/p></body>
+      </ownedComment>
       <generalization xmi:type="uml:Generalization" xmi:id="_9c0VgHdVEeKil48b18T7iA" general="_1hzAEHBMEeKie9MLu0o9lQ"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_v_IBVHdVEeKil48b18T7iA" name="member" visibility="private" type="Member" association="_v_IBUHdVEeKil48b18T7iA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_v_IBVndVEeKil48b18T7iA" value="1"/>
@@ -2203,7 +2209,7 @@
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_axmHoYGdEeKtQfbmXovTzA" name="fieldOwner" visibility="private" type="Expression" association="_axmHoIGdEeKtQfbmXovTzA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_axmHo4GdEeKtQfbmXovTzA" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_axmHooGdEeKtQfbmXovTzA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_axmHooGdEeKtQfbmXovTzA"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_5YoiYYGdEeKtQfbmXovTzA" name="arrayIndices" visibility="private" type="Expression" association="_5YoiYIGdEeKtQfbmXovTzA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_5YoiY4GdEeKtQfbmXovTzA" value="*"/>

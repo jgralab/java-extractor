@@ -4,16 +4,77 @@ imports
   java/member/Members   %% ParenBlock
   java/Identifiers %% Id
   java/expression/Expressions %% Expression
+ 
+ global actions
+	pattern "@" PlainClassifierType _(0..4) -> Annotation #
+			$qName = $1;
+			$qualifiedName = QualifiedType();
+			{getPositionsMap().put((Vertex) #$qualifiedName#, currentElement.getChild(2).getPosition());}
+			$qualifiedName.fullyQualifiedName = $qName;
+			$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					{getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());}
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());
+				}
+			}
+			HasSimpleName($qualifiedName, $identifier);
+			
+			$ = Annotation();
+			HasAnnotationType($, $qualifiedName);
+			ContainsAnnotationArgument($, $args);
+	#
 
 exports
   sorts Annotation ElemValPair ElemVal
 
   context-free syntax
-    rule "@" PlainClassifierType "(" {ElemValPair ","}* ","? ")" -> Annotation
-    rule "@" PlainClassifierType "(" ElemVal ","? ")"            -> Annotation {avoid}
-    rule "@" PlainClassifierType                            -> Annotation
+    rule "@" PlainClassifierType "(" {ElemValPair #lift($0);# ","}* #$args = $3;# ","? ")" -> Annotation
+    rule "@" PlainClassifierType "(" ElemVal ","? ")" #
+			$fieldName = "value";
+			$identifier = name2Identifier.use($fieldName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $fieldName;
+					name2Identifier.declare($fieldName, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(6).getPosition());
+				}
+			}
+			$fieldAccess = FieldAccess();
+			HasFieldName($fieldAccess, $identifier);
+			$elementValuePair = ElementValuePair();
+			SetsField($elementValuePair, $fieldAccess);
+			AssignesValue($elementValuePair, $3);
+			$args = list();
+			$args.add($elementValuePair);
+		#
+		-> Annotation {avoid}
+    rule "@" PlainClassifierType #$args = list();#                            -> Annotation
 	
-    rule Id "=" ElemVal -> ElemValPair
+    rule Id "=" ElemVal -> ElemValPair #
+		$identifier = name2Identifier.use(lexem($0));
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = lexem($0);
+				name2Identifier.declare(lexem($0), $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		$fieldAccess = FieldAccess();
+		HasFieldName($fieldAccess, $identifier);
+		$ = ElementValuePair();
+		SetsField($, $fieldAccess);
+		AssignesValue($, $2);
+	#
 
-    rule Expression -> ElemVal
-    rule Annotation -> ElemVal
+    rule Expression -> ElemVal #$ = $0;#
+    rule Annotation -> ElemVal #$ = $0;#

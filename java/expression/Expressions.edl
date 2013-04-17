@@ -16,12 +16,12 @@ exports
   sorts Expression ArrayAccess SubArrayAccess
 
   context-free syntax
-	rule IntLiteral    -> Expression
-    rule FloatLiteral  -> Expression
-    rule BoolLiteral   -> Expression 
-    rule CharLiteral   -> Expression
-    rule StringLiteral -> Expression
-    rule NullLiteral   -> Expression
+	rule IntLiteral    -> Expression #$ = $0;#
+    rule FloatLiteral  -> Expression #$ = $0;#
+    rule BoolLiteral   -> Expression #$ = $0;#
+    rule CharLiteral   -> Expression #$ = $0;#
+    rule StringLiteral -> Expression #$ = $0;#
+    rule NullLiteral   -> Expression #$ = $0;#
 	
     rule Type   "." "class" -> Expression
 	

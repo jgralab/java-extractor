@@ -19,6 +19,7 @@ import de.uni_koblenz.jgralab.java_extractor.schema.annotation.Annotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.common.AttributedEdge;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableAnnotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableModifier;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.Member;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
@@ -217,11 +218,15 @@ public class SemanticActionUtilities {
 	 * {@link QualifiedType} instead of {@link TypeParameterUsage}.
 	 * 
 	 * @param name2TypeParameter
-	 * @param typeDefinition
+	 * @param typeDefinitionOrMember
 	 */
 	public void correctTypeParameterUsage(SymbolTableStack name2TypeParameter,
-			Vertex typeDefinition) {
-		for (TypeParameterDeclaration typeParamDecl : ((Type) typeDefinition)
+			Vertex typeDefinitionOrMember) {
+		assert typeDefinitionOrMember.isInstanceOf(Type.VC)
+				|| typeDefinitionOrMember.isInstanceOf(Member.VC);
+		for (TypeParameterDeclaration typeParamDecl : typeDefinitionOrMember
+				.isInstanceOf(Type.VC) ? ((Type) typeDefinitionOrMember)
+				.get_typeParameters() : ((Member) typeDefinitionOrMember)
 				.get_typeParameters()) {
 			HasTypeParameterUpperBound htpub = typeParamDecl
 					.getFirstHasTypeParameterUpperBoundIncidence(EdgeDirection.OUT);

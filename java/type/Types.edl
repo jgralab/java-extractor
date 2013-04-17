@@ -155,7 +155,7 @@ exports
 		Id
 		#{
 			if (((String) #$name#).isEmpty()) {#
-				$ = {return utilities.resolveQualifiedName(#lexem($0)#);};
+				$ = {return utilities.resolveQualifiedName(#lexem($1)#);};
 			#} else {#
 				$ = $name.concat(lexem($1));
 			#}
