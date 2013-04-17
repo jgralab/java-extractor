@@ -52,9 +52,16 @@ exports
 	
 	rule #$ = Break();# "break"    Id #BreaksTo($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
 	rule #$ = Continue();# "continue" Id #ContinuesAt($, name2Label.use(lexem($0)));# ? ";"   -> ClosedStatement
-	rule "return"   Expression? ";" -> ClosedStatement
-	rule "throw"    Expression  ";" -> ClosedStatement
-	rule "synchronized" "(" Expression ")" Block -> ClosedStatement
+	rule #$ = Return();# "return"   Expression #ContainsReturnValue($, $0);# ? ";" -> ClosedStatement
+	rule "throw"    Expression  ";" -> ClosedStatement #
+		$ = Throw();
+		ThrowsExceptionCreatedBy($, $1);
+	#
+	rule #$ = Synchronized();#
+		"synchronized" 
+		"(" Expression ")" #ContainsMonitor($, $2);#
+		"{" Statement #ContainsSynchronizedStatement($, $0);# * "}"
+		-> ClosedStatement
 	
     rule #$ = Assert();# 
 		"assert" Expression #ContainsAssertCondition($, $1);#
