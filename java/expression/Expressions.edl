@@ -16,16 +16,17 @@ exports
   sorts Expression ArrayAccess SubArrayAccess
 
   context-free syntax
-	rule IntLiteral    -> Expression #$ = $0;#
-    rule FloatLiteral  -> Expression #$ = $0;#
-    rule BoolLiteral   -> Expression #$ = $0;#
-    rule CharLiteral   -> Expression #$ = $0;#
-    rule StringLiteral -> Expression #$ = $0;#
-    rule NullLiteral   -> Expression #$ = $0;#
+	rule IntLiteral    -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule FloatLiteral  -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule BoolLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule CharLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule StringLiteral -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule NullLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
 	
     rule Type   "." "class" -> Expression
 	
-	rule (ClassifierType ".")? "this" -> Expression
+	rule #$ = ThisConstant();#
+		(ClassifierType #ContainsQualifier($, $0);# ".")? "this" -> Expression
 
 	rule "(" Expression ")"          -> Expression
 	

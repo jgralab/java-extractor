@@ -17,6 +17,15 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.java_extractor.builder.Java5Builder;
 import de.uni_koblenz.jgralab.java_extractor.schema.annotation.Annotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.common.AttributedEdge;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.BooleanConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.CharConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.DoubleConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.Expression;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.FloatConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.IntegerConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.LongConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.Null;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.StringConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableAnnotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableModifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Member;
@@ -184,6 +193,86 @@ public class SemanticActionUtilities {
 			graphBuilder.getPositionsMap().put(emptyStatement, position);
 		}
 		return emptyStatement;
+	}
+
+	/*
+	 * Constants
+	 */
+
+	private final Map<String, Expression> name2Literal = new HashMap<String, Expression>();
+
+	public Expression getLiteral(String lexem, Position position) {
+		Expression result = name2Literal.get(lexem);
+		if (result == null) {
+			if (lexem.equals("null")) {
+				result = (Expression) graphBuilder.createVertex(Null.VC,
+						position);
+			} else if (lexem.equals("true") || lexem.equals("false")) {
+				result = (Expression) graphBuilder.createVertex(
+						BooleanConstant.VC, position);
+				((BooleanConstant) result).set_value(Boolean
+						.parseBoolean(lexem));
+			} else if (lexem.startsWith("\'") && lexem.endsWith("\'")) {
+				result = (Expression) graphBuilder.createVertex(
+						CharConstant.VC, position);
+				((CharConstant) result).set_literal(lexem);
+				((CharConstant) result).set_value(lexem.charAt(1));
+			} else if (lexem.startsWith("\"") && lexem.endsWith("\"")) {
+				result = (Expression) graphBuilder.createVertex(
+						StringConstant.VC, position);
+				((StringConstant) result).set_value(lexem.substring(1,
+						lexem.length() - 1));
+			} else if (lexem.matches("^(\\d+|(0[xX](\\d|[a-fA-F])+))$")) {
+				result = (Expression) graphBuilder.createVertex(
+						IntegerConstant.VC, position);
+				int value = 0;
+				if (lexem.toLowerCase().startsWith("0x")) {
+					value = Integer.parseInt(lexem.substring(2), 16);
+				} else if (lexem.startsWith("0")) {
+					value = Integer.parseInt(lexem.substring(1), 8);
+				} else {
+					value = Integer.parseInt(lexem);
+				}
+				((IntegerConstant) result).set_value(value);
+				((IntegerConstant) result).set_literal(lexem);
+			} else if (lexem.matches("^((\\d+|(0[xX](\\d|[a-fA-F])+))[lL])$")) {
+				result = (Expression) graphBuilder.createVertex(
+						LongConstant.VC, position);
+				String shortenedLexem = lexem.substring(0, lexem.length() - 1);
+				long value = 0;
+				if (shortenedLexem.toLowerCase().startsWith("0x")) {
+					value = Integer.parseInt(shortenedLexem.substring(2), 16);
+				} else if (shortenedLexem.startsWith("0")) {
+					value = Integer.parseInt(shortenedLexem.substring(1), 8);
+				} else {
+					value = Integer.parseInt(shortenedLexem);
+				}
+				((LongConstant) result).set_value(value);
+				((LongConstant) result).set_literal(lexem);
+			} else if (lexem
+					.matches("^(((\\d+\\.\\d*([eE][+-]?\\d+)?)|(\\.\\d+([eE][+-]?\\d+)?)|(\\d+([eE][+-]?\\d+)?))"
+							+ "|(0[xX](([0-9a-fA-F]\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
+							+ "[fF]$")) {
+				result = (Expression) graphBuilder.createVertex(
+						FloatConstant.VC, position);
+				((FloatConstant) result).set_value(Double.valueOf(lexem));
+				((FloatConstant) result).set_literal(lexem);
+			} else if (lexem
+					.matches("^(((\\d+\\.\\d*([eE][+-]?\\d+)?)|(\\.\\d+([eE][+-]?\\d+)?)|(\\d+([eE][+-]?\\d+)?))"
+							+ "|(0[xX](([0-9a-fA-F]\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
+							+ "[dD]?$")) {
+				result = (Expression) graphBuilder.createVertex(
+						DoubleConstant.VC, position);
+				((DoubleConstant) result).set_value(Double.valueOf(lexem));
+				((DoubleConstant) result).set_literal(lexem);
+			}
+			if (result != null) {
+				name2Literal.put(lexem, result);
+			}
+		} else {
+			graphBuilder.getPositionsMap().put(result, position);
+		}
+		return result;
 	}
 
 	/*
