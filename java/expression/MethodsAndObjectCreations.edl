@@ -16,17 +16,26 @@ exports
     rule Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
 	
 	%% method call
-	rule MethodSpec "(" {Expression ","}* ")" -> Expression
+	rule MethodSpec #$ = $0;# "(" {Expression #ContainsCurrentParameter($, $0);# ","}* ")" -> Expression
 
 	rule (PlainClassifierType ".")? ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
 	rule    (Type ".")? "super" "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
 	rule             Expression "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec {avoid}
 	
 	%% array creation
-    rule "new" NonArrayType ("[" Expression? "]")+ -> SubArrayExpression
-	rule SubArrayExpression ArrayInit? -> Expression
-	rule "{" {(Expression|Annotation) ","}* ","? "}" -> ArrayInit
-	rule ArrayInit -> Expression
+    rule #$ = ArrayCreation();#
+		"new" NonArrayType #
+			expression.HasElementType($, $1);
+			$dimension = 0;
+		#
+		(
+			"["
+			Expression #HasDimensionSize($, $0);# ?
+			"]" #$dimension = {return ((Integer) #$dimension#) + 1;};#
+		)+ -> SubArrayExpression #$.dimensions = $dimension;#
+	rule SubArrayExpression #$ = $0;# ArrayInit #ContainsInitializer($, $0);# ? -> Expression
+	rule #$ = ArrayInitializer();# "{" {(Expression|Annotation) #ContainsElement($, $0);# ","}* ","? "}" -> ArrayInit
+	rule ArrayInit -> Expression #$ = $0;#
 	
   context-free restrictions
 	SubArrayExpression -/- [\[]

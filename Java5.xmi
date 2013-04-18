@@ -2275,10 +2275,13 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_mRXZkoZeEeKpOY8hzLCoLg" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_mRXZkYZeEeKpOY8hzLCoLg"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_qQMDYKg7EeK7PbkcALvgcQ" name="dimensions" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Integer"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ArrayInitializer" name="ArrayInitializer">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ArrayInitializer" general="Expression"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_oZ9oUYZfEeKpOY8hzLCoLg" name="element" visibility="private" type="Expression" aggregation="composite" association="_oZ9oUIZfEeKpOY8hzLCoLg">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_oZ9oUYZfEeKpOY8hzLCoLg" name="element" visibility="private" type="_iXrSkIZbEeKpOY8hzLCoLg" aggregation="composite" association="_oZ9oUIZfEeKpOY8hzLCoLg">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_oZ9oU4ZfEeKpOY8hzLCoLg" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_oZ9oUoZfEeKpOY8hzLCoLg"/>
       </ownedAttribute>
@@ -2647,7 +2650,7 @@
       <ownedComment xmi:type="uml:Comment" xmi:id="_--tAkIZfEeKpOY8hzLCoLg" annotatedElement="_oZ9oUIZfEeKpOY8hzLCoLg">
         <body>: AttributedEdge</body>
       </ownedComment>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_oZ9oVIZfEeKpOY8hzLCoLg" name="initializerOfArry" visibility="private" type="ArrayInitializer" association="_oZ9oUIZfEeKpOY8hzLCoLg">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_oZ9oVIZfEeKpOY8hzLCoLg" name="initializerOfArray" visibility="private" type="ArrayInitializer" association="_oZ9oUIZfEeKpOY8hzLCoLg">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_oZ9oVoZfEeKpOY8hzLCoLg" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_oZ9oVYZfEeKpOY8hzLCoLg"/>
       </ownedEnd>
