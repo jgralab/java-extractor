@@ -2492,7 +2492,7 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="Expression_incidence_IsLeftHandSideOf_to_lowervalue"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="__RWR8IGMEeKtQfbmXovTzA" name="ReferesToType" memberEnd="__RgC8IGMEeKtQfbmXovTzA __RgC84GMEeKtQfbmXovTzA">
+    <packagedElement xmi:type="uml:Association" xmi:id="__RWR8IGMEeKtQfbmXovTzA" name="RefersToType" memberEnd="__RgC8IGMEeKtQfbmXovTzA __RgC84GMEeKtQfbmXovTzA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_e3n8IIGNEeKtQfbmXovTzA" annotatedElement="__RWR8IGMEeKtQfbmXovTzA">
         <body>: HasType</body>
       </ownedComment>

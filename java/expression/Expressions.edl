@@ -23,12 +23,24 @@ exports
     rule StringLiteral -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
     rule NullLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
 	
-    rule Type   "." "class" -> Expression
+    rule Type   "." "class" -> Expression #
+		$ = ClassLiteral();
+		RefersToType($, $0);
+	#
 	
 	rule #$ = ThisConstant();#
 		(ClassifierType #ContainsQualifier($, $0);# ".")? "this" -> Expression
 
-	rule "(" Expression ")"          -> Expression
+	rule "(" Expression ")"          -> Expression #$ = $1;#
+
+    %% todo JFR-30
+    rule Expression CondMid Expression -> Expression {right} #
+		$ = ConditionalExpression();
+		ContainsCondExpCondition($, $0);
+		ContainsMatch($, $1);
+		ContainsMismatch($, $2);
+	#
+    rule "?" Expression ":" -> CondMid {bracket} #$ = $1;#
 	
 	rule FieldAccess -> Expression
 	

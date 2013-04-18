@@ -3,75 +3,117 @@ imports
   java/expression/Expressions %% Expression ArrayAccess
   java/type/Types %% Type ClassifierType PrimType ArrayType
 
+global actions
+	pattern _ Expression -> Expression #
+		$ = PrefixExpression();
+		$.operator = $operator;
+		ContainsPrefixedRightHandSide($, $1);
+	#
+	
+	pattern Expression _ -> Expression #
+		$ = PostfixExpression();
+		$.operator = $operator;
+		ContainsPostfixedLeftHandSide($, $0);
+	#
+	
+	pattern Expression _ Expression -> Expression #
+		$ = InfixExpression();
+		$.operator = $operator;
+		ContainsInfixedLeftHandSide($, $0);
+		ContainsInfixedRightHandSide($, $2);
+	#
+	
+	pattern LHS _ Expression -> Expression #
+		$ = InfixExpression();
+		$.operator = $operator;
+		ContainsInfixedLeftHandSide($, $0);
+		ContainsInfixedRightHandSide($, $2);
+	#
+
 exports
   sorts Expression
   sorts CondMid LHS
 
   context-free syntax
-	rule "+" Expression -> Expression
-    rule "-" Expression -> Expression
+	rule #$operator = PrefixOperators.PLUS;# "+" Expression -> Expression 
+    rule #$operator = PrefixOperators.MINUS;# "-" Expression -> Expression
 
-    rule "++" Expression -> Expression
-    rule "--" Expression -> Expression
+    rule #$operator = PrefixOperators.INCREMENT;# "++" Expression -> Expression
+    rule #$operator = PrefixOperators.DECREMENT;# "--" Expression -> Expression
 
-    rule "~" Expression -> Expression
-    rule "!" Expression -> Expression
+    rule #$operator = PrefixOperators.BITWISECOMPLEMENT;# "~" Expression -> Expression
+    rule #$operator = PrefixOperators.NOT;# "!" Expression -> Expression
 
 	%% splitting in three rules is required because of priorities
-    rule "(" PrimType ")" Expression -> Expression
-    rule "(" ArrayType ")" Expression -> Expression
-    rule "(" ClassifierType ")" Expression -> Expression
+    rule "(" PrimType ")" Expression -> Expression #
+		$ = BuiltInCast();
+		CastsToBuiltInType($, $1);
+		CastsValueOf($, $3);
+	#
+    rule "(" ArrayType ")" Expression -> Expression #
+		$ = ClassCast();
+		CastsToType($, $1);
+		CastsValueOf($, $3);
+	#
+    rule "(" ClassifierType ")" Expression -> Expression #
+		$ = ClassCast();
+		CastsToType($, $1);
+		CastsValueOf($, $3);
+	#
 	
-    rule Expression "++" -> Expression
-    rule Expression "--" -> Expression
+    rule #$operator = PostfixOperators.INCREMENT;# Expression "++" -> Expression
+    rule #$operator = PostfixOperators.DECREMENT;# Expression "--" -> Expression
 	
-	rule Expression "instanceof" Type -> Expression
+	rule Expression "instanceof" Type -> Expression #
+		$rhs = ClassLiteral();
+		RefersToType($rhs, $2);
+		$ = InfixExpression();
+		$.operator = InfixOperators.INSTANCEOF;
+		ContainsInfixedLeftHandSide($, $0);
+		ContainsInfixedRightHandSide($, $right);
+	#
 
-    rule Expression "*"   Expression -> Expression  {left}
-    rule Expression "/"   Expression -> Expression  {left}
-    rule Expression "%"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.MULTIPLICATION;# Expression "*"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.DIVISION;# Expression "/"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.MODULO;# Expression "%"   Expression -> Expression  {left}
 
-    rule Expression "+"   Expression -> Expression  {left}
-    rule Expression "-"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.PLUS;# Expression "+"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.MINUS;# Expression "-"   Expression -> Expression  {left}
 
-    rule Expression "<<"  Expression -> Expression  {left}
-    rule Expression ">>"  Expression -> Expression  {left}
-    rule Expression ">>>" Expression -> Expression  {left}
+    rule #$operator = InfixOperators.LEFTSHIFT;# Expression "<<"  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.RIGHTSHIFT;# Expression ">>"  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.UNSIGNEDRIGHTSHIFT;# Expression ">>>" Expression -> Expression  {left}
 
-    rule Expression "<"   Expression -> Expression  {left}
-    rule Expression ">"   Expression -> Expression  {left}
-    rule Expression "<="  Expression -> Expression  {left}
-    rule Expression ">="  Expression -> Expression  {left}
-    rule Expression "=="  Expression -> Expression  {left}
-    rule Expression "!="  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.LESS;# Expression "<"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.GREATER;# Expression ">"   Expression -> Expression  {left}
+    rule #$operator = InfixOperators.LESSEQUALS;# Expression "<="  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.GREATEREQUALS;# Expression ">="  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.EQUALS;# Expression "=="  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.UNEQUALS;# Expression "!="  Expression -> Expression  {left}
 
-    rule Expression "&&"  Expression -> Expression  {left}
-    rule Expression "||"  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.SHORTCIRCUITAND;# Expression "&&"  Expression -> Expression  {left}
+    rule #$operator = InfixOperators.SHORTCIRCUITOR;# Expression "||"  Expression -> Expression  {left}
 
-    rule Expression "&" Expression -> Expression {left}
-    rule Expression "^" Expression -> Expression {left}
-    rule Expression "|" Expression -> Expression {left}
-
-    %% todo JFR-30
-    rule Expression CondMid Expression -> Expression {right}
-    rule "?" Expression ":" -> CondMid {bracket}
+    rule #$operator = InfixOperators.AND;# Expression "&" Expression -> Expression {left}
+    rule #$operator = InfixOperators.XOR;# Expression "^" Expression -> Expression {left}
+    rule #$operator = InfixOperators.OR;# Expression "|" Expression -> Expression {left}
 	
-	rule LHS "="    Expression -> Expression
-    rule LHS "*="   Expression -> Expression
-    rule LHS "/="   Expression -> Expression
-    rule LHS "%="   Expression -> Expression
-    rule LHS "+="   Expression -> Expression
-    rule LHS "-="   Expression -> Expression
-    rule LHS "<<="  Expression -> Expression
-    rule LHS ">>="  Expression -> Expression
-    rule LHS ">>>=" Expression -> Expression
-    rule LHS "&="   Expression -> Expression
-    rule LHS "^="   Expression -> Expression
-    rule LHS "|="   Expression -> Expression
+	rule #$operator = InfixOperators.ASSIGNMENT;# LHS "="    Expression -> Expression
+    rule #$operator = InfixOperators.MULTIPLICATIONASSIGNMENT;# LHS "*="   Expression -> Expression
+    rule #$operator = InfixOperators.DIVISIONASSIGNMENT;# LHS "/="   Expression -> Expression
+    rule #$operator = InfixOperators.MODULOASSIGNMENT;# LHS "%="   Expression -> Expression
+    rule #$operator = InfixOperators.PLUSASSIGNMENT;# LHS "+="   Expression -> Expression
+    rule #$operator = InfixOperators.MINUSASSIGNMENT;# LHS "-="   Expression -> Expression
+    rule #$operator = InfixOperators.LEFTSHIFTASSIGNMENT;# LHS "<<="  Expression -> Expression
+    rule #$operator = InfixOperators.RIGHTSHIFTASSIGNMENT;# LHS ">>="  Expression -> Expression
+    rule #$operator = InfixOperators.UNSIGNEDRIGHTSHIFTASSIGNMENT;# LHS ">>>=" Expression -> Expression
+    rule #$operator = InfixOperators.ANDASSIGNMENT;# LHS "&="   Expression -> Expression
+    rule #$operator = InfixOperators.XORASSIGNMENT;# LHS "^="   Expression -> Expression
+    rule #$operator = InfixOperators.ORASSIGNMENT;# LHS "|="   Expression -> Expression
 
-    rule FieldAccess -> LHS
-    rule ArrayAccess -> LHS
-	rule "(" LHS ")" -> LHS %% javac accepts this
+    rule FieldAccess -> LHS #$ = $0;#
+    rule ArrayAccess -> LHS #$ = $0;#
+	rule "(" LHS ")" -> LHS #$ = $1;# %% javac accepts this
 	
 	lexical restrictions
 		"+" -/- [\+]
