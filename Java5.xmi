@@ -1045,7 +1045,7 @@
         </ownedComment>
         <ownedEnd xmi:type="uml:Property" xmi:id="_A86TNHHnEeKMkawfmexbrA" name="genericType" visibility="private" type="TypeSpecification" association="_A86TMHHnEeKMkawfmexbrA">
           <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_A86TNnHnEeKMkawfmexbrA" value="1"/>
-          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A86TNXHnEeKMkawfmexbrA" value="1"/>
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_A86TNXHnEeKMkawfmexbrA"/>
         </ownedEnd>
       </packagedElement>
       <packagedElement xmi:type="uml:Realization" xmi:id="_FHNwcHHnEeKMkawfmexbrA" name="" supplier="AttributedEdge" client="_A86TMHHnEeKMkawfmexbrA"/>
@@ -2308,6 +2308,10 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_gRDWg4caEeKHeMAreRvUUw" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_gRDWgocaEeKHeMAreRvUUw"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_zq730ahBEeK7PbkcALvgcQ" name="typeArguments" visibility="private" type="TypeArgument" aggregation="composite" association="_zq730KhBEeK7PbkcALvgcQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_zq7306hBEeK7PbkcALvgcQ" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_zq730qhBEeK7PbkcALvgcQ"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ObjectCreation" name="ConstructorCall">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ObjectCreation" general="Expression"/>
@@ -2787,6 +2791,16 @@
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Realization" xmi:id="_4iZagIcaEeKHeMAreRvUUw" name="" supplier="AttributedEdge" client="_gRDWgIcaEeKHeMAreRvUUw"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_zq730KhBEeK7PbkcALvgcQ" name="HasMethodTypeArgument" clientDependency="_EGBKMKhCEeK7PbkcALvgcQ" memberEnd="_zq730ahBEeK7PbkcALvgcQ _zq731KhBEeK7PbkcALvgcQ">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_UWFfYKhCEeK7PbkcALvgcQ" annotatedElement="_zq730KhBEeK7PbkcALvgcQ">
+        <body>&lt;p>:&amp;nbsp;AttributedEdge&lt;/p></body>
+      </ownedComment>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_zq731KhBEeK7PbkcALvgcQ" name="genericMethodInvocation" visibility="private" type="MethodInvocation" association="_zq730KhBEeK7PbkcALvgcQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_zq731qhBEeK7PbkcALvgcQ" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_zq731ahBEeK7PbkcALvgcQ"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Realization" xmi:id="_EGBKMKhCEeK7PbkcALvgcQ" supplier="AttributedEdge" client="_zq730KhBEeK7PbkcALvgcQ"/>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="profileApplication1358335121250">
     <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">

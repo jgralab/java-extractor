@@ -12,7 +12,18 @@ exports
   context-free syntax
 	%% constructor call
 	%% duplicate method because of priorities
-    rule "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+    rule "new" ("<" #$typeArg = TypeArgument();#
+		{
+			TypeArg #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("type.specification.SimpleArgument"))) {#
+					ContainsSimpleArgument($typeArg, $0);
+				#} else {#
+					ContainsWildcardArgument($typeArg, $0);
+				#}
+			}#
+			","
+		}+ #HasMethodTypeArgument($, $typeArg);#
+		">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
     rule Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
 	
 	%% method call
