@@ -18,7 +18,8 @@ exports
     rule [0]     [0-7]+       -> OctaNumeral
 
   lexical restrictions
-    DeciNumeral -/- [0-9\.fFdD]
+    DeciNumeral -/- [0-9fFdD]
+	DeciNumeral -/- [\.].[0-9]
     HexaNumeral -/- [0-9a-fA-F]
     OctaNumeral -/- [0-7]
 

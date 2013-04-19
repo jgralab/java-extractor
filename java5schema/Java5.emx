@@ -20997,7 +20997,7 @@
           </children>
           <children xmi:type="notation:DecorationNode" xmi:id="_gRNHiocaEeKHeMAreRvUUw" type="ToRoleLabel" element="_gRDWhIcaEeKHeMAreRvUUw">
             <children xmi:type="notation:BasicDecorationNode" xmi:id="_gRNHjIcaEeKHeMAreRvUUw" type="ToRole"/>
-            <layoutConstraint xmi:type="notation:Location" xmi:id="_gRNHi4caEeKHeMAreRvUUw" x="-95" y="1366"/>
+            <layoutConstraint xmi:type="notation:Location" xmi:id="_gRNHi4caEeKHeMAreRvUUw" x="52" y="1386"/>
           </children>
           <children xmi:type="notation:DecorationNode" xmi:id="_gRNHjYcaEeKHeMAreRvUUw" type="FromMultiplicityLabel" element="_gRDWgYcaEeKHeMAreRvUUw">
             <children xmi:type="notation:BasicDecorationNode" xmi:id="_gRNHj4caEeKHeMAreRvUUw" type="FromMultiplicity"/>
@@ -23057,7 +23057,7 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_iHxScocYEeKHeMAreRvUUw" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_iHxScYcYEeKHeMAreRvUUw" value="1"/>
       </ownedAttribute>
-      <ownedAttribute xmi:id="_8CSTsYcYEeKHeMAreRvUUw" name="constuctorInvocation" visibility="private" type="MethodInvocation" aggregation="composite" association="_8CSTsIcYEeKHeMAreRvUUw">
+      <ownedAttribute xmi:id="_8CSTsYcYEeKHeMAreRvUUw" name="constructorInvocation" visibility="private" type="MethodInvocation" aggregation="composite" association="_8CSTsIcYEeKHeMAreRvUUw">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_8CSTs4cYEeKHeMAreRvUUw" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_8CSTsocYEeKHeMAreRvUUw" value="1"/>
       </ownedAttribute>

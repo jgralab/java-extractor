@@ -12,7 +12,13 @@ exports
   context-free syntax
 	%% constructor call
 	%% duplicate method because of priorities
-    rule "new" ("<" #$typeArg = TypeArgument();#
+    rule #
+			$ = ConstructorCall();
+			$method = MethodInvocation();
+			$method.type = MethodInvocationTypes.CONSTRUCTOR;
+			InvokesConstructor($, $method);
+		#
+		"new" ("<" #$typeArg = TypeArgument();#
 		{
 			TypeArg #{
 				if (((Vertex) #$0#).isInstanceOf(getVertexClass("type.specification.SimpleArgument"))) {#
@@ -22,12 +28,64 @@ exports
 				#}
 			}#
 			","
-		}+ #HasMethodTypeArgument($, $typeArg);#
-		">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
-    rule Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+		}+ #HasMethodTypeArgument($method, $typeArg);#
+		">")?
+		ClassifierType #
+			$type = $2;
+			$identifier = {return utilities.getIdentifierOfConstructorType((Vertex) #$2#);};
+			HasInvokedMethodName($method, $identifier);
+		#
+		"(" {Expression #ContainsCurrentParameter($method, $0);# ","}* ")"
+		#
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = false;}
+		#
+		ClassifierBody #
+				%% create anonymous class
+				$anonymousType = ClassDefinition();
+				$name = {return "";// TODO create qualified name for anonymous class};
+				$anonymousType.name = $name;
+				$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
+				$anonymousType.fullyQualifiedName = $qName;
+				$identifier = name2Identifier.use($name);
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = $name;
+						name2Identifier.declare($name, $identifier);
+					#} else {
+						getPositionsMap().put((Vertex) #$identifier#, currentElement.getParentApplicationOfDefinedRule().getPosition());
+					}
+				}
+				HasTypeName($anonymousType, $identifier);
+				ExtendsClass($anonymousType, $type);
+				{//TODO check if the anonymous class extends a class or implements an interface}
+				ContainsTypeMember($anonymousType, $0);
+				%% create type specification
+				$type = QualifiedType();
+				$type.fullyQualifiedName = $qName;
+				HasSimpleName($type, $identifier);
+				IsDefinedByType($type, $anonymousType);
+			#
+		?
+		#{isLocalVariable = (Boolean) #$isLocalVariable#;}#
+		-> ConstructorSuffix #HasCreatedObjectType($, $type);#
+	rule ConstructorSuffix -> Expression #$ = $0;#
+    rule Expression "." ConstructorSuffix -> Expression #
+			$ = $2;
+			ContainsCalledMethod($.get_constructorInvocation(), $0);
+		#
 	
-	%% method call
-	rule MethodSpec #$ = $0;# "(" {Expression #ContainsCurrentParameter($, $0);# ","}* ")" -> Expression
+	%% method call or constructor calls this() (Expliciteconstructor) or super()
+	rule MethodSpec #$method = $0;# "(" {Expression #ContainsCurrentParameter($method $0);# ","}* ")" -> Expression #
+		$constructorCall = $method.get_consructorCall();
+	{
+		if (#$consructorCall# != null) {#
+			$ = $consructorCall;
+		#} else {#
+			$ = $method;
+		#}
+	}#
 
 	rule (PlainClassifierType ".")? ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
 	rule    (Type ".")? "super" "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec

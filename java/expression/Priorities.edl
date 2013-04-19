@@ -4,7 +4,7 @@ imports
 
 exports
   context-free priorities
-      Expression "." "new" ("<" {TypeArg "," }+ ">")? ClassifierType "(" {Expression ","}* ")" ClassifierBody? -> Expression
+      Expression "." ConstructorSuffix -> Expression
     > {right:
         Expression "++" -> Expression
         Expression "--" -> Expression

@@ -2319,7 +2319,7 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_iHxScocYEeKHeMAreRvUUw" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_iHxScYcYEeKHeMAreRvUUw" value="1"/>
       </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_8CSTsYcYEeKHeMAreRvUUw" name="constuctorInvocation" visibility="private" type="MethodInvocation" aggregation="composite" association="_8CSTsIcYEeKHeMAreRvUUw">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_8CSTsYcYEeKHeMAreRvUUw" name="constructorInvocation" visibility="private" type="MethodInvocation" aggregation="composite" association="_8CSTsIcYEeKHeMAreRvUUw">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_8CSTs4cYEeKHeMAreRvUUw" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_8CSTsocYEeKHeMAreRvUUw" value="1"/>
       </ownedAttribute>

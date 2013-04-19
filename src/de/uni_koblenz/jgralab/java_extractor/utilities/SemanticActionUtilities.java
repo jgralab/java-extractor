@@ -17,6 +17,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.java_extractor.builder.Java5Builder;
 import de.uni_koblenz.jgralab.java_extractor.schema.annotation.Annotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.common.AttributedEdge;
+import de.uni_koblenz.jgralab.java_extractor.schema.common.Identifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.BooleanConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.CharConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.DoubleConstant;
@@ -47,6 +48,7 @@ import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasSimple
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasSimpleName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasUpperBound;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.IsDefinedByType;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.SimpleArgument;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeArgument;
@@ -476,6 +478,21 @@ public class SemanticActionUtilities {
 						vertex);
 			}
 		}
+	}
+
+	public Identifier getIdentifierOfConstructorType(Vertex typeSpecification) {
+		Identifier id = null;
+		if (typeSpecification.isInstanceOf(QualifiedName.VC)) {
+			id = ((QualifiedName) typeSpecification).get_simpleName();
+		} else if (typeSpecification.isInstanceOf(EnclosedType.VC)) {
+			id = getIdentifierOfConstructorType(((EnclosedType) typeSpecification)
+					.get_enclosedType());
+		} else if (typeSpecification.isInstanceOf(TypeParameterUsage.VC)) {
+			id = ((TypeParameterUsage) typeSpecification)
+					.getFirstIsDefinedByTypeIncidence(EdgeDirection.OUT)
+					.getOmega().get_simpleName();
+		}
+		return id;
 	}
 
 	// TODO link qualified names to types, packages, members (especially
