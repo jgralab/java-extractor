@@ -52,9 +52,13 @@ exports
     rule Type "." "super" "." Id -> FieldAccess
 	
     %% todo: JFR-29
-	rule ArrayAccess -> Expression
-    rule Expression SubArrayAccess -> ArrayAccess
-	rule "[" Expression? "]" -> SubArrayAccess
+	rule ArrayAccess -> Expression #$ = $0;#
+    rule Expression SubArrayAccess -> ArrayAccess #
+		$ = FieldAccess();
+		OwnsField($, $0);
+		HasArrayElementIndex($, $1);
+	#
+	rule "[" Expression #lift($0);#? "]" -> SubArrayAccess #$ = $1;#
 
   context-free priorities
 	Expression SubArrayAccess -> ArrayAccess
