@@ -44,7 +44,7 @@ exports
     {
       Expression SubArrayAccess -> ArrayAccess
       Expression "." Id -> FieldAccess
-      Expression "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
+      Expression "." MethodSuffix -> MethodSpec
     }
   > {right:
       Expression "++" -> Expression

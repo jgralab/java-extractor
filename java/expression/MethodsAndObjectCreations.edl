@@ -36,17 +36,22 @@ exports
 			HasInvokedMethodName($method, $identifier);
 		#
 		"(" {Expression #ContainsCurrentParameter($method, $0);# ","}* ")"
-		#
-			$isLocalVariable = {return isLocalVariable;};
-			{isLocalVariable = false;}
-		#
-		ClassifierBody #
+		(
+			#
+				$isLocalVariable = {return isLocalVariable;};
+				{isLocalVariable = false;}
 				%% create anonymous class
 				$anonymousType = ClassDefinition();
-				$name = {return "";// TODO create qualified name for anonymous class};
+				$currentType = {return currentType;};
+				{currentType = (Vertex) #$anonymousType#;}
+				$name = {return "";// TODO create simple name for anonymous class};
 				$anonymousType.name = $name;
 				$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
 				$anonymousType.fullyQualifiedName = $qName;
+				$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+				{qualifiedNamePrefix += "." + #$name#;}
+			#
+			ClassifierBody #
 				$identifier = name2Identifier.use($name);
 				{
 					if (#$identifier# == null) {#
@@ -66,9 +71,12 @@ exports
 				$type.fullyQualifiedName = $qName;
 				HasSimpleName($type, $identifier);
 				IsDefinedByType($type, $anonymousType);
+				%% restore values
+				{isLocalVariable = (Boolean) #$isLocalVariable#;} 
+				{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+				{currentType = (Vertex) #$currentType#;}
 			#
-		?
-		#{isLocalVariable = (Boolean) #$isLocalVariable#;}#
+		)?
 		-> ConstructorSuffix #HasCreatedObjectType($, $type);#
 	rule ConstructorSuffix -> Expression #$ = $0;#
     rule Expression "." ConstructorSuffix -> Expression #
@@ -77,19 +85,142 @@ exports
 		#
 	
 	%% method call or constructor calls this() (Expliciteconstructor) or super()
-	rule MethodSpec #$method = $0;# "(" {Expression #ContainsCurrentParameter($method $0);# ","}* ")" -> Expression #
-		$constructorCall = $method.get_consructorCall();
+	rule MethodSpec #$method = $0;# "(" {Expression #ContainsCurrentParameter($method, $0);# ","}* ")" -> Expression #
+		$constructorCall = $method.get_constructorCall();
 	{
-		if (#$consructorCall# != null) {#
-			$ = $consructorCall;
+		if (#$constructorCall# != null) {#
+			$ = $constructorCall;
 		#} else {#
 			$ = $method;
 		#}
 	}#
 
-	rule (PlainClassifierType ".")? ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
-	rule    (Type ".")? "super" "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec
-	rule             Expression "." ("<" {TypeArg "," }+ ">")? (Id|"this"|"super") -> MethodSpec {avoid}
+	rule #$ = MethodInvocation();# 
+		("<" #$typeArg = TypeArgument();#
+		{
+			TypeArg #{
+				if (((Vertex) #$0#).isInstanceOf(getVertexClass("type.specification.SimpleArgument"))) {#
+					ContainsSimpleArgument($typeArg, $0);
+				#} else {#
+					ContainsWildcardArgument($typeArg, $0);
+				#}
+			}#
+			","
+		}+ #HasMethodTypeArgument($, $typeArg);#
+		">")?
+		(
+			Id #
+				$.type = MethodInvocationTypes.METHOD;
+				$name = lexem($0);
+				$identifier = name2Identifier.use($name);
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = $name;
+						name2Identifier.declare($name, $identifier);
+					#} else {
+						getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+					}
+				}
+				HasInvokedMethodName($, $identifier);
+			#
+			|"this" #
+				$.type = MethodInvocationTypes.EXPLICITCONSTRUCTOR;
+				$cons = ConstructorCall();
+				InvokesConstructor($cons, $);
+				$currentType = {return currentType;};
+				$qualifiedType = QualifiedType();
+				$qualifiedType.fullyQualifiedName = $currentType.fullyQualifiedName;
+				$name = $currentType.name;
+				$identifier = name2Identifier.use($name);
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = $name;
+						name2Identifier.declare($name, $identifier);
+					#} else {
+						getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+					}
+				}
+				HasSimpleName($qualifiedType, $identifier);
+				HasCreatedObjectType($cons, $qualifiedType);
+			#
+			|("super" #
+				$.type = MethodInvocationTypes.SUPERCONSTRUCTOR;
+				$cons = ConstructorCall();
+				InvokesConstructor($cons, $);
+				$currentType = {return currentType;};
+				$superType = $currentType.get_superClass();
+				{
+					if (#$superType# == null) {#
+						%% if no explicite super class exists, then use Object
+						$superType = QualifiedType();
+						$superType.fullyQualifiedName = "java.lang.Object";
+						$name = "Object";
+						$identifier = name2Identifier.use($name);
+						{
+							if (#$identifier# == null) {#
+								$identifier = Identifier();
+								$identifier.name = $name;
+								name2Identifier.declare($name, $identifier);
+							#} else {
+								getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+							}
+						}
+						HasSimpleName($superType, $identifier);
+					#}
+				}
+				HasCreatedObjectType($cons, $superType);
+			#)%% falls kein super, dann Object
+		) -> MethodSuffix
+	rule #$prefix = null;#
+		(
+			PlainClassifierType "." #
+				$prefix = ClassLiteral();
+				$qualifiedType = QualifiedType();
+				$qName = $0;
+				$qualifiedType.fullyQualifiedName = $qName;
+				$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
+				$identifier = name2Identifier.use($simpleName);
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = $simpleName;
+						name2Identifier.declare($simpleName, $identifier);
+					#} else {
+						getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+					}
+				}
+				HasSimpleName($qualifiedType, $identifier);
+				RefersToType($prefix, $qualifiedType);
+			#
+		)? MethodSuffix -> MethodSpec #
+		$ = $1;
+		{
+		if (#$prefix# != null) {#
+			ContainsCalledMethod($, $prefix);
+		#}
+	}#
+	rule #$prefix = null;#
+		(
+			Type "." #
+				$prefix = ClassLiteral();
+				RefersToType($prefix, $0);
+			#
+		)? "super" "." MethodSuffix -> MethodSpec #
+		$ = $3;
+		{
+		if (#$.type# == #MethodInvocationTypes.METHOD#) {#
+			$.type = MethodInvocationTypes.SUPERMETHOD;
+		#}
+		if (#$prefix# != null) {#
+			ContainsCalledMethod($, $prefix);
+		#}
+	}#
+	rule             Expression "." MethodSuffix -> MethodSpec {avoid} #
+		$ = $2;
+		ContainsCalledMethod($, $0);
+	#
 	
 	%% array creation
     rule #$ = ArrayCreation();#

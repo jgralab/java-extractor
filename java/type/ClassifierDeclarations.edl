@@ -10,6 +10,10 @@ global actions
 		$ = $0;
 	#
 
+user code {
+	private Vertex currentType = null;
+}
+
 exports
   sorts ClassDeclaration InterfaceDeclaration EnumDeclaration AnnotationDeclaration ClassifierDeclaration
 
@@ -20,6 +24,8 @@ exports
     rule #
 			$ = ClassDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+			$currentType = {return currentType;};
+			{currentType = (Vertex) #$#;}
 		 #
 		 (
 			Modifier #HasTypeModifier($, $0);#
@@ -34,13 +40,18 @@ exports
          ("extends" ClassifierType #ExtendsClass($, $1);#)?
          ("implements" {ClassifierType #ImplementedInterfacesFromClass($, $0);# ","}+)?
          ClassifierBody #ContainsTypeMember($, $6);#
-		 -> ClassDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
+		 -> ClassDeclaration #
+			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+			{currentType = (Vertex) #$currentType#;}
+		#
 
     %% Enums
 	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule  #
 			$ = EnumDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+			$currentType = {return currentType;};
+			{currentType = (Vertex) #$#;}
 		 #
 		 (
 			Modifier #HasTypeModifier($, $0);#
@@ -53,7 +64,10 @@ exports
 		 #
          ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
          EnumBody  #ContainsTypeMember($, $4);#
-		 -> EnumDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
+		 -> EnumDeclaration #
+			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+			{currentType = (Vertex) #$currentType#;}
+		#
     rule "{" #$ = list();#  EnumConstants #$.addAll($1);# (";"
              %% All kinds of Members except for EnumConstants may follow
              (FieldDeclaration |
@@ -72,6 +86,8 @@ exports
     rule #
 			$ = InterfaceDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+			$currentType = {return currentType;};
+			{currentType = (Vertex) #$#;}
 		 #
 		 (
 			Modifier #HasTypeModifier($, $0);#
@@ -85,13 +101,18 @@ exports
          ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
          ("extends" {ClassifierType #ExtendsInterfaces($, $0);# ","}+)?
          ClassifierBody #ContainsTypeMember($, $5);#
-		 -> InterfaceDeclaration #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
+		 -> InterfaceDeclaration #
+			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+			{currentType = (Vertex) #$currentType#;}
+		#
 
     %% Annotations
 	@Symboltable{name2TypeParameter,name2VariableDeclaration}
     rule  #
 			$ = AnnotationDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+			$currentType = {return currentType;};
+			{currentType = (Vertex) #$#;}
 		 #
 		 (
 			Modifier #HasTypeModifier($, $0);#
@@ -103,7 +124,10 @@ exports
 			$.fullyQualifiedName = {return qualifiedNamePrefix;};
 		 #
 		 AnnotationBody #ContainsTypeMember($, $4);#
-		 -> AnnotationDeclaration  #{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}#
+		 -> AnnotationDeclaration #
+			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+			{currentType = (Vertex) #$currentType#;}
+		#
     %% Yes, there may be enums in annotations
     rule "{" #$ = list();# (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"* #{
 			if (#$0# instanceof java.util.List) {#
