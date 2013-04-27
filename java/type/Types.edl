@@ -77,8 +77,8 @@ exports
 		{
 			if (#$identifier# == null) {#
 				$identifier = Identifier();
-				$identifier.name = lexem($0);
-				name2Identifier.declare(lexem($0), $identifier);
+				$identifier.name = lexem($2);
+				name2Identifier.declare(lexem($2), $identifier);
 			#} else {
 				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
 			}
@@ -119,8 +119,8 @@ exports
 			{
 				if (#$identifier# == null) {#
 					$identifier = Identifier();
-					$identifier.name = lexem($0);
-					name2Identifier.declare(lexem($0), $identifier);
+					$identifier.name = lexem($2);
+					name2Identifier.declare(lexem($2), $identifier);
 				#} else {
 					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
 				}

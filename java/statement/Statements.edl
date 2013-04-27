@@ -33,11 +33,22 @@ exports
 		#
   
     %% statements without trailing substatements
+	@Symboltable{name2VariableDeclaration}
 	rule Block		-> ClosedStatement #
 		$ = Block();
 		ContainsBlockStatement($, $0);
 	#
-	rule "{" Statement #lift($0);# * "}" -> Block #$ = $1;#
+	rule #$statements = list();#
+		"{"
+		Statement #{
+				if (#$0# instanceof Vertex) {#
+					$statements.add($0);
+				#} else {#
+					$statements.addAll($0);
+				#}
+			}# 
+		*
+		"}" -> Block #$ = $statements;#
 	
 	rule ";"        -> ClosedStatement #$ = {return utilities.getEmptyStatement(currentElement.getPosition());};#
 	
@@ -49,6 +60,7 @@ exports
 			{isLocalVariable = (Boolean) #$isLocalVariable#;}
 			$ = $0;
 		#
+	@Symboltable{name2VariableDeclaration}
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}
@@ -58,6 +70,7 @@ exports
 		ContainsDefinedType($, $0);
 		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
+	@Symboltable{name2VariableDeclaration}
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}
@@ -70,6 +83,7 @@ exports
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
 	
+	@Symboltable{name2VariableDeclaration}
 	rule #$ = Switch();#
 		"switch"
 		"(" Expression ")" #ContainsSwitchArgument($, $2);#
@@ -121,6 +135,7 @@ exports
 		$ = Throw();
 		ThrowsExceptionCreatedBy($, $1);
 	#
+	@Symboltable{name2VariableDeclaration}
 	rule #$ = Synchronized();#
 		"synchronized" 
 		"(" Expression ")" #ContainsMonitor($, $2);#
@@ -135,11 +150,22 @@ exports
 		)?
 		";" -> ClosedStatement
 	
-    rule #$ = Try();#
-		"try" Block #ContainsTryBlockStatement($, $1);#
+    rule #
+			$ = Try();
+			name2VariableDeclaration.push();
+		#
+		"try" Block #
+			ContainsTryBlockStatement($, $1);
+			name2VariableDeclaration.pop();
+		#
 		CatchClause #ContainsExceptionHandler($, $0);# *
-		("finally" Block #ContainsFinallyBlockStatement($, $1);#)?
+		(#name2VariableDeclaration.push();# "finally" Block #
+				ContainsFinallyBlockStatement($, $1);
+				name2VariableDeclaration.pop();
+			#
+		)?
 		-> ClosedStatement
+	@Symboltable{name2VariableDeclaration}
     rule "catch" "(" ParamDeclaration ")" Block -> CatchClause #
 		$ = Catch();
 		DeclaresCaughtException($, $2);

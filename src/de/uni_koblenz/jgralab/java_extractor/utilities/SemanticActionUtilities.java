@@ -230,7 +230,7 @@ public class SemanticActionUtilities {
 				int value = 0;
 				if (lexem.toLowerCase().startsWith("0x")) {
 					value = Integer.parseInt(lexem.substring(2), 16);
-				} else if (lexem.startsWith("0")) {
+				} else if (lexem.startsWith("0") && lexem.length() > 1) {
 					value = Integer.parseInt(lexem.substring(1), 8);
 				} else {
 					value = Integer.parseInt(lexem);
@@ -244,7 +244,8 @@ public class SemanticActionUtilities {
 				long value = 0;
 				if (shortenedLexem.toLowerCase().startsWith("0x")) {
 					value = Integer.parseInt(shortenedLexem.substring(2), 16);
-				} else if (shortenedLexem.startsWith("0")) {
+				} else if (shortenedLexem.startsWith("0")
+						&& shortenedLexem.length() > 0) {
 					value = Integer.parseInt(shortenedLexem.substring(1), 8);
 				} else {
 					value = Integer.parseInt(shortenedLexem);

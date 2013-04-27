@@ -70,7 +70,7 @@ exports
 		$ = InfixExpression();
 		$.operator = InfixOperators.INSTANCEOF;
 		ContainsInfixedLeftHandSide($, $0);
-		ContainsInfixedRightHandSide($, $right);
+		ContainsInfixedRightHandSide($, $rhs);
 	#
 
     rule #$operator = InfixOperators.MULTIPLICATION;# Expression "*"   Expression -> Expression  {left}
