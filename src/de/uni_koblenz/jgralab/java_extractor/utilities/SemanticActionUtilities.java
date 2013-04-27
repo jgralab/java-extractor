@@ -229,11 +229,12 @@ public class SemanticActionUtilities {
 						IntegerConstant.VC, position);
 				int value = 0;
 				if (lexem.toLowerCase().startsWith("0x")) {
-					value = Integer.parseInt(lexem.substring(2), 16);
+					String hexString = lexem.substring(2);
+					value = (int) Long.parseLong(hexString, 16);
 				} else if (lexem.startsWith("0") && lexem.length() > 1) {
-					value = Integer.parseInt(lexem.substring(1), 8);
+					value = (int) Long.parseLong(lexem.substring(1), 8);
 				} else {
-					value = Integer.parseInt(lexem);
+					value = (int) Long.parseLong(lexem);
 				}
 				((IntegerConstant) result).set_value(value);
 				((IntegerConstant) result).set_literal(lexem);
@@ -243,12 +244,13 @@ public class SemanticActionUtilities {
 				String shortenedLexem = lexem.substring(0, lexem.length() - 1);
 				long value = 0;
 				if (shortenedLexem.toLowerCase().startsWith("0x")) {
-					value = Integer.parseInt(shortenedLexem.substring(2), 16);
+					shortenedLexem = shortenedLexem.substring(2);
+					value = convertToLong(shortenedLexem, 16);
 				} else if (shortenedLexem.startsWith("0")
-						&& shortenedLexem.length() > 0) {
-					value = Integer.parseInt(shortenedLexem.substring(1), 8);
+						&& shortenedLexem.length() > 1) {
+					value = Long.parseLong(shortenedLexem.substring(1), 8);
 				} else {
-					value = Integer.parseInt(shortenedLexem);
+					value = Long.parseLong(shortenedLexem);
 				}
 				((LongConstant) result).set_value(value);
 				((LongConstant) result).set_literal(lexem);
@@ -274,6 +276,17 @@ public class SemanticActionUtilities {
 			}
 		} else {
 			graphBuilder.getPositionsMap().put(result, position);
+		}
+		return result;
+	}
+
+	private long convertToLong(String shortenedLexem, int radix) {
+		shortenedLexem = shortenedLexem.toLowerCase();
+		long result = 0;
+		for (char currentChar : shortenedLexem.toCharArray()) {
+			result <<= 4;
+			byte currentByte = Byte.parseByte("" + currentChar, radix);
+			result |= currentByte;
 		}
 		return result;
 	}

@@ -12,6 +12,7 @@ exports
   context-free syntax
 	%% constructor call
 	%% duplicate method because of priorities
+	@Symboltable{name2VariableDeclaration}
     rule #
 			$ = ConstructorCall();
 			$method = MethodInvocation();

@@ -110,6 +110,7 @@ exports
 			$qName = $2;
 			$ = StaticImportDefinition();
 			$qualifiedName = QualifiedType();
+			$idIndex = 4;
 		# -> ImportDeclaration #
 			ImportsType($, $qualifiedName);
 			$simpleName = lexem($4);

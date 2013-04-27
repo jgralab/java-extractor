@@ -211,6 +211,7 @@ exports
 		ContainsWhileBody($, $4);
 	#
 	
+	@Symboltable{name2VariableDeclaration}
 	rule #$ = TraditionalFor();#
 		"for" "("
 		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
@@ -219,7 +220,8 @@ exports
 		")"
 		ClosedStatement #ContainsForBody($, $8);#
 		-> ClosedStatement
-
+	
+	@Symboltable{name2VariableDeclaration}
     rule "for" "(" ParamDeclaration ":" Expression ")" ClosedStatement -> ClosedStatement #
 		$ = ForEach();
 		$2 = LocalVariableDeclaration();
@@ -256,6 +258,7 @@ exports
 		ContainsWhileBody($, $4);
 	#
 	
+	@Symboltable{name2VariableDeclaration}
 	rule #$ = TraditionalFor();#
 		"for" "("
 		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
@@ -265,6 +268,7 @@ exports
 		OpenStatement #ContainsForBody($, $8);#
 		-> OpenStatement
 
+	@Symboltable{name2VariableDeclaration}
     rule "for" "(" ParamDeclaration ":" Expression ")" OpenStatement -> OpenStatement #
 		$ = ForEach();
 		$2 = LocalVariableDeclaration();

@@ -36,7 +36,13 @@ exports
 			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		("(" {Expression #ContainsEnumConstantArgument($, $0);# ","}* ")")?
-		ClassifierBody #ContainsEnumMember($, $0);#?      -> EnumConst
+		(
+			#name2VariableDeclaration.push();#
+			ClassifierBody #
+				ContainsEnumMember($, $0);
+				name2VariableDeclaration.pop();
+			#
+		)?      -> EnumConst
 
     %% AnnotationElementDecl
     rule #$ = AnnotationField();#
