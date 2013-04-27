@@ -42,20 +42,98 @@ exports
 	#
     rule "?" Expression ":" -> CondMid {bracket} #$ = $1;#
 	
-	rule FieldAccess -> Expression
+	rule FieldAccess -> Expression #$ = $0;#
 	
-    rule Id  -> FieldAccess %% variable, local field, type parameter, enum constant
+	 %% variable, local field, type parameter, enum constant
+    rule Id  -> FieldAccess #
+		$ = FieldAccess();
+		$name = lexem($0);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		HasFieldName($, $identifier);
+	#
 	
-	rule                 Expression "." Id -> FieldAccess
-    rule             Type "." Id -> FieldAccess {avoid}
-    rule              "super" "." Id -> FieldAccess
-    rule Type "." "super" "." Id -> FieldAccess
+	rule                 Expression "." Id -> FieldAccess #
+		$ = FieldAccess();
+		$name = lexem($2);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		OwnsField($, $0);
+		HasFieldName($, $identifier);
+	#
+    rule             Type "." Id -> FieldAccess {avoid} #
+		$ = FieldAccess();
+		$name = lexem($2);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		$classLiteral = ClassLiteral();
+		RefersToType($classLiteral, $0);
+		OwnsField($, $classLiteral);
+		HasFieldName($, $identifier);
+	#
+    rule              "super" "." Id -> FieldAccess #
+		$ = SuperFieldAccess();
+		$name = lexem($2);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		HasFieldName($, $identifier);
+	#
+    rule Type "." "super" "." Id -> FieldAccess #
+		$ = SuperFieldAccess();
+		$name = lexem($4);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		$classLiteral = ClassLiteral();
+		RefersToType($classLiteral, $0);
+		OwnsField($, $classLiteral);
+		HasFieldName($, $identifier);
+	#
 	
     %% todo: JFR-29
 	rule ArrayAccess -> Expression #$ = $0;#
     rule Expression SubArrayAccess -> ArrayAccess #
-		$ = FieldAccess();
-		OwnsField($, $0);
+		$ = ArrayAccess();
+		OwnsArray($, $0);
 		HasArrayElementIndex($, $1);
 	#
 	rule "[" Expression #lift($0);#? "]" -> SubArrayAccess #$ = $1;#

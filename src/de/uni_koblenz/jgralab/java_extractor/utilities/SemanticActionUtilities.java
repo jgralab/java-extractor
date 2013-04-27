@@ -494,7 +494,14 @@ public class SemanticActionUtilities {
 		}
 		return id;
 	}
-	
+
+	// TODO correct field access
+
+	// TODO check if the anonymous class extends a class or implements an
+	// interface
+
+	// TODO create simple name for anonymous class
+
 	// TODO a.b.c.run() if a or b or c is a field
 
 	// TODO link qualified names to types, packages, members (especially
