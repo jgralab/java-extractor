@@ -60,7 +60,7 @@ exports
 			{isLocalVariable = (Boolean) #$isLocalVariable#;}
 			$ = $0;
 		#
-	@Symboltable{name2VariableDeclaration}
+	@Symboltable{name2VariableDeclaration, name2Label}
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}
@@ -70,7 +70,7 @@ exports
 		ContainsDefinedType($, $0);
 		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
-	@Symboltable{name2VariableDeclaration}
+	@Symboltable{name2VariableDeclaration, name2Label}
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}

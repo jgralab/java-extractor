@@ -256,7 +256,7 @@ public class SemanticActionUtilities {
 				((LongConstant) result).set_literal(lexem);
 			} else if (lexem
 					.matches("^(((\\d+\\.\\d*([eE][+-]?\\d+)?)|(\\.\\d+([eE][+-]?\\d+)?)|(\\d+([eE][+-]?\\d+)?))"
-							+ "|(0[xX](([0-9a-fA-F]\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
+							+ "|(0[xX](([0-9a-fA-F]+\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
 							+ "[fF]$")) {
 				result = (Expression) graphBuilder.createVertex(
 						FloatConstant.VC, position);
@@ -264,7 +264,7 @@ public class SemanticActionUtilities {
 				((FloatConstant) result).set_literal(lexem);
 			} else if (lexem
 					.matches("^(((\\d+\\.\\d*([eE][+-]?\\d+)?)|(\\.\\d+([eE][+-]?\\d+)?)|(\\d+([eE][+-]?\\d+)?))"
-							+ "|(0[xX](([0-9a-fA-F]\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
+							+ "|(0[xX](([0-9a-fA-F]+\\.?)|([0-9a-fA-F]*\\.[0-9a-fA-F]+))[pP][+-]?\\d+))"
 							+ "[dD]?$")) {
 				result = (Expression) graphBuilder.createVertex(
 						DoubleConstant.VC, position);
