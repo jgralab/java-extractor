@@ -243,7 +243,10 @@ public class SemanticActionUtilities {
 						LongConstant.VC, position);
 				String shortenedLexem = lexem.substring(0, lexem.length() - 1);
 				long value = 0;
-				if (shortenedLexem.toLowerCase().startsWith("0x")) {
+				if (shortenedLexem.equals(Long.toString(Long.MIN_VALUE)
+						.substring(1))) {
+					value = Long.MIN_VALUE;
+				} else if (shortenedLexem.toLowerCase().startsWith("0x")) {
 					shortenedLexem = shortenedLexem.substring(2);
 					value = convertToLong(shortenedLexem, 16);
 				} else if (shortenedLexem.startsWith("0")
@@ -278,6 +281,22 @@ public class SemanticActionUtilities {
 			graphBuilder.getPositionsMap().put(result, position);
 		}
 		return result;
+	}
+
+	public Vertex applyMinus(Vertex numberLiteral) {
+		if (numberLiteral.isInstanceOf(LongConstant.VC)
+				&& numberLiteral.getAttribute("value").equals(Long.MIN_VALUE)) {
+			return numberLiteral;
+		}
+		Object oldValue = numberLiteral.getAttribute("value");
+		if (oldValue instanceof Long) {
+			numberLiteral.setAttribute("value", -1 * ((Long) oldValue));
+		} else {
+			numberLiteral.setAttribute("value", -1 * ((Double) oldValue));
+		}
+		numberLiteral.setAttribute("literal",
+				"-" + numberLiteral.getAttribute("literal"));
+		return numberLiteral;
 	}
 
 	private long convertToLong(String shortenedLexem, int radix) {

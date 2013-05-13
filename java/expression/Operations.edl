@@ -4,11 +4,13 @@ imports
   java/type/Types %% Type ClassifierType PrimType ArrayType
 
 global actions
-	pattern _ Expression -> Expression #
-		$ = PrefixExpression();
-		$.operator = $operator;
-		ContainsPrefixedRightHandSide($, $1);
-	#
+	pattern _ Expression -> Expression #{
+		if (!(Boolean) #$isLiteralPrefix#) {#
+			$ = PrefixExpression();
+			$.operator = $operator;
+			ContainsPrefixedRightHandSide($, $1);
+		#}
+	}#
 	
 	pattern Expression _ -> Expression #
 		$ = PostfixExpression();
@@ -35,14 +37,25 @@ exports
   sorts CondMid LHS
 
   context-free syntax
-	rule #$operator = PrefixOperators.PLUS;# "+" Expression -> Expression 
-    rule #$operator = PrefixOperators.MINUS;# "-" Expression -> Expression
+	rule #$operator = PrefixOperators.PLUS;# "+" Expression #$isLiteralPrefix = false;# -> Expression 
+    rule #$operator = PrefixOperators.MINUS;# "-" Expression #
+			$isLiteralPrefix = {return (((Vertex) #$1#).isInstanceOf(getVertexClass("expression.LongConstant"))
+					|| ((Vertex) #$1#).isInstanceOf(getVertexClass("expression.IntegerConstant"))
+					|| ((Vertex) #$1#).isInstanceOf(getVertexClass("expression.FloatConstant"))
+					|| ((Vertex) #$1#).isInstanceOf(getVertexClass("expression.DoubleConstant")))
+					&& !((String) #lexem($1)#).startsWith("-");};
+		#
+		 -> Expression #{
+			if ((Boolean) #$isLiteralPrefix#) {#
+				$ = {return utilities.applyMinus((Vertex) #$1#);};
+			#}
+		 }#
 
-    rule #$operator = PrefixOperators.INCREMENT;# "++" Expression -> Expression
-    rule #$operator = PrefixOperators.DECREMENT;# "--" Expression -> Expression
+    rule #$operator = PrefixOperators.INCREMENT;# "++" #$isLiteralPrefix = false;# Expression -> Expression
+    rule #$operator = PrefixOperators.DECREMENT;# "--" #$isLiteralPrefix = false;# Expression -> Expression
 
-    rule #$operator = PrefixOperators.BITWISECOMPLEMENT;# "~" Expression -> Expression
-    rule #$operator = PrefixOperators.NOT;# "!" Expression -> Expression
+    rule #$operator = PrefixOperators.BITWISECOMPLEMENT;# "~" Expression #$isLiteralPrefix = false;# -> Expression
+    rule #$operator = PrefixOperators.NOT;# "!" Expression #$isLiteralPrefix = false;# -> Expression
 
 	%% splitting in three rules is required because of priorities
     rule "(" PrimType ")" Expression -> Expression #
