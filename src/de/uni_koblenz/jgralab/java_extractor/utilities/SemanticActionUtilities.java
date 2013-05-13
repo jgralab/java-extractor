@@ -509,6 +509,10 @@ public class SemanticActionUtilities {
 		return id;
 	}
 
+	// TODO check octal-excape of strings (if numbers follows after, e.g., \007)
+
+	// TODO check long value -9223372036854775808L
+
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an
