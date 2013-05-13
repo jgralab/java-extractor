@@ -2426,6 +2426,9 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="StringConstant" name="StringConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_StringConstant" general="Expression"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_wgDJ0LvBEeKS2YAIchA85A" name="literal" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
+      </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="StringConstant_value" name="value" visibility="private">
         <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
       </ownedAttribute>

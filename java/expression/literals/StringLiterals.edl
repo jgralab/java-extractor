@@ -7,13 +7,15 @@ exports
   sorts StringLiteral StringPart StringChars FooStringChars
 
   lexical syntax
-    rule "\"" StringPart* "\"" -> StringLiteral
-    rule StringChars    -> StringPart
+    rule #$result = {return new StringBuilder();};# 
+		"\"" StringPart #{((StringBuilder) #$result#).append((String) #$0#);}# * "\"" -> StringLiteral #$ = $result.toString();#
+    rule StringChars    -> StringPart #$ = $0;#
     %% rule UnicodeEscape  -> StringPart
-    rule EscapeSeq      -> StringPart
+    rule EscapeSeq      -> StringPart #$ = $0;#
 
-    rule FooStringChars -> StringChars
-    rule ~[\"\\\n\13]+  -> FooStringChars
+    rule FooStringChars -> StringChars #$ = $0;# 
+    rule #$result = {return new StringBuilder();};# 
+		~[\"\\\n\13] #{((StringBuilder) #$result#).append((String) #lexem($0)#);}# +  -> FooStringChars #$ = $result.toString();#
 
   lexical restrictions
     StringChars -/- ~[\"\\\n\13]

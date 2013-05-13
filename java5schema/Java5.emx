@@ -19426,7 +19426,7 @@
           </children>
           <children xmi:type="notation:BasicDecorationNode" xmi:id="_MCgtyIZjEeKpOY8hzLCoLg" type="Stereotype"/>
           <children xmi:type="notation:BasicDecorationNode" xmi:id="_MCgtyYZjEeKpOY8hzLCoLg" type="CommentBody"/>
-          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_MCgtw4ZjEeKpOY8hzLCoLg" x="19272" y="4224"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_MCgtw4ZjEeKpOY8hzLCoLg" x="19139" y="4224" width="3093"/>
         </children>
         <element xsi:nil="true"/>
         <edges xmi:type="umlnotation:UMLConnector" xmi:id="_QGZ4zWx_EeKYs9kdGHEfww" element="generalization_BooleanConstant" source="_LpzKkGx_EeKYs9kdGHEfww" target="_QGQHwGx_EeKYs9kdGHEfww" routing="Tree" lineColor="8421504" showStereotype="Text">
@@ -23253,6 +23253,9 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="StringConstant" name="StringConstant">
       <generalization xmi:id="generalization_StringConstant" general="Expression"/>
+      <ownedAttribute xmi:id="_wgDJ0LvBEeKS2YAIchA85A" name="literal" visibility="private">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
       <ownedAttribute xmi:id="StringConstant_value" name="value" visibility="private">
         <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
       </ownedAttribute>

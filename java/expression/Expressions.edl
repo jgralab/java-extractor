@@ -19,8 +19,14 @@ exports
 	rule IntLiteral    -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
     rule FloatLiteral  -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
     rule BoolLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
-    rule CharLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
-    rule StringLiteral -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
+    rule CharLiteral   -> Expression #
+		$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};
+		$.value = {return (int) ((String) #$0#).charAt(0);};
+	#
+    rule StringLiteral -> Expression #
+		$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};
+		$.value = $0;
+	#
     rule NullLiteral   -> Expression #$ = {return utilities.getLiteral((String) #lexem($0)#, currentElement.getPosition());};#
 	
     rule Type   "." "class" -> Expression #

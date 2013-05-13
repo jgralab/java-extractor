@@ -218,12 +218,10 @@ public class SemanticActionUtilities {
 				result = (Expression) graphBuilder.createVertex(
 						CharConstant.VC, position);
 				((CharConstant) result).set_literal(lexem);
-				((CharConstant) result).set_value(lexem.charAt(1));
 			} else if (lexem.startsWith("\"") && lexem.endsWith("\"")) {
 				result = (Expression) graphBuilder.createVertex(
 						StringConstant.VC, position);
-				((StringConstant) result).set_value(lexem.substring(1,
-						lexem.length() - 1));
+				((StringConstant) result).set_literal(lexem);
 			} else if (lexem.matches("^(\\d+|(0[xX](\\d|[a-fA-F])+))$")) {
 				result = (Expression) graphBuilder.createVertex(
 						IntegerConstant.VC, position);
@@ -308,6 +306,25 @@ public class SemanticActionUtilities {
 			result |= currentByte;
 		}
 		return result;
+	}
+
+	public String getEscapedString(String escapedString) {
+		escapedString = escapedString.substring(1);
+		if (escapedString.equals("b")) {
+			return "\b";
+		} else if (escapedString.equals("t")) {
+			return "\t";
+		} else if (escapedString.equals("n")) {
+			return "\n";
+		} else if (escapedString.equals("f")) {
+			return "\f";
+		} else if (escapedString.equals("r")) {
+			return "\r";
+		} else if (escapedString.matches("^\\d\\d?\\d?$")) {
+			return "" + (char) Integer.parseInt(escapedString, 8);
+		} else {
+			return escapedString;
+		}
 	}
 
 	/*
@@ -529,8 +546,6 @@ public class SemanticActionUtilities {
 	}
 
 	// TODO check octal-excape of strings (if numbers follows after, e.g., \007)
-
-	// TODO check long value -9223372036854775808L
 
 	// TODO correct field access
 
