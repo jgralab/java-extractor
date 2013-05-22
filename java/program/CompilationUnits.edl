@@ -61,7 +61,7 @@ exports
 		 #
 			ContainsTranslationUnit($currentPackage, $translationUnit);
 		 #
-		ImportDeclaration #DeclaresExternalDeclaration($translationUnit, $0);#*
+		(ImportDeclaration #DeclaresExternalDeclaration($translationUnit, $0);# | ";")*
 		(ClassifierDeclaration #DeclaresExternalDeclaration($translationUnit, $0);# ";"*)* -> CompilationUnit #
 			$translationUnit.lengthOfFile = length($);
 			$ = $program;
@@ -96,6 +96,8 @@ exports
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
+			$importedType = {return utilities.resolveQualifiedType(currentElement, (SymbolTableStack) #qName2Type#, (SymbolTableStack) #name2Identifier#, (String) #$qName#);};
+			IsDefinedByType($qualifiedName, $importedType);
 		#
     rule "import" PackageName "." "*" ";" #
 			$qName = $1;

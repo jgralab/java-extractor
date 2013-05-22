@@ -14,6 +14,7 @@ symbol tables
 	name2Identifier<Identifier>
 	name2TypeParameter<TypeParameterDeclaration> %% uses simple names as keys
 	name2VariableDeclaration<VariableDeclaration>
+	qName2Type<Type>
 user code {
 
 	private static String programName;

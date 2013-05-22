@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.edl.parser.Position;
+import de.uni_koblenz.edl.parser.stack.elements.StackElement;
 import de.uni_koblenz.edl.parser.symboltable.SymbolTableStack;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.EdgeDirection;
@@ -34,7 +35,13 @@ import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
 import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.AnnotationDefinition;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ClassDefinition;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.InterfaceDefinition;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.SpecificType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.ArrayType;
@@ -545,6 +552,75 @@ public class SemanticActionUtilities {
 		return id;
 	}
 
+	/*
+	 * Linking
+	 */
+
+	public Type resolveQualifiedType(StackElement currentElement,
+			SymbolTableStack qName2Type, SymbolTableStack name2Identifier,
+			String qualifiedName) {
+		Type type = (Type) qName2Type.use(qualifiedName);
+		String simpleName = qualifiedName.substring(qualifiedName
+				.lastIndexOf('.') + 1);
+		String qName = qualifiedName;
+		if (type == null) {
+			Position position = currentElement.getPosition();
+			SpecificType specificType = null;
+			Class<?> cls = null;
+			while (specificType == null) {
+				try {
+					cls = Class.forName(qName);
+					if (cls.isAnnotation()) {
+						specificType = (SpecificType) graphBuilder
+								.createVertex(AnnotationDefinition.VC, position);
+					} else if (cls.isInterface()) {
+						specificType = (SpecificType) graphBuilder
+								.createVertex(InterfaceDefinition.VC, position);
+					} else if (cls.isEnum()) {
+						specificType = (SpecificType) graphBuilder
+								.createVertex(EnumDefinition.VC, position);
+					} else {
+						// this is a class definition
+						specificType = (SpecificType) graphBuilder
+								.createVertex(ClassDefinition.VC, position);
+					}
+					simpleName = cls.getSimpleName();
+				} catch (ClassNotFoundException e) {
+					if (qName.contains(".")) {
+						qName = qName.substring(0, qName.lastIndexOf('.'))
+								+ "$"
+								+ qName.substring(qName.lastIndexOf('.') + 1);
+					} else {
+						specificType = (SpecificType) graphBuilder
+								.createVertex(ClassDefinition.VC, position);
+						qName = qualifiedName;
+						System.out
+								.println("WARNING: No type with qualified name "
+										+ qualifiedName
+										+ " could be found.\n\tThe following vertex was created as default: "
+										+ specificType
+										+ "\n\tcurrentFile: "
+										+ currentElement.getNameOfParsedFile()
+										+ "\n\t" + currentElement.getPosition());
+					}
+				}
+			}
+			specificType.set_external(true);
+			specificType.set_fullyQualifiedName(qName);
+			type = specificType;
+			type.set_name(simpleName);
+			Identifier id = (Identifier) name2Identifier.use(simpleName);
+			if (id == null) {
+				id = (Identifier) graphBuilder.createVertex(Identifier.VC,
+						position);
+				id.set_name(simpleName);
+				name2Identifier.declare(simpleName, id);
+			}
+			graphBuilder.createEdge(HasTypeName.EC, type, id);
+			qName2Type.declare(qualifiedName, type);
+		}
+		return type;
+	}
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an
