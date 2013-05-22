@@ -545,8 +545,6 @@ public class SemanticActionUtilities {
 		return id;
 	}
 
-	// TODO check octal-excape of strings (if numbers follows after, e.g., \007)
-
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an
