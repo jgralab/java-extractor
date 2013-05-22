@@ -45,7 +45,11 @@
 		 classpathref="classpath" debug="true"
 		 srcdir="src" destdir="build/classes"/>
 	</target>
+	
+	<target name="createLibDir">
+			<mkdir dir="${lib.dir}" />
+	</target>
 
-	<target name="build" depends="jgralab,clean,compile,process-edl,jar" />
+	<target name="build" depends="createLibDir,jgralab,clean,compile,process-edl,jar" />
 
 </project>
