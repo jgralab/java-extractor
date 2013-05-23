@@ -621,6 +621,7 @@ public class SemanticActionUtilities {
 		}
 		return type;
 	}
+	
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an
