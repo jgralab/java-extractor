@@ -96,8 +96,14 @@ exports
 		# 
 		-> ImportDeclaration #
 			ImportsType($, $qualifiedName);
-			$importedType = {return utilities.resolveQualifiedType(currentElement, (SymbolTableStack) #qName2Type#, (SymbolTableStack) #name2Identifier#, (String) #$qName#);};
-			IsDefinedByType($qualifiedName, $importedType);
+			{
+			 if (mode == Mode.LAZY) {
+				utilities.addImportedType((Vertex) #$qualifiedName#);
+			 } else {#
+				$importedType = {return utilities.resolveQualifiedType(currentElement, (SymbolTableStack) #qName2Type#, (SymbolTableStack) #name2Identifier#, (String) #$qName#);};
+				IsDefinedByType($qualifiedName, $importedType);
+			 #}
+			}
 		#
     rule "import" PackageName "." "*" ";" #
 			$qName = $1;

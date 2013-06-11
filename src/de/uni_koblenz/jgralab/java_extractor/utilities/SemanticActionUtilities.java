@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uni_koblenz.edl.parser.Position;
 import de.uni_koblenz.edl.parser.stack.elements.StackElement;
@@ -556,6 +558,20 @@ public class SemanticActionUtilities {
 	 * Linking
 	 */
 
+	/*
+	 * a) LAZY
+	 */
+
+	private Set<Vertex> importedTypes = new HashSet<Vertex>();
+
+	public void addImportedType(Vertex qualifiedType) {
+		importedTypes.add(qualifiedType);
+	}
+
+	/*
+	 * b) EAGER & COMPLETE
+	 */
+
 	public Type resolveQualifiedType(StackElement currentElement,
 			SymbolTableStack qName2Type, SymbolTableStack name2Identifier,
 			String qualifiedName) {
@@ -621,7 +637,7 @@ public class SemanticActionUtilities {
 		}
 		return type;
 	}
-	
+
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an

@@ -16,6 +16,7 @@
   <packagedElement xmi:type="uml:Package" xmi:id="PrimitiveTypes" name="PrimitiveTypes">
     <packagedElement xmi:type="uml:PrimitiveType" xmi:id="Double" name="Double"/>
     <packagedElement xmi:type="uml:PrimitiveType" xmi:id="Long" name="Long"/>
+    <packagedElement xmi:type="uml:PrimitiveType" xmi:id="_OSel0NKBEeKSKrj7T_jYuw" name="String"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_d4914F_rEeKcZY0fjvOS6w" name="common">
     <packagedElement xmi:type="uml:Class" xmi:id="Identifier" name="Identifier">
@@ -2820,6 +2821,10 @@
     <packagedElement xmi:type="uml:Realization" xmi:id="_nKWHsK8pEeKDMvkH-RadZw" supplier="AttributedEdge" client="_XYLPcK8pEeKDMvkH-RadZw"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_7OcSsK8qEeKDMvkH-RadZw" name="SuperFieldAccess">
       <generalization xmi:type="uml:Generalization" xmi:id="_8c1_gK8qEeKDMvkH-RadZw" general="FieldAccess"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_sU9z8NJ_EeKSKrj7T_jYuw" name="UnknownExpression">
+      <generalization xmi:type="uml:Generalization" xmi:id="_t2aYkNJ_EeKSKrj7T_jYuw" general="Expression"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Lrjm4NKBEeKSKrj7T_jYuw" name="lexem" visibility="private" type="_OSel0NKBEeKSKrj7T_jYuw"/>
     </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="profileApplication1358335121250">

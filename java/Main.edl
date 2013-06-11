@@ -17,6 +17,12 @@ symbol tables
 	qName2Type<Type>
 user code {
 
+	public static enum Mode{
+		LAZY, EAGER, COMPLETE;
+	}
+	
+	private static Mode mode;
+
 	private static String programName;
 	
 	static {
@@ -26,6 +32,26 @@ user code {
 		name.setRequired(false);
 		name.setArgName("name");
 		GraphBuilderBaseImpl.furtherCommandLineOptions.add(name);
+		
+		Option lazy = new Option("l", "lazy", false,
+				"(optional): Only the fields, methods, and types are linked, which are currently parsed."
+				+ " No reflection is done to identify used types."
+				+ " Expressions such as a.b.c which cannot be determined exactly are represented by a vertex of type expression.UnknownExpression."
+				+ " This is the default case.");
+		lazy.setRequired(false);
+		GraphBuilderBaseImpl.furtherCommandLineOptions.add(lazy);
+		
+		Option eager = new Option("e", "eager", false,
+				"(optional): In this mode, fields, methods and type which cannot be identified in the LAZY mode are identified via reflection."
+				+ "This requires that all used types are added to the CLASSPATH."
+				+ "Only the fields, methods and types which are used directly or indirectly in the parsed source code is represented.");
+		eager.setRequired(false);
+		GraphBuilderBaseImpl.furtherCommandLineOptions.add(eager);
+		
+		Option complete = new Option("c", "complete", false,
+				"(optional): This mode extends the EAGER mode by adding all fields, method signaturs, and extended or implemented types of directly or indirectly used types even if these members and types are not used in the parsed source code.");
+		complete.setRequired(false);
+		GraphBuilderBaseImpl.furtherCommandLineOptions.add(complete);
 	}
 
 	@Override
@@ -35,6 +61,14 @@ user code {
 			name = commandLine.getOptionValue("n");
 		}
 		programName = name;
+		
+		mode = Mode.LAZY;
+		if (commandLine.hasOption("e")) {
+			mode = Mode.EAGER;
+		}
+		if (commandLine.hasOption("c")) {
+			mode = Mode.COMPLETE;
+		}
 	}
 	
 	private SemanticActionUtilities utilities = new SemanticActionUtilities(this);
