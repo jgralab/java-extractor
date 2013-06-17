@@ -21,9 +21,11 @@ user code {
 		LAZY, EAGER, COMPLETE;
 	}
 	
-	private static Mode mode;
+	private Mode mode;
 
-	private static String programName;
+	private String programName;
+	
+	private boolean noComment; 
 	
 	static {
 		Option name = new Option("n", "name", true,
@@ -52,6 +54,11 @@ user code {
 				"(optional): This mode extends the EAGER mode by adding all fields, method signaturs, and extended or implemented types of directly or indirectly used types even if these members and types are not used in the parsed source code.");
 		complete.setRequired(false);
 		GraphBuilderBaseImpl.furtherCommandLineOptions.add(complete);
+		
+		Option noComment = new Option("no_comments", false,
+				"(optional): If set, no comments are created.");
+		noComment.setRequired(false);
+		GraphBuilderBaseImpl.furtherCommandLineOptions.add(noComment);
 	}
 
 	@Override
@@ -69,6 +76,8 @@ user code {
 		if (commandLine.hasOption("c")) {
 			mode = Mode.COMPLETE;
 		}
+		
+		noComment = commandLine.hasOption("no_comments");
 	}
 	
 	private SemanticActionUtilities utilities = new SemanticActionUtilities(this);
