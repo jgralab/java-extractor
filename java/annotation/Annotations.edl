@@ -48,7 +48,7 @@ exports
 				}
 			}
 			$fieldAccess = FieldAccess();
-			HasFieldName($fieldAccess, $identifier);
+			expression.HasVariableName($fieldAccess, $identifier);
 			$elementValuePair = ElementValuePair();
 			SetsField($elementValuePair, $fieldAccess);
 			AssignesValue($elementValuePair, $3);
@@ -70,7 +70,7 @@ exports
 			}
 		}
 		$fieldAccess = FieldAccess();
-		HasFieldName($fieldAccess, $identifier);
+		expression.HasVariableName($fieldAccess, $identifier);
 		$ = ElementValuePair();
 		SetsField($, $fieldAccess);
 		AssignesValue($, $2);

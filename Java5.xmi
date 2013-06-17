@@ -2220,11 +2220,7 @@
       <body>: AttributedEdge</body>
     </ownedComment>
     <packagedElement xmi:type="uml:Class" xmi:id="FieldAccess" name="FieldAccess">
-      <generalization xmi:type="uml:Generalization" xmi:id="generalization_FieldAccess" general="Expression"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_JKBCYYGcEeKtQfbmXovTzA" name="declarationOfAccessedField" visibility="private" type="JavaVertex" association="_JKBCYIGcEeKtQfbmXovTzA">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JKBCY4GcEeKtQfbmXovTzA" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JKBCYoGcEeKtQfbmXovTzA"/>
-      </ownedAttribute>
+      <generalization xmi:type="uml:Generalization" xmi:id="_1TLHENdLEeKxOPUbmjfw7A" general="_pN2UANdLEeKxOPUbmjfw7A"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_axmHoYGdEeKtQfbmXovTzA" name="fieldOwner" visibility="private" type="Expression" association="_axmHoIGdEeKtQfbmXovTzA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_axmHo4GdEeKtQfbmXovTzA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_axmHooGdEeKtQfbmXovTzA"/>
@@ -2577,22 +2573,22 @@
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Realization" xmi:id="_BAW0oIGREeKtQfbmXovTzA" name="" supplier="AttributedEdge" client="__UpgwIGQEeKtQfbmXovTzA"/>
-    <packagedElement xmi:type="uml:Association" xmi:id="_JKBCYIGcEeKtQfbmXovTzA" name="DeclaresAccessedField" memberEnd="_JKBCYYGcEeKtQfbmXovTzA _JKBCZIGcEeKtQfbmXovTzA">
+    <packagedElement xmi:type="uml:Association" xmi:id="_JKBCYIGcEeKtQfbmXovTzA" name="DeclaresAccessedVariable" memberEnd="_JKBCYYGcEeKtQfbmXovTzA _JKBCZIGcEeKtQfbmXovTzA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_tP32QIGcEeKtQfbmXovTzA" annotatedElement="_JKBCYIGcEeKtQfbmXovTzA">
         <body>: Declares</body>
       </ownedComment>
       <generalization xmi:type="uml:Generalization" xmi:id="_wpYIsIGcEeKtQfbmXovTzA" general="IsDeclarationOf"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_JKBCZIGcEeKtQfbmXovTzA" name="accessOfDeclaredField" visibility="private" type="FieldAccess" association="_JKBCYIGcEeKtQfbmXovTzA">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_JKBCZIGcEeKtQfbmXovTzA" name="accessOfDeclaredVariable" visibility="private" type="_pN2UANdLEeKxOPUbmjfw7A" association="_JKBCYIGcEeKtQfbmXovTzA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JKBCZoGcEeKtQfbmXovTzA" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JKBCZYGcEeKtQfbmXovTzA"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_DYodIIGdEeKtQfbmXovTzA" name="HasFieldName" memberEnd="_DYodIYGdEeKtQfbmXovTzA _DYodJIGdEeKtQfbmXovTzA">
+    <packagedElement xmi:type="uml:Association" xmi:id="_DYodIIGdEeKtQfbmXovTzA" name="HasVariableName" memberEnd="_DYodIYGdEeKtQfbmXovTzA _DYodJIGdEeKtQfbmXovTzA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_QtGj4IGdEeKtQfbmXovTzA" annotatedElement="_DYodIIGdEeKtQfbmXovTzA">
         <body>: HasName</body>
       </ownedComment>
       <generalization xmi:type="uml:Generalization" xmi:id="_FHd9gIGdEeKtQfbmXovTzA" general="_VZaxkHBQEeKie9MLu0o9lQ"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_DYodJIGdEeKtQfbmXovTzA" name="namedFieldAccess" visibility="private" type="FieldAccess" association="_DYodIIGdEeKtQfbmXovTzA">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_DYodJIGdEeKtQfbmXovTzA" name="namedFieldAccess" visibility="private" type="_pN2UANdLEeKxOPUbmjfw7A" association="_DYodIIGdEeKtQfbmXovTzA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DYodJoGdEeKtQfbmXovTzA" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DYodJYGdEeKtQfbmXovTzA"/>
       </ownedEnd>
@@ -2825,6 +2821,16 @@
     <packagedElement xmi:type="uml:Class" xmi:id="_sU9z8NJ_EeKSKrj7T_jYuw" name="UnknownExpression">
       <generalization xmi:type="uml:Generalization" xmi:id="_t2aYkNJ_EeKSKrj7T_jYuw" general="Expression"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Lrjm4NKBEeKSKrj7T_jYuw" name="lexem" visibility="private" type="_OSel0NKBEeKSKrj7T_jYuw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_pN2UANdLEeKxOPUbmjfw7A" name="VariableAccess" isAbstract="true">
+      <generalization xmi:type="uml:Generalization" xmi:id="generalization_FieldAccess" general="Expression"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_JKBCYYGcEeKtQfbmXovTzA" name="declarationOfAccessedVariable" visibility="private" type="JavaVertex" association="_JKBCYIGcEeKtQfbmXovTzA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_JKBCY4GcEeKtQfbmXovTzA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_JKBCYoGcEeKtQfbmXovTzA"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_zmuMUNdLEeKxOPUbmjfw7A" name="LocalVariableAccess">
+      <generalization xmi:type="uml:Generalization" xmi:id="_0w0A4NdLEeKxOPUbmjfw7A" general="_pN2UANdLEeKxOPUbmjfw7A"/>
     </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="profileApplication1358335121250">

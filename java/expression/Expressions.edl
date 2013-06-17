@@ -64,7 +64,7 @@ exports
 				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
 			}
 		}
-		HasFieldName($, $identifier);
+		expression.HasVariableName($, $identifier);
 	#
 	
 	rule                 Expression "." Id -> FieldAccess #
@@ -81,7 +81,7 @@ exports
 			}
 		}
 		OwnsField($, $0);
-		HasFieldName($, $identifier);
+		expression.HasVariableName($, $identifier);
 	#
     rule             Type "." Id -> FieldAccess {avoid} #
 		$ = FieldAccess();
@@ -99,7 +99,7 @@ exports
 		$classLiteral = ClassLiteral();
 		RefersToType($classLiteral, $0);
 		OwnsField($, $classLiteral);
-		HasFieldName($, $identifier);
+		expression.HasVariableName($, $identifier);
 	#
     rule              "super" "." Id -> FieldAccess #
 		$ = SuperFieldAccess();
@@ -114,7 +114,7 @@ exports
 				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
 			}
 		}
-		HasFieldName($, $identifier);
+		expression.HasVariableName($, $identifier);
 	#
     rule Type "." "super" "." Id -> FieldAccess #
 		$ = SuperFieldAccess();
@@ -132,7 +132,7 @@ exports
 		$classLiteral = ClassLiteral();
 		RefersToType($classLiteral, $0);
 		OwnsField($, $classLiteral);
-		HasFieldName($, $identifier);
+		expression.HasVariableName($, $identifier);
 	#
 	
     %% todo: JFR-29

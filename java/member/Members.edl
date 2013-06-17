@@ -32,7 +32,7 @@ exports
 					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());
 				}
 			}
-			HasVariableName($, $identifier);
+			member.HasVariableName($, $identifier);
 			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		("(" {Expression #ContainsEnumConstantArgument($, $0);# ","}* ")")?
@@ -77,7 +77,7 @@ exports
 			#
 		)* #
 			HasVariableType($, $type);
-			HasVariableName($, $identifier);
+			member.HasVariableName($, $identifier);
 		#
          "(" ")" AnnoInitializer #ContainsDefaultValue($, $0);# ? ";" -> AnnotationElementDecl
 
@@ -130,7 +130,7 @@ exports
 							getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
 						}
 					}
-					HasVariableName($field, $identifier);
+					member.HasVariableName($field, $identifier);
 					name2VariableDeclaration.declare($identifier.name, $field);
 				#
 				Initializer #ContainsVariableInitializer($field, $0);#?
@@ -179,7 +179,7 @@ exports
 			#
 		)* #
 			HasVariableType($, $type);
-			HasVariableName($, $identifier);
+			member.HasVariableName($, $identifier);
 		#
          -> ParamDeclaration
 
