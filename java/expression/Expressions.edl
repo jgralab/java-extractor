@@ -51,21 +51,49 @@ exports
 	rule FieldAccess -> Expression #$ = $0;#
 	
 	 %% variable, local field, type parameter, enum constant
-    rule Id  -> FieldAccess #
-		$ = FieldAccess();
-		$name = lexem($0);
-		$identifier = name2Identifier.use($name);
-		{
-			if (#$identifier# == null) {#
-				$identifier = Identifier();
-				$identifier.name = $name;
-				name2Identifier.declare($name, $identifier);
-			#} else {
-				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+    rule Id  -> FieldAccess #{
+		if (currentElement.getParent().getParentApplicationOfDefinedRule().getAppliedRule() != currentElement.getAppliedRule()) {#
+			%% this id is a simple expression name
+			%% see section 6.5.6.1 in http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html
+			$name = lexem($0);
+			$identifier = name2Identifier.use($name);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $name;
+					name2Identifier.declare($name, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+				}
 			}
-		}
-		expression.HasVariableName($, $identifier);
-	#
+			$var = name2VariableDeclaration.use($name);
+			{
+				if(#$var# == null) {#
+					%% a field was found whose declaration in the same class was not yet read OR
+					%% a field was found, which was imported statically
+					%% $var = name2VariableDeclaration.useOrDeclare($name, Field);
+				#} else {#
+					$ = {return utilities.createVariableAccessForVariableDeclaration(#$var#, currentElement.getPosition());};
+				#}
+			}
+			expression.HasVariableName($, $identifier);
+			DeclaresAccessedVariable($, $var);
+		#} else {#
+			$ = FieldAccess();
+			$name = lexem($0);
+			$identifier = name2Identifier.use($name);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $name;
+					name2Identifier.declare($name, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+				}
+			}
+			expression.HasVariableName($, $identifier);
+		#}
+	}#
 	
 	rule                 Expression "." Id -> FieldAccess #
 		$ = FieldAccess();

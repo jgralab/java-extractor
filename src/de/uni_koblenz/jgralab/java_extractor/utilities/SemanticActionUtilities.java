@@ -25,18 +25,25 @@ import de.uni_koblenz.jgralab.java_extractor.schema.expression.BooleanConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.CharConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.DoubleConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.Expression;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.FieldAccess;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.FloatConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.IntegerConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.LocalVariableAccess;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.LongConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.Null;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.StringConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.expression.VariableAccess;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.EnumConstant;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.Field;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableAnnotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableModifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Member;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.ParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
 import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
+import de.uni_koblenz.jgralab.java_extractor.schema.statement.LocalVariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.AnnotationDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ClassDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
@@ -557,6 +564,21 @@ public class SemanticActionUtilities {
 	/*
 	 * Linking
 	 */
+
+	public VariableAccess createVariableAccessForVariableDeclaration(
+			Object var, Position position) {
+		if (((Vertex) var).isTemporary()
+				|| ((Vertex) var).isInstanceOf(Field.VC)
+				|| ((Vertex) var).isInstanceOf(EnumConstant.VC)) {
+			return (VariableAccess) graphBuilder.createVertex(FieldAccess.VC,
+					position);
+		} else {
+			assert ((Vertex) var).isInstanceOf(ParameterDeclaration.VC)
+					|| ((Vertex) var).isInstanceOf(LocalVariableDeclaration.VC);
+			return (VariableAccess) graphBuilder.createVertex(
+					LocalVariableAccess.VC, position);
+		}
+	}
 
 	/*
 	 * a) LAZY
