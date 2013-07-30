@@ -403,12 +403,16 @@
         </eAnnotations>
       </xmi:Extension>
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ImportDefinition" general="ExternalDeclaration"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_MQxb8XBZEeKie9MLu0o9lQ" name="nameOfImportedType" visibility="private" type="QualifiedName" association="_MQxb8HBZEeKie9MLu0o9lQ">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_MQxb83BZEeKie9MLu0o9lQ" value="1"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MQxb8XBZEeKie9MLu0o9lQ" name="nameOfImportedTypes" visibility="private" type="QualifiedName" association="_MQxb8HBZEeKie9MLu0o9lQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_MQxb83BZEeKie9MLu0o9lQ" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_MQxb8nBZEeKie9MLu0o9lQ"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DJ2rAXBqEeKie9MLu0o9lQ" name="memberNames" visibility="private" type="Identifier" association="_DJ2rAHBqEeKie9MLu0o9lQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DJ2rA3BqEeKie9MLu0o9lQ" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DJ2rAnBqEeKie9MLu0o9lQ"/>
+      </ownedAttribute>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="PackageImportDefinition" name="PackageImportDefinition">
+    <packagedElement xmi:type="uml:Class" xmi:id="PackageImportDefinition" name="TypeImportOnDemandDefinition">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_PackageImportDefinition" general="ImportDefinition"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ExternalDeclaration" name="ExternalDeclaration" isAbstract="true">
@@ -527,9 +531,7 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_fBT0sHBXEeKie9MLu0o9lQ" name="HasPackageName" clientDependency="_TS97QHB4EeKie9MLu0o9lQ" memberEnd="_fBT0sXBXEeKie9MLu0o9lQ _fBc-onBXEeKie9MLu0o9lQ">
       <ownedComment xmi:type="uml:Comment" xmi:id="_-kM-QHBYEeKie9MLu0o9lQ" annotatedElement="_fBT0sHBXEeKie9MLu0o9lQ">
-        <body>&lt;p>&#xD;
-    : AttributedEdge&#xD;
-&lt;/p>&lt;br /></body>
+        <body>&lt;p>:&amp;nbsp;AttributedEdge&lt;/p></body>
       </ownedComment>
       <ownedEnd xmi:type="uml:Property" xmi:id="_fBc-onBXEeKie9MLu0o9lQ" name="package" visibility="private" type="PackageDefinition" association="_fBT0sHBXEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fBc-pHBXEeKie9MLu0o9lQ" value="*"/>
@@ -547,22 +549,21 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_RmPY4HBmEeKie9MLu0o9lQ" name="StaticImportDefinition">
       <generalization xmi:type="uml:Generalization" xmi:id="_VACmQHBmEeKie9MLu0o9lQ" general="ImportDefinition"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_DJ2rAXBqEeKie9MLu0o9lQ" name="memberName" visibility="private" type="Identifier" association="_DJ2rAHBqEeKie9MLu0o9lQ">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DJ2rA3BqEeKie9MLu0o9lQ" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DJ2rAnBqEeKie9MLu0o9lQ"/>
-      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_DJ2rAHBqEeKie9MLu0o9lQ" name="ImportsStaticMember" clientDependency="_bjo5UHBqEeKie9MLu0o9lQ" memberEnd="_DJ2rAXBqEeKie9MLu0o9lQ _DKAcAHBqEeKie9MLu0o9lQ">
       <ownedComment xmi:type="uml:Comment" xmi:id="_cqJ1cHBqEeKie9MLu0o9lQ" annotatedElement="_DJ2rAHBqEeKie9MLu0o9lQ">
         <body>: AttributedEdge</body>
       </ownedComment>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_DKAcAHBqEeKie9MLu0o9lQ" name="staticImportDefinition" visibility="private" type="_RmPY4HBmEeKie9MLu0o9lQ" association="_DJ2rAHBqEeKie9MLu0o9lQ">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_DKAcAHBqEeKie9MLu0o9lQ" name="staticImportDefinitions" visibility="private" type="ImportDefinition" association="_DJ2rAHBqEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DKAcAnBqEeKie9MLu0o9lQ" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DKAcAXBqEeKie9MLu0o9lQ"/>
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Realization" xmi:id="_bjo5UHBqEeKie9MLu0o9lQ" name="" supplier="AttributedEdge" client="_DJ2rAHBqEeKie9MLu0o9lQ"/>
     <packagedElement xmi:type="uml:Realization" xmi:id="_TS97QHB4EeKie9MLu0o9lQ" name="" supplier="AttributedEdge" client="_fBT0sHBXEeKie9MLu0o9lQ"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_nOyo8PkOEeK2YLAtxtburA" name="StaticImportOnDemandDefinition">
+      <generalization xmi:type="uml:Generalization" xmi:id="_pulFIPkOEeK2YLAtxtburA" general="ImportDefinition"/>
+    </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_vaqt4F_yEeKcZY0fjvOS6w" name="type">
     <packagedElement xmi:type="uml:Package" xmi:id="_awM3sF_3EeKcZY0fjvOS6w" name="definition">
