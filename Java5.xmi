@@ -393,7 +393,12 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fBc-oHBXEeKie9MLu0o9lQ" value="1"/>
       </ownedAttribute>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="TypeImportDefinition">
+    <packagedElement xmi:type="uml:Class" xmi:id="ClassImportDefinition" name="TypeImportDefinition" isAbstract="true">
+      <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WYy_YPkSEeK2YLAtxtburA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WYy_YfkSEeK2YLAtxtburA" key="abstract"/>
+        </eAnnotations>
+      </xmi:Extension>
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ClassImportDefinition" general="ImportDefinition"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ImportDefinition" name="ImportDefinition" isAbstract="true">
@@ -403,17 +408,17 @@
         </eAnnotations>
       </xmi:Extension>
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ImportDefinition" general="ExternalDeclaration"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_MQxb8XBZEeKie9MLu0o9lQ" name="nameOfImportedTypes" visibility="private" type="QualifiedName" association="_MQxb8HBZEeKie9MLu0o9lQ">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MQxb8XBZEeKie9MLu0o9lQ" name="nameOfImportedTypes" visibility="private" type="_JDZdoHUSEeKifMVNH3xezA" association="_MQxb8HBZEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_MQxb83BZEeKie9MLu0o9lQ" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_MQxb8nBZEeKie9MLu0o9lQ"/>
       </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_DJ2rAXBqEeKie9MLu0o9lQ" name="memberNames" visibility="private" type="Identifier" association="_DJ2rAHBqEeKie9MLu0o9lQ">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DJ2rA3BqEeKie9MLu0o9lQ" value="*"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DJ2rAnBqEeKie9MLu0o9lQ"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_-e51QPkVEeK2YLAtxtburA" name="definedImportName" visibility="private" type="QualifiedName" association="_-ewrUPkVEeK2YLAtxtburA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-e51QvkVEeK2YLAtxtburA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-e51QfkVEeK2YLAtxtburA" value="1"/>
       </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="PackageImportDefinition" name="TypeImportOnDemandDefinition">
-      <generalization xmi:type="uml:Generalization" xmi:id="generalization_PackageImportDefinition" general="ImportDefinition"/>
+      <generalization xmi:type="uml:Generalization" xmi:id="generalization_PackageImportDefinition" general="ClassImportDefinition"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ExternalDeclaration" name="ExternalDeclaration" isAbstract="true">
       <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">
@@ -530,7 +535,7 @@
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_fBT0sHBXEeKie9MLu0o9lQ" name="HasPackageName" clientDependency="_TS97QHB4EeKie9MLu0o9lQ" memberEnd="_fBT0sXBXEeKie9MLu0o9lQ _fBc-onBXEeKie9MLu0o9lQ">
-      <ownedComment xmi:type="uml:Comment" xmi:id="_-kM-QHBYEeKie9MLu0o9lQ" annotatedElement="_fBT0sHBXEeKie9MLu0o9lQ">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_-kM-QHBYEeKie9MLu0o9lQ" annotatedElement="_fBT0sHBXEeKie9MLu0o9lQ _-ewrUPkVEeK2YLAtxtburA">
         <body>&lt;p>:&amp;nbsp;AttributedEdge&lt;/p></body>
       </ownedComment>
       <ownedEnd xmi:type="uml:Property" xmi:id="_fBc-onBXEeKie9MLu0o9lQ" name="package" visibility="private" type="PackageDefinition" association="_fBT0sHBXEeKie9MLu0o9lQ">
@@ -547,14 +552,23 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_MQxb9XBZEeKie9MLu0o9lQ"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_RmPY4HBmEeKie9MLu0o9lQ" name="StaticImportDefinition">
+    <packagedElement xmi:type="uml:Class" xmi:id="_RmPY4HBmEeKie9MLu0o9lQ" name="StaticImportDefinition" isAbstract="true">
+      <xmi:Extension extender="http://www.eclipse.org/emf/2002/Ecore">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QxgmwPkSEeK2YLAtxtburA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QxgmwfkSEeK2YLAtxtburA" key="abstract"/>
+        </eAnnotations>
+      </xmi:Extension>
       <generalization xmi:type="uml:Generalization" xmi:id="_VACmQHBmEeKie9MLu0o9lQ" general="ImportDefinition"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DJ2rAXBqEeKie9MLu0o9lQ" name="memberNames" visibility="private" type="Member" association="_DJ2rAHBqEeKie9MLu0o9lQ">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DJ2rA3BqEeKie9MLu0o9lQ" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DJ2rAnBqEeKie9MLu0o9lQ"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_DJ2rAHBqEeKie9MLu0o9lQ" name="ImportsStaticMember" clientDependency="_bjo5UHBqEeKie9MLu0o9lQ" memberEnd="_DJ2rAXBqEeKie9MLu0o9lQ _DKAcAHBqEeKie9MLu0o9lQ">
       <ownedComment xmi:type="uml:Comment" xmi:id="_cqJ1cHBqEeKie9MLu0o9lQ" annotatedElement="_DJ2rAHBqEeKie9MLu0o9lQ">
         <body>: AttributedEdge</body>
       </ownedComment>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_DKAcAHBqEeKie9MLu0o9lQ" name="staticImportDefinitions" visibility="private" type="ImportDefinition" association="_DJ2rAHBqEeKie9MLu0o9lQ">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_DKAcAHBqEeKie9MLu0o9lQ" name="staticImportDefinitions" visibility="private" type="_RmPY4HBmEeKie9MLu0o9lQ" association="_DJ2rAHBqEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_DKAcAnBqEeKie9MLu0o9lQ" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_DKAcAXBqEeKie9MLu0o9lQ"/>
       </ownedEnd>
@@ -562,8 +576,21 @@
     <packagedElement xmi:type="uml:Realization" xmi:id="_bjo5UHBqEeKie9MLu0o9lQ" name="" supplier="AttributedEdge" client="_DJ2rAHBqEeKie9MLu0o9lQ"/>
     <packagedElement xmi:type="uml:Realization" xmi:id="_TS97QHB4EeKie9MLu0o9lQ" name="" supplier="AttributedEdge" client="_fBT0sHBXEeKie9MLu0o9lQ"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_nOyo8PkOEeK2YLAtxtburA" name="StaticImportOnDemandDefinition">
-      <generalization xmi:type="uml:Generalization" xmi:id="_pulFIPkOEeK2YLAtxtburA" general="ImportDefinition"/>
+      <generalization xmi:type="uml:Generalization" xmi:id="_pulFIPkOEeK2YLAtxtburA" general="_RmPY4HBmEeKie9MLu0o9lQ"/>
     </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_EJ93cPkSEeK2YLAtxtburA" name="SingleTypeImportDefinition">
+      <generalization xmi:type="uml:Generalization" xmi:id="_P2S7sPkSEeK2YLAtxtburA" general="ClassImportDefinition"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_K_XB8PkSEeK2YLAtxtburA" name="SingleStaticImportDefinition">
+      <generalization xmi:type="uml:Generalization" xmi:id="_N98S8PkSEeK2YLAtxtburA" general="_RmPY4HBmEeKie9MLu0o9lQ"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_-ewrUPkVEeK2YLAtxtburA" name="DefinesImport" clientDependency="_QvOK8PkWEeK2YLAtxtburA" memberEnd="_-e51QPkVEeK2YLAtxtburA _-e51Q_kVEeK2YLAtxtburA">
+      <ownedEnd xmi:type="uml:Property" xmi:id="_-e51Q_kVEeK2YLAtxtburA" name="definingImports" visibility="private" type="ImportDefinition" association="_-ewrUPkVEeK2YLAtxtburA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_-e51RfkVEeK2YLAtxtburA" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_-e51RPkVEeK2YLAtxtburA"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Realization" xmi:id="_QvOK8PkWEeK2YLAtxtburA" supplier="AttributedEdge" client="_-ewrUPkVEeK2YLAtxtburA"/>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_vaqt4F_yEeKcZY0fjvOS6w" name="type">
     <packagedElement xmi:type="uml:Package" xmi:id="_awM3sF_3EeKcZY0fjvOS6w" name="definition">
@@ -682,9 +709,7 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="Type_external" name="external" visibility="private">
           <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#Boolean"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="Type_fullyQualifiedName" name="fullyQualifiedName" visibility="private">
-          <type xmi:type="uml:PrimitiveType" href="http://schema.omg.org/spec/UML/2.2/uml.xml#String"/>
-        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="Type_fullyQualifiedName" name="canonicalName" visibility="private" type="_OSel0NKBEeKSKrj7T_jYuw"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_fl3Q0XXJEeKzucOdrv90nw" name="superTypes" visibility="private" type="TypeSpecification" association="_fl3Q0HXJEeKzucOdrv90nw">
           <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fl3Q03XJEeKzucOdrv90nw" value="*"/>
           <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fl3Q0nXJEeKzucOdrv90nw"/>
@@ -1279,6 +1304,9 @@
       </ownedComment>
       <ownedComment xmi:type="uml:Comment" xmi:id="_yLoTwIDaEeKnI79eddblXg" annotatedElement="_nGTOgHXsEeKzucOdrv90nw _IzVgcIDbEeKnI79eddblXg">
         <body>: AttributedEdge</body>
+      </ownedComment>
+      <ownedComment xmi:type="uml:Comment" xmi:id="_JS2YkPndEeKDgpQijBv75g" annotatedElement="_nGTOgHXsEeKzucOdrv90nw">
+        <body>&lt;p>:&amp;nbsp;AttributedEdge&lt;/p></body>
       </ownedComment>
       <ownedEnd xmi:type="uml:Property" xmi:id="_nGc_gnXsEeKzucOdrv90nw" name="genericElement" visibility="private" type="Member" association="_nGTOgHXsEeKzucOdrv90nw">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_nGc_hHXsEeKzucOdrv90nw" value="1"/>
