@@ -15,9 +15,12 @@ public class ParseFiles {
 		Java5Builder builder = new Java5Builder(Java5Schema.instance());
 		// JavaGraphBuilder builder = new JavaGraphBuilder();//
 		// JavaSchema.instance());
-		parseAllJavaFiles(builder, new File("D:/JDK6SourceCode/" + "langtools"
-				+ File.separator + "test" + File.separator + "tools"
-				+ File.separator + "javac" + File.separator + "unicode"));
+		parseAllJavaFiles(builder, new File("D:/JDK6SourceCode/"));
+		/*
+		 * + "langtools" + File.separator + "test" + File.separator + "tools" +
+		 * File.separator + "javac" + File.separator + "unicode"
+		 */
+		builder.link();
 	}
 
 	private static void parseAllJavaFiles(GraphBuilder builder, File file) {

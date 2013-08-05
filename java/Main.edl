@@ -10,6 +10,9 @@ import declarations
 	org.apache.commons.cli.Option;
 	de.uni_koblenz.jgralab.java_extractor.utilities.SemanticActionUtilities;
 	de.uni_koblenz.jgralab.java_extractor.utilities.Linker;
+	de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
+	de.uni_koblenz.jgralab.exception.GraphIOException;
+	de.uni_koblenz.jgralab.GraphIO;
 symbol tables
 	qName2Package<JavaPackage>
 	name2Identifier<Identifier>
@@ -92,21 +95,57 @@ user code {
 	
 	@Override
 	protected void finalize() {
+		reset();
+	}
+	
+	private void reset() {
+		GraphBuilderBaseImpl.furtherCommandLineOptions = new java.util.ArrayList<Option>();
+	}
+	
+	@Override
+	public void parse(String[] inputFiles, String outputFile, String encoding, boolean debugMode, boolean verboseMode, boolean dotMode, String dotOutputFormat) {
+		Graph graph = parse(inputFiles, encoding, debugMode, verboseMode,
+				dotMode, dotOutputFormat);
+		link();
+		if (outputFile != null) {
+			if (printDebugInformationToTheConsole) {
+				System.out.println("Saving graph...");
+			}
+			try {
+				GraphIO.saveGraphToFile(
+						graph,
+						outputFile,
+						printDebugInformationToTheConsole ? new ConsoleProgressFunction()
+								: null);
+			} catch (GraphIOException e) {
+				throw new SemanticActionException(
+						"The graph could not be saved to " + outputFile + ".",
+						e);
+			}
+		}
+	}
+	
+	/**
+	 * This method has to be called when all input files are parsed.
+	 */
+	public void link(){
+		if (linker == null) {
+			 return;
+		}
+	
+		if (printDebugInformationToTheConsole) {
+			System.out.println("Linking...");
+		}
 		linker.setPackageNames(#qName2Package#);
 		linker.link(mode);
+		linker = null;
 		
 		try {
 			getGraph().save("output.tg");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot.main(new String[] { "-g", "output.tg", "-o", "output.png", "-t", "png", "-i", "-e" });
-	
-		reset();
-	}
-	
-	private void reset() {
-		GraphBuilderBaseImpl.furtherCommandLineOptions = new java.util.ArrayList<Option>();
+		//de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot.main(new String[] { "-g", "output.tg", "-o", "output.png", "-t", "png", "-i", "-e" });
 	}
 }
 default values

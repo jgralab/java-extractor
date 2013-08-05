@@ -143,7 +143,7 @@ exports
 				InvokesConstructor($cons, $);
 				$currentType = {return currentType;};
 				$qualifiedType = QualifiedType();
-				$qualifiedType.fullyQualifiedName = $currentType.fullyQualifiedName;
+				$qualifiedType.fullyQualifiedName = $currentType.canonicalName;
 				$name = $currentType.name;
 				$identifier = name2Identifier.use($name);
 				{
