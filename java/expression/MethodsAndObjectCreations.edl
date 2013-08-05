@@ -5,6 +5,17 @@ imports
   java/type/ClassifierDeclarations %% ClassifierBody
   java/annotation/Annotations %% Annotation
 
+global actions
+	@Before
+	pattern _(*) -> Expression #
+		$isAmbiguousName = {return isAmbiguousName;};
+		{isAmbiguousName = false;}
+	#
+	
+	pattern _(*) -> Expression #{
+		isAmbiguousName = (Boolean) #$isAmbiguousName#;
+	}#
+
 exports
   sorts Expression
   sorts MethodSpec ArrayInit SubArrayExpression
@@ -12,12 +23,12 @@ exports
   context-free syntax
 	%% constructor call
 	%% duplicate method because of priorities
-	@Symboltable{name2VariableDeclaration}
     rule #
 			$ = ConstructorCall();
 			$method = MethodInvocation();
 			$method.type = MethodInvocationTypes.CONSTRUCTOR;
 			InvokesConstructor($, $method);
+			{linker.addConstructorName((Vertex) #$method#);}
 		#
 		"new" ("<" #$typeArg = TypeArgument();#
 		{
@@ -48,7 +59,7 @@ exports
 				$name = {return "";// TODO create simple name for anonymous class};
 				$anonymousType.name = $name;
 				$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
-				$anonymousType.fullyQualifiedName = $qName;
+				$anonymousType.canonicalName = $qName;
 				$qualifiedNamePrefix= {return qualifiedNamePrefix;};
 				{qualifiedNamePrefix += "." + #$name#;}
 			#
@@ -65,7 +76,7 @@ exports
 				}
 				HasTypeName($anonymousType, $identifier);
 				ExtendsClass($anonymousType, $type);
-				{//TODO check if the anonymous class extends a class or implements an interface}
+				{linker.addAnonymousClass((Vertex) #$anonymousType#);}
 				ContainsTypeMember($anonymousType, $0);
 				%% create type specification
 				$type = QualifiedType();
@@ -124,6 +135,7 @@ exports
 					}
 				}
 				HasInvokedMethodName($, $identifier);
+				{linker.addMethodName((Vertex) #$#);}
 			#
 			|"this" #
 				$.type = MethodInvocationTypes.EXPLICITCONSTRUCTOR;
@@ -145,6 +157,7 @@ exports
 				}
 				HasSimpleName($qualifiedType, $identifier);
 				HasCreatedObjectType($cons, $qualifiedType);
+				{linker.addConstructorName((Vertex) #$#);}
 			#
 			|("super" #
 				$.type = MethodInvocationTypes.SUPERCONSTRUCTOR;
@@ -172,31 +185,36 @@ exports
 					#}
 				}
 				HasCreatedObjectType($cons, $superType);
-			#)%% falls kein super, dann Object
+				{linker.addConstructorName((Vertex) #$#);}
+			#)
 		) -> MethodSuffix
-	rule #$prefix = null;#
-		(
-			PlainClassifierType "." #
-				$prefix = ClassLiteral();
-				$qualifiedType = QualifiedType();
-				$qName = $0;
-				$qualifiedType.fullyQualifiedName = $qName;
-				$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
-				$identifier = name2Identifier.use($simpleName);
-				{
-					if (#$identifier# == null) {#
-						$identifier = Identifier();
-						$identifier.name = $simpleName;
-						name2Identifier.declare($simpleName, $identifier);
-					#} else {
-						getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-					}
-				}
-				HasSimpleName($qualifiedType, $identifier);
-				RefersToType($prefix, $qualifiedType);
-			#
-		)? MethodSuffix -> MethodSpec #
-		$ = $1;
+		
+		
+	rule #$prefix = null;{// TODO remove this}#
+		%% (
+			%% PlainClassifierType "." #
+				%% $prefix = ClassLiteral();
+				%% $qualifiedType = QualifiedType();
+				%% $qName = $0;
+				%% $qualifiedType.fullyQualifiedName = $qName;
+				%% $simpleName = {return utilities.extractSimpleName((String) #$qName#);};
+				%% $identifier = name2Identifier.use($simpleName);
+				%% {
+					%% if (#$identifier# == null) {#
+						%% $identifier = Identifier();
+						%% $identifier.name = $simpleName;
+						%% name2Identifier.declare($simpleName, $identifier);
+					%% #} else {
+						%% getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+					%% }
+				%% }
+				%% HasSimpleName($qualifiedType, $identifier);
+				%% RefersToType($prefix, $qualifiedType);
+			%% #
+		%% )? 
+		MethodSuffix -> MethodSpec #
+		%%$ = $1;
+		$ = $0;
 		{
 		if (#$prefix# != null) {#
 			ContainsCalledMethod($, $prefix);
@@ -218,7 +236,14 @@ exports
 			ContainsCalledMethod($, $prefix);
 		#}
 	}#
-	rule             Expression "." MethodSuffix -> MethodSpec {avoid} #
+	rule #
+			$isAmbiguousName = {return isAmbiguousName;};
+			{isAmbiguousName = true;}
+		# 
+		Expression #
+			{isAmbiguousName = (Boolean) #$isAmbiguousName#;}
+		#
+		"." MethodSuffix -> MethodSpec % {avoid} %#
 		$ = $2;
 		ContainsCalledMethod($, $0);
 	#

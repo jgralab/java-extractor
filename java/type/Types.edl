@@ -64,6 +64,14 @@ exports
 					}
 				}
 				HasSimpleName($, $identifier);
+				{
+					if (currentElement.getParentApplicationOfDefinedRule()
+							.getParent().getParentApplicationOfDefinedRule()
+							.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+						// the QualifiedType is only linked, if it is not part of an EnclosedType
+						linker.addTypeName((Vertex) #$#);
+					}
+				}
 			#} else {#
 				$ = TypeParameterUsage();
 				IsDefinedByType($, $typeParamDecl);
@@ -84,6 +92,14 @@ exports
 			}
 		}
 		HasSimpleName($, $identifier);
+		{
+			if (currentElement.getParentApplicationOfDefinedRule()
+					.getParent().getParentApplicationOfDefinedRule()
+					.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+				// the QualifiedType is only linked, if it is not part of an EnclosedType
+				linker.addTypeName((Vertex) #$#);
+			}
+		}
 	#
     rule Id #
 			$ = QualifiedType();
@@ -99,6 +115,14 @@ exports
 				}
 			}
 			HasSimpleName($, $identifier);
+			{
+				if (currentElement.getParentApplicationOfDefinedRule()
+						.getParent().getParentApplicationOfDefinedRule()
+						.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+					// the QualifiedType is only linked, if it is not part of an EnclosedType
+					linker.addTypeName((Vertex) #$#);
+				}
+			}
 		#
 		"<" #$typeArg = TypeArgument();#
 		{
@@ -126,6 +150,14 @@ exports
 				}
 			}
 			HasSimpleName($, $identifier);
+			{
+				if (currentElement.getParentApplicationOfDefinedRule()
+						.getParent().getParentApplicationOfDefinedRule()
+						.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+					// the QualifiedType is only linked, if it is not part of an EnclosedType
+					linker.addTypeName((Vertex) #$#);
+				}
+			}
 		#
 		"<" #$typeArg = TypeArgument();#
 		{
@@ -143,6 +175,14 @@ exports
 		$ = EnclosedType();
 		HasEnclosingType($, $0);
 		HasEnclosedType($, $2);
+		{
+			if (currentElement.getParentApplicationOfDefinedRule()
+					.getParent().getParentApplicationOfDefinedRule()
+					.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+				// the QualifiedType is only linked, if it is not part of an EnclosedType
+				linker.addTypeName((Vertex) #$#);
+			}
+		}
 	#
 	
 	%% the name of a classifier type 
@@ -152,14 +192,7 @@ exports
 			"."
 			#$name = $name.concat($0).concat(".");#
 		)?
-		Id
-		#{
-			if (((String) #$name#).isEmpty()) {#
-				$ = {return utilities.resolveQualifiedName(#lexem($1)#);};
-			#} else {#
-				$ = $name.concat(lexem($1));
-			#}
-		}#
+		Id #$ = $name.concat(lexem($1));#
 		-> PlainClassifierType
 
     %% TypeArg
@@ -193,7 +226,7 @@ exports
 			HasTypeParameterName($, $identifier);
 			name2TypeParameter.declare(lexem($0), $);
 		#
-		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+)?  -> TypeParam
+		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+ )?  -> TypeParam
 	
 	context-free priorities
 		ClassifierType "." ClassifierType -> ClassifierType {left, avoid}

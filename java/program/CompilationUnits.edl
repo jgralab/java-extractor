@@ -13,23 +13,6 @@ user code {
 	private String qualifiedNamePrefix = "";
 }
 
-global actions
-	pattern "import" _(1..4) ";" -> ImportDeclaration #
-			$qualifiedName.fullyQualifiedName = $qName;
-			$simpleName = {return utilities.extractSimpleName((String) #$qName#);};
-			$identifier = name2Identifier.use($simpleName);
-			{
-				if (#$identifier# == null) {#
-					$identifier = Identifier();
-					$identifier.name = $simpleName;
-					name2Identifier.declare($simpleName, $identifier);
-				#} else {
-					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild((Integer) #$idIndex#).getPosition());
-				}
-			}
-			HasSimpleName($qualifiedName, $identifier);
-	#
-
 exports
   sorts CompilationUnit
 
@@ -88,40 +71,10 @@ exports
 		#
 		";" -> PackageDeclaration
 	
-    rule "import" PlainClassifierType ";" #
-			$qName = $1;
-			$ = TypeImportDefinition();
-			$qualifiedName = QualifiedType();
-			$idIndex = 2;
-		# 
-		-> ImportDeclaration #
-			ImportsType($, $qualifiedName);
-			{
-			 if (mode == Mode.LAZY) {
-				utilities.addImportedType((Vertex) #$qualifiedName#);
-			 } else {#
-				$importedType = {return utilities.resolveQualifiedType(currentElement, (SymbolTableStack) #qName2Type#, (SymbolTableStack) #name2Identifier#, (String) #$qName#);};
-				IsDefinedByType($qualifiedName, $importedType);
-			 #}
-			}
-		#
-    rule "import" PackageName "." "*" ";" #
-			$qName = $1;
-			$ = PackageImportDefinition();
-			$qualifiedName = QualifiedName();
-			$idIndex = 2;
-		# 
-		-> ImportDeclaration #
-			ImportsType($, $qualifiedName);
-		#
-    rule "import" "static" PlainClassifierType "." Id ";" #
-			$qName = $2;
-			$ = StaticImportDefinition();
-			$qualifiedName = QualifiedType();
-			$idIndex = 4;
-		# -> ImportDeclaration #
-			ImportsType($, $qualifiedName);
-			$simpleName = lexem($4);
+    rule "import" PlainClassifierType ";" -> ImportDeclaration #
+			$qualifiedType = QualifiedType();
+			$qualifiedType.fullyQualifiedName = $1;
+			$simpleName = {return utilities.extractSimpleName((String) #$1#);};
 			$identifier = name2Identifier.use($simpleName);
 			{
 				if (#$identifier# == null) {#
@@ -129,16 +82,74 @@ exports
 					$identifier.name = $simpleName;
 					name2Identifier.declare($simpleName, $identifier);
 				#} else {
-					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(8).getPosition());
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());
 				}
 			}
-			ImportsStaticMember($, $identifier);
+			HasSimpleName($qualifiedType, $identifier);
+			$ = SingleTypeImportDefinition();
+			DefinesImport($, $qualifiedType);
+			{linker.addTypeName((Vertex) #$#);}
 		#
-    rule "import" "static" PlainClassifierType "." "*" ";" #
-			$qName = $2;
-			$ = StaticImportDefinition();
-			$qualifiedName = QualifiedType();
-			$idIndex = 4;
-		# -> ImportDeclaration #
-			ImportsType($, $qualifiedName);
+    rule "import" PackageName "." "*" ";" -> ImportDeclaration #
+			$qualifiedName = QualifiedName();
+			$qualifiedName.fullyQualifiedName = $1;
+			$simpleName = {return utilities.extractSimpleName((String) #$1#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(2).getPosition());
+				}
+			}
+			HasSimpleName($qualifiedName, $identifier);
+			$ = TypeImportOnDemandDefinition();
+			DefinesImport($, $qualifiedName);
+			{linker.addPackageOrTypeName((Vertex) #$#);}
+		#
+    rule "import" "static" PlainClassifierType "." Id ";" -> ImportDeclaration #
+			$qualifiedType = QualifiedType();
+			$qualifiedType.fullyQualifiedName = $2;
+			$simpleName = {return utilities.extractSimpleName((String) #$q2#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
+				}
+			}
+			HasSimpleName($qualifiedType, $identifier);
+			$ = SingleStaticImportDefinition();
+			DefinesImport($, $qualifiedType);
+			
+			$temp = {
+				Vertex v = createTemporaryVertex(currentElement.getChild(4).getPosition());
+				v.setAttribute("name", #lexem($4)#);
+				linker.addTypeName(v);
+				return v;
+			};
+			ImportsStaticMember($, $temp);
+		#
+    rule "import" "static" PlainClassifierType "." "*" ";" -> ImportDeclaration #
+			$qualifiedType = QualifiedType();
+			$qualifiedType.fullyQualifiedName = $2;
+			$simpleName = {return utilities.extractSimpleName((String) #$2#);};
+			$identifier = name2Identifier.use($simpleName);
+			{
+				if (#$identifier# == null) {#
+					$identifier = Identifier();
+					$identifier.name = $simpleName;
+					name2Identifier.declare($simpleName, $identifier);
+				#} else {
+					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
+				}
+			}
+			HasSimpleName($qualifiedType, $identifier);
+			$ = StaticImportOnDemandDefinition();
+			DefinesImport($, $qualifiedType);
 		#

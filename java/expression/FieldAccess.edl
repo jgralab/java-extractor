@@ -1,0 +1,107 @@
+module java/expression/FieldAccess
+imports
+  java/expression/Expressions %% Expression
+  java/Identifiers %% Id
+  java/type/Types %% Type ClassifierType
+
+exports
+  sorts Expression ArrayAccess SubArrayAccess
+
+  context-free syntax	
+	rule "(" Expression ")"          -> Expression #$ = $1;#
+	
+	rule FieldAccess -> Expression #$ = $0;#
+	
+	 %% variable, local field, type parameter, enum constant
+    rule Id  -> FieldAccess #{
+		if (isAmbiguousName) {#
+				$ = {return createTemporaryVertex(currentElement.getPosition());};
+				$.lexem = lexem($0);
+				{linker.addAmbiguousName((Vertex) #$#);}
+		#} else {#
+				$ = {return createTemporaryVertex(getVertexClass("expression.VariableAccess"), currentElement.getPosition());};
+				$.lexem = lexem($0);
+				{linker.addExpressionName((Vertex) #$#);}
+		#}
+	}#
+	
+	rule #
+			$isAmbiguousName = {return isAmbiguousName;};
+			{isAmbiguousName = true;}
+		# 
+		Expression #{isAmbiguousName = (Boolean) #$isAmbiguousName#;}#
+		"." Id -> FieldAccess #{
+		if (isAmbiguousName) {#
+				$ = {return createTemporaryVertex(currentElement.getPosition());};
+				$.lexem = lexem($2);
+				{linker.addAmbiguousName((Vertex) #$#);}
+		#} else {#
+				$ = {return createTemporaryVertex(getVertexClass("expression.VariableAccess"), currentElement.getPosition());};
+				$.lexem = lexem($2);
+				{linker.addExpressionName((Vertex) #$#);}
+		#}
+		#OwnsField($, $0);#
+	}#
+    %% rule             Type "." Id -> FieldAccess {avoid} #
+		%% $ = FieldAccess();
+		%% $name = lexem($2);
+		%% $identifier = name2Identifier.use($name);
+		%% {
+			%% if (#$identifier# == null) {#
+				%% $identifier = Identifier();
+				%% $identifier.name = $name;
+				%% name2Identifier.declare($name, $identifier);
+			%% #} else {
+				%% getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			%% }
+		%% }
+		%% $classLiteral = ClassLiteral();
+		%% RefersToType($classLiteral, $0);
+		%% OwnsField($, $classLiteral);
+		%% expression.HasVariableName($, $identifier);
+	%% #
+    rule              "super" "." Id -> FieldAccess #
+		$ = SuperFieldAccess();
+		$name = lexem($2);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		expression.HasVariableName($, $identifier);
+		{linker.addExpressionName((Vertex) #$#);}
+	#
+    rule Type "." "super" "." Id -> FieldAccess #
+		$ = SuperFieldAccess();
+		$name = lexem($4);
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		$classLiteral = ClassLiteral();
+		RefersToType($classLiteral, $0);
+		OwnsField($, $classLiteral);
+		expression.HasVariableName($, $identifier);
+		{linker.addExpressionName((Vertex) #$#);}
+	#
+
+  context-free priorities
+	Expression "." Id -> FieldAccess
+	<0>>{
+		IntLiteral    -> Expression
+		FloatLiteral  -> Expression
+		BoolLiteral   -> Expression 
+		CharLiteral   -> Expression
+		NullLiteral   -> Expression
+	}

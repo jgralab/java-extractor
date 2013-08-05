@@ -4,6 +4,16 @@ imports
   java/type/Types %% Type ClassifierType PrimType ArrayType
 
 global actions
+	@Before
+	pattern _(*) -> Expression #
+		$isAmbiguousName = {return isAmbiguousName;};
+		{isAmbiguousName = false;}
+	#
+	
+	pattern _(*) -> Expression #{
+		isAmbiguousName = (Boolean) #$isAmbiguousName#;
+	}#
+
 	pattern _ Expression -> Expression #{
 		if (!(Boolean) #$isLiteralPrefix#) {#
 			$ = PrefixExpression();

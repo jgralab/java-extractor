@@ -20,7 +20,7 @@ exports
   context-free syntax
 
     %% Classes
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule #
 			$ = ClassDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -34,7 +34,7 @@ exports
 			{qualifiedNamePrefix += "." + #lexem($2)#;}
 			$.name = lexem($2);
 			$.external = false;
-			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("<" {TypeParam #DeclaresClassTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
          ("extends" ClassifierType #ExtendsClass($, $1);#)?
@@ -46,7 +46,7 @@ exports
 		#
 
     %% Enums
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule  #
 			$ = EnumDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -60,10 +60,10 @@ exports
 			{qualifiedNamePrefix += "." + #lexem($2)#;}
 			$.name = lexem($2);
 			$.external = false;
-			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
-         EnumBody  #ContainsTypeMember($, $4);#
+         EnumBody  #{utilities.handleEnumMembers((Vertex) #$#, #$4#);}#
 		 -> EnumDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
@@ -82,7 +82,7 @@ exports
 		}#)*)? "}" -> EnumBody
 
     %% Interfaces
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule #
 			$ = InterfaceDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -96,7 +96,7 @@ exports
 			{qualifiedNamePrefix += "." + #lexem($2)#;}
 			$.name = lexem($2);
 			$.external = false;
-			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
          ("extends" {ClassifierType #ExtendsInterfaces($, $0);# ","}+)?
@@ -107,7 +107,7 @@ exports
 		#
 
     %% Annotations
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule  #
 			$ = AnnotationDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -121,7 +121,7 @@ exports
 			{qualifiedNamePrefix += "." + #lexem($3)#;}
 			$.name = lexem($3);
 			$.external = false;
-			$.fullyQualifiedName = {return qualifiedNamePrefix;};
+			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
 		 AnnotationBody #ContainsTypeMember($, $4);#
 		 -> AnnotationDeclaration #

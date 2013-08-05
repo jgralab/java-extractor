@@ -1,0 +1,186 @@
+== Lookup algorithm for field/variable names ==
+
+Field declaration *hides* all accessible field declarations with the same name in superclasses and superinterfaces of the class. Their types may differ.
+
+Field declaration *shadows* all accessible field declarations in enclosing classes or interfaces, and any local variables, formal parameters, and exception handler parameters with the same name in any enclosing blocks.
+
+A class inherits from its direct superclass and superinterfaces all the non-private(! even if a private field is accessible) fields that are both accessible to code in the class and not hidden by a declaration in the class.
+
+Inheritance of two fields with same name from different classes is possible but they must not be accessed in the class.
+
+A hidden static field can be accessed by using a qualified name.
+A hidden field can be accessed by a field access expression with *super* or a *cast* to a superclass type.
+
+= Field Access Expression =
+
+A field access expression accesses a field of an array or object, which is the value of an expression or super.
+
+Expression may not donate a package, class type or interface type.
+
+If expression in expression.field is of type T then the field of Type T is accessed even if the current object is a subclass of T.
+
+== Names ==
+
+Default: a member can be accessed anywhere within the package that contains its declaration
+
+= Scopes =
+
+scope of a package:
+	A package knows all compilation units which are contained in it but not in any of its subpackages.
+
+scope of "import <Type>" or "import <Package>":
+	A compilation unit knows all types that ar imported.
+	
+scope of "import static <Member>" or "import static <Type>":
+	A compilation unit knows all members that ar imported.
+	
+scope of a top level type:
+	A top level type knows all type declarations which are in the same package.
+
+scope of a member:
+	A member wich is declared in class C/interface I or inherited is visible in the entire body of C/I included any nested declaration.
+
+scope of a parameter (not type parameter):
+	A parameter is visible in the entire body of the corresponding method or constructor.
+	A parameter of a catch clause is visible in the entire block associated with the catch.
+	
+scope of a local variable declaration:
+	A local variable declaration is visible in any further declarators to the right or in any following statement of the enclosing block.
+	A local variable declared in a basic for statement is visible in the rest of the for statement.
+	A local variable declared in an enhanced for statement (for each) is visible in the contained statement.
+	
+scope of a local class:
+	A local class is visible in its own declaration and in any following statement of the enclosing block. If this enclosing block is a switch block statement group, than it is only visible in this group.
+	
+== Shadowing ==
+
+A declaration shadows any other names in the current scope:
+	- a type shadows types
+	- a variable, field, parameter, etc. shadows variables, fields, parameters, etc.
+	- a method shadows a method
+A package declaration does not shadow anything.
+
+A normal (static) import always shadows (static) *-imports (i.e., the imported elements).
+Only normal (static) imports shadow types declared in the same package as the compilation unit which contains the import.
+
+== Obsured Simple Name ==
+
+If a simple name is not unambiguous than it is interpreted in the following order:
+1. variable
+2. type
+3. package
+
+== Determining the meaning of a name ==
+
+1. The context causes a name syntactically to fall into one of six categories:
+	a) PackageName
+		~ package <PackageName>;
+		~ part of a qualified PackageName
+	b) TypeName
+		~ import <TypeName>;
+		~ import static <TypeName>.<???>;
+		~ import static <TypeName>.*;
+		~ <TypeName> "<" TypeParameters ">"
+		~ in an actual type argument list of a parametrized type, generic method invocation, or generic constructor invocation
+		~ "<" T extends <TypeName> ">"
+		~ "<" ? extends <TypeName> ">"
+		~ "<" ? super <TypeName> ">"
+		~ class AClass extends <TypeName>
+		~ class AClass implements <TypeName>
+		~ interface AnInterface extends <TypeName>
+		~ @<TypeName>
+		~ public <TypeName> aField;
+		~ public <TypeName> aMethod(<TypName> aParam) throws <TypeName>;
+		~ public aConstructor(<TypName> aParam) throws <TypeName>;
+		~ <TypeName> localVariable;
+		~ catch(<TypeName> anException)
+		~ <TypeName>.class
+		~ <TypeName>.this
+		~ new <TypeName>()
+		~ new <TypeName>(){...}
+		~ new <TypeName>[...]...
+		~ <TypeName>.super.aField
+		~ <TypeName>.super.aMethod()
+		~ (<TypeName>) anExpression
+		~ anExpression instanceof <TypeName>
+	c) ExpressionName
+		~ <ExpressionName>.super()
+		~ <ExpressionName>.new aConstructor()
+		~ <ExpressionName>.this()
+		~ <ExpressionName>[...]
+		~ as a variable access
+		~ <ExpressionName> = ...;
+	c) MethodName
+		~ <MethodName>(...)
+		~ @AnAnnotation(<MethodName>=...)
+	d) PackageOrTypeName
+		~ in a qualified TypeName: <PackageOrTypeName>.<TypeName>
+		~ import <PackageOrTypeName>.*;
+	e) AmbiguousName
+		~ in a qualified ExpressionName: <AmbiguousName>.<ExpressionName>
+		~ in a qualified MethodName: <AmbiguousName>.<MethodName>(...)
+		~ in a qualified AmbiguousName: <AmbiguousName>.<AmbiguousName>
+		~ in an annotation declaration: public int aMethod() default <AmbiguousName>;
+		~ @AnAnnotation(aMethod=<AmbiguousName>)
+2. Reclassification of AmbiguousName
+	a) AmbiguousName is simple
+		i)	 => ExpressionName, if a variable with that name exists in the current scope
+		ii)	 => ExpressionName, if a field with that name is imported by a single-static-import or by a static-import-on-demand
+		iii) => TypeName, if a top-level-class (not nested including local, membern and anonymous classes), interface type, local class, or member type with that name exists
+		iv)	 => TypeName, if it is imported by a single-type-import, type-import-on-demand, single-static-import, or static-import-on-demand
+		v)	 => PackageName, otherwise
+	b) AmbiguousName <a>.<b> is qualified
+		i) <a> is a PackageName
+			i.1) => TypeName, if a package with name <a> exists and it contains a type named <b>
+			i.2) => PackageName, otherwise
+		ii) <a> is a TypeName
+			ii.1) => ExpressionName, if a type with name <a> exists and it contains a field or method named <b>
+			ii.2) => TypeName, if a type with name <a> exists and it contains a type named <b>
+			ii.3) ERROR
+		iii) <a> is an ExpressionName of type <T>
+			ii.1) => ExpressionName, if <T> contains a field or method named <b>
+			ii.2) => TypeName, if <T> contains a type named <b>
+			ii.3) ERROR
+3. Reclassification of PackageOrTypeName
+	a) PackageOrTypeName is simple
+		i)  => TypeName, if a type with that name exists in the current scope
+		ii) => PackageName, otherwise
+	b) PackageOrTypeName <a>.<b> is qualified
+		i)  => TypeName, if <a> is a PackageName or TypeName that contains a type named <b>
+		ii) => PackageName, otherwise
+4. Determination by Category
+	4.1. PackageName
+		a) PackageName is simple
+			i)  => Package if a top-level-package (= qualified name of package is a simple name) with that name exists
+			ii) ERROR, otherwise
+		b) PackageName <a>.<b> is qualified
+			i)  => Package, if <a> is a Package, and it contains a subpackage named <b>
+			ii) ERROR, otherwise
+	4.2. TypeName
+		a) TypeName is simple
+			i)  => Type, if there exists exactly one visible type with that name in the current scope
+			ii) ERROR, otherwise
+		b) TypeName <a>.<b> is qualified
+			i)  => Type, if <a> is a Package or Type, which contains exactly one accessible Type with that name
+			ii) ERROR, otherwise
+	4.3. ExpressionName
+		a) ExpressionName is simple
+			i)  => Variable, if there exists exactly one visible variable with that name in the current scope
+			ii) ERROR, otherwise
+		b) ExpressionName <a>.<b> is qualified
+			i) <a> is a PackageName
+				i.1) ERROR
+			ii) <a> is a TypeName
+				ii.1) => Variable, if <a> is a type, then it must contain exactly one (static) field with name <b>
+				ii.2) ERROR, otherwise
+			iii) <a> is an ExpressionName of Type <T>
+				iii.1) => Variable, if <T> is a reference or array type and it has exactly one accessible field named <b>
+				iii.2) ERROR, otherwise
+	4.4. MethodName
+		http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.5.7
+		http://docs.oracle.com/javase/specs/jls/se5.0/html/expressions.html#20448
+	
+http://docs.oracle.com/javase/specs/jls/se5.0/html/j3TOC.html
+http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html
+http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.3.2
+http://docs.oracle.com/javase/specs/jls/se5.0/html/packages.html

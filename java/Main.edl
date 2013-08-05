@@ -9,12 +9,11 @@ import declarations
 	org.apache.commons.cli.CommandLine;
 	org.apache.commons.cli.Option;
 	de.uni_koblenz.jgralab.java_extractor.utilities.SemanticActionUtilities;
+	de.uni_koblenz.jgralab.java_extractor.utilities.Linker;
 symbol tables
 	qName2Package<JavaPackage>
 	name2Identifier<Identifier>
 	name2TypeParameter<TypeParameterDeclaration> %% uses simple names as keys
-	name2VariableDeclaration<VariableDeclaration>
-	qName2Type<Type>
 user code {
 
 	public static enum Mode{
@@ -26,6 +25,8 @@ user code {
 	private String programName;
 	
 	private boolean noComment; 
+	
+	private boolean isAmbiguousName = false;
 	
 	static {
 		Option name = new Option("n", "name", true,
@@ -87,8 +88,13 @@ user code {
 		return utilities.readInput(inputFile, encoding);
 	}
 	
+	private Linker linker = new Linker(this);
+	
 	@Override
 	protected void finalize() {
+		linker.setPackageNames(#qName2Package#);
+		linker.link(mode);
+		
 		try {
 			getGraph().save("output.tg");
 		} catch (Exception e) {

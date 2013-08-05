@@ -1,0 +1,172 @@
+== 1. Determining the meaning of a name ==
+
+1. The context causes a name syntactically to fall into one of six categories:
+	a) PackageName
+		~ package <PackageName>;
+		~ part of a qualified PackageName
+	b) TypeName
+		~ import <TypeName>;
+		~ import static <TypeName>.aMemberName;
+		~ import static <TypeName>.*;
+		~ <TypeName> "<" TypeParameters ">"
+		~ in an actual type argument list of a parametrized type, generic method invocation, or generic constructor invocation
+		~ "<" T extends <TypeName> ">"
+		~ "<" ? extends <TypeName> ">"
+		~ "<" ? super <TypeName> ">"
+		~ class AClass extends <TypeName>
+		~ class AClass implements <TypeName>
+		~ interface AnInterface extends <TypeName>
+		~ @<TypeName>
+		~ public <TypeName> aField;
+		~ public <TypeName> aMethod(<TypName> aParam) throws <TypeName>;
+		~ public aConstructor(<TypName> aParam) throws <TypeName>;
+		~ <TypeName> localVariable;
+		~ catch(<TypeName> anException)
+		~ <TypeName>.class
+		~ <TypeName>.this
+		~ new <TypeName>()
+		~ new <TypeName>(){...}
+		~ new <TypeName>[...]...
+		~ <TypeName>.super.aField
+		~ <TypeName>.super.aMethod()
+		~ (<TypeName>) anExpression
+		~ anExpression instanceof <TypeName>
+	c) ExpressionName
+		~ <ExpressionName>.super()
+		~ <ExpressionName>.new aConstructor()
+		~ <ExpressionName>.this()
+		~ <ExpressionName>[...]
+		~ as a variable access
+		~ <ExpressionName> = ...;
+	c) MethodName
+		~ <MethodName>(...)
+		~ @AnAnnotation(<MethodName>=...)
+	d) PackageOrTypeName
+		~ in a qualified TypeName: <PackageOrTypeName>.<TypeName>
+		~ import <PackageOrTypeName>.*;
+	e) AmbiguousName
+		~ in a qualified ExpressionName: <AmbiguousName>.<ExpressionName>
+		~ in a qualified MethodName: <AmbiguousName>.<MethodName>(...)
+		~ in a qualified AmbiguousName: <AmbiguousName>.<AmbiguousName>
+		~ in an annotation declaration: public int aMethod() default <AmbiguousName>;
+		~ @AnAnnotation(aMethod=<AmbiguousName>)
+2. Reclassification of AmbiguousName
+	a) AmbiguousName is simple
+		i)	 => ExpressionName, if a variable (including type parameters) with that name exists in the current scope
+		ii)	 => ExpressionName, if a field with that name is imported by a single-static-import or by a static-import-on-demand
+		iii) => TypeName, if a top level class (not nested including local, member, and anonymous classes), interface type, local class, or member type with that name exists
+		iv)	 => TypeName, if it is imported by a single-type-import, type-import-on-demand, single-static-import, or static-import-on-demand
+		v)	 => PackageName, otherwise
+	b) AmbiguousName <a>.<b> is qualified
+		i) <a> is a PackageName
+			i.1) => TypeName, if a package with name <a> exists and it contains a type named <b>
+			i.2) => PackageName, otherwise
+		ii) <a> is a TypeName
+			ii.1) => ExpressionName, if a type with name <a> exists and it contains a field or method named <b>
+			ii.2) => TypeName, if a type with name <a> exists and it contains a type named <b>
+			ii.3) ERROR
+		iii) <a> is an ExpressionName of type <T>
+			ii.1) => ExpressionName, if <T> contains a field or method named <b>
+			ii.2) => TypeName, if <T> contains a type named <b>
+			ii.3) ERROR
+3. Reclassification of PackageOrTypeName
+	a) PackageOrTypeName is simple
+		i)  => TypeName, if a type with that name exists in the current scope
+		ii) => PackageName, otherwise
+	b) PackageOrTypeName <a>.<b> is qualified
+		i)  => TypeName, if <a> is a PackageName or TypeName that contains a type named <b>
+		ii) => PackageName, otherwise
+4. Determination by Category
+	4.1. PackageName
+		a) PackageName is simple
+			i)  => Package if a top-level-package (= qualified name of package is a simple name) with that name exists
+			ii) ERROR, otherwise
+		b) PackageName <a>.<b> is qualified
+			i)  => Package, if <a> is a Package, and it contains a subpackage named <b>
+			ii) ERROR, otherwise
+	4.2. TypeName
+		a) TypeName is simple
+			i)  => Type, if there exists exactly one visible type with that name in the current scope
+			ii) ERROR, otherwise
+		b) TypeName <a>.<b> is qualified
+			i)  => Type, if <a> is a Package or Type, which contains exactly one accessible Type with that name
+			ii) ERROR, otherwise
+	4.3. ExpressionName
+		a) ExpressionName is simple
+			i)  => Variable, if there exists exactly one visible variable with that name in the current scope
+			ii) ERROR, otherwise
+		b) ExpressionName <a>.<b> is qualified
+			i) <a> is a PackageName
+				i.1) ERROR
+			ii) <a> is a TypeName
+				ii.1) => Variable, if <a> is a type, then it must contain exactly one (static) field with name <b>
+				ii.2) ERROR, otherwise
+			iii) <a> is an ExpressionName of Type <T> (the type is given in the declaration of the variable.
+			##############TODO:Determine type of expression <a> http://docs.oracle.com/javase/specs/jls/se5.0/html/conversions.html)
+				iii.1) => Variable, if <T> is a reference or array type and it has exactly one accessible field named <b>
+				iii.2) ERROR, otherwise
+	4.4. MethodName
+		http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.5.7
+		http://docs.oracle.com/javase/specs/jls/se5.0/html/expressions.html#20448
+
+== 2. Determining accessible elements ==
+
+1. A package is always accessible
+2. A public class or interface type is accessible by any code.
+3. A non-public top level class or interface type (= not nested including local, member, and anonymous classes) is accessible within the package it was defined.
+4. An array type is accessible if its element type is accessible.
+5. A member <m> or a constructor of a reference type is accessible, if the type is accessible and it is declared
+	- public (members of interfaces are implicitly public)
+	- protected and the access is within the package it is declared
+	- (for members) protected and in another package and the access is in the body of a subclass <S> (and in case of <e>.<m> in <S>, the type of <e> must be <S> or a subclass of <S>)
+	- (for consructors) protected and in another package then the access in the body of a subclass of <C> is only permitted in the cases: super(), E.super(), new C(){...}, E.new C(){...}
+	- private and the access is within the body of the top level class that encloses the declaration
+	- otherwise the access has to be within the package it is declared
+
+== 3. Determining the type of a simple name ==
+
+1. Look for type definition in the current type body or in the statements before the current statement.
+2. Look for type definition which are inherited from classes or interfaces.
+3. In case of a nested type look for the searched type in the enclosing scope (block or type) and repead with 1.
+4. In case of a top level type look for other declarations in the same compilation unit.
+5. Single-type-import or single-static-import
+6. Top level type in another compilation unit of the same package
+7. Type-import-on-demand (also implicit import java.lang.*;) and static-import-on-demand
+	
+== X. Shadowing of type names ==
+
+(Simple names have to be defined in the package, that contains the compilation unit. Classes of the unnamed package are out of scope, because they only occure as simple names.)
+
+#####TODO canonical name and fully qualified name
+##### Shadowing http://docs.oracle.com/javase/tutorial/java/javaOO/nested.html ShadowTest.this.x
+
+Fully qualified names are unique. Each type can be accessed by its fully qualified name. The fully qualified name of a top level class or top level interface that is declared in an unnamed package is the simple name of the class or interface.
+
+1. Top level types in compilation units
+
+	- The scope of a top level type is all type declarations in the package in which the top level type is declared. Types in unnamed packages (default packages) are shadowed and are not accessible any more.
+	- If a type is imported by a single-type-import (by its canonical name) then there must not exist a type declaration with its simple name in the compilation unit.
+	- Each compilation unit implicitly imports every public type name declared by java.lang.*.
+
+2. Member types
+	- A member type hides all accessible declarations of member types with the same name in superclasses and superinterfaces of that class.
+	- A member type declaration within class C shadows the declaration of any other types with the same name, that are in the current scope (= body of C).
+	- A member type declaration within a nested class C shadows all names in the enclosing scope (block, class, package) of C with the same name.
+	- A inherited type shadows a type of the enclosing class.
+	
+	- Static member types may only access static field of the enclosing type.
+	
+	- Local classes have no fully qualified nor a canonical name.
+	
+	http://docs.oracle.com/javase/specs/jls/se5.0/html/classes.html#8.5
+	http://docs.oracle.com/javase/specs/jls/se5.0/html/classes.html#8.2
+	
+	- If an enumeration constant has a class body, then it is an anonymous classes which is a subclass of the enum class. Otherwise an enumeration is a field which references an instance of the enumeration.
+	
+== 3. Members ==
+	http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.4
+
+a nested class knows all members of its enclosing class
+
+== Capture Conversion ==
+http://docs.oracle.com/javase/specs/jls/se5.0/html/conversions.html#190795

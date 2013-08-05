@@ -19,7 +19,10 @@ exports
 
     %% EnumConstant
 	rule {EnumConst #lift($0);# ","}* ","? -> EnumConstants #$ = $0;#
-    rule #$ = EnumConstant();# 
+    rule #
+			$ = EnumConstant();
+			{linker.addEnumConstant((Vertex) #$#);}
+		# 
 		Annotation #HasVariableAnnotation($, $0);#* 
 		Id #
 			$identifier = name2Identifier.use(lexem($1));
@@ -33,14 +36,41 @@ exports
 				}
 			}
 			member.HasVariableName($, $identifier);
-			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		("(" {Expression #ContainsEnumConstantArgument($, $0);# ","}* ")")?
 		(
-			#name2VariableDeclaration.push();#
+			#
+				$isLocalVariable = {return isLocalVariable;};
+				{isLocalVariable = false;}
+				%% create anonymous class
+				$anonymousType = ClassDefinition();
+				$currentType = {return currentType;};
+				{currentType = (Vertex) #$anonymousType#;}
+				$name = {return "";// TODO create simple name for anonymous class};
+				$anonymousType.name = $name;
+				$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
+				$anonymousType.canonicalName = $qName;
+				$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+				{qualifiedNamePrefix += "." + #$name#;}
+			#
 			ClassifierBody #
-				ContainsEnumMember($, $0);
-				name2VariableDeclaration.pop();
+				$identifier = name2Identifier.use($name);
+				{
+					if (#$identifier# == null) {#
+						$identifier = Identifier();
+						$identifier.name = $name;
+						name2Identifier.declare($name, $identifier);
+					#} else {
+						getPositionsMap().put((Vertex) #$identifier#, currentElement.getParentApplicationOfDefinedRule().getPosition());
+					}
+				}
+				HasTypeName($anonymousType, $identifier);
+				ContainsTypeMember($anonymousType, $0);
+				HasEnumConstantType($, $anonymousType);
+				%% restore values
+				{isLocalVariable = (Boolean) #$isLocalVariable#;} 
+				{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
+				{currentType = (Vertex) #$currentType#;}
 			#
 		)?      -> EnumConst
 
@@ -65,7 +95,6 @@ exports
 					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(4).getPosition());
 				}
 			}
-			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		(
 			"[" "]" #
@@ -81,7 +110,13 @@ exports
 		#
          "(" ")" AnnoInitializer #ContainsDefaultValue($, $0);# ? ";" -> AnnotationElementDecl
 
-    rule "default" Expression|Annotation          -> AnnoInitializer #$ = $1;#
+    rule #
+			$isAmbiguousName = {return isAmbiguousName;};
+			{isAmbiguousName = true;}
+		# "default" Expression|Annotation          -> AnnoInitializer #
+			$ = $1;
+			{isAmbiguousName = (Boolean) #$isAmbiguousName#;}
+		#
 
     %% FieldDeclaration
     rule #$modAndAnno = list();# 
@@ -131,7 +166,6 @@ exports
 						}
 					}
 					member.HasVariableName($field, $identifier);
-					name2VariableDeclaration.declare($identifier.name, $field);
 				#
 				Initializer #ContainsVariableInitializer($field, $0);#?
 			) 
@@ -167,7 +201,6 @@ exports
 					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(6).getPosition());
 				}
 			}
-			name2VariableDeclaration.declare($identifier.name, $);
 		#
 		(
 			"[" "]" #
@@ -184,7 +217,7 @@ exports
          -> ParamDeclaration
 
     %% MethodDeclaration
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule #$ = MethodDefinition();# 
 		(
 			Modifier #HasMethodModifier($, $0);#
@@ -227,7 +260,7 @@ exports
     rule MethodDeclaration -> Member #$ = $0;#
 
     %% ConstructorDeclaration
-	@Symboltable{name2TypeParameter,name2VariableDeclaration}
+	@Symboltable{name2TypeParameter}
     rule #$ = ConstructorDefinition();#
 		(
 			Modifier #HasConstructorModifier($, $0);#
@@ -254,13 +287,11 @@ exports
     rule ConstructorDeclaration -> Member #$ = $0;# 
 
     %% StaticInitializer
-	@Symboltable{name2VariableDeclaration}
     rule #$ = StaticInitializer();#
 		"static" "{" (Statement #ContainsStaticInitializerStatement($, $0);# )* "}"  -> StaticInitializer
     rule StaticInitializer                         -> InitializerBlock #$ = $0;#
 
     %% InstanceInitializer
-	@Symboltable{name2VariableDeclaration}
     rule #$ = InstanceInitializer();#
 		"{" (Statement #ContainsInstanceInitializerStatement($, $0);# )* "}" -> InstanceInitializer
     rule InstanceInitializer                       -> InitializerBlock #$ = $0;#

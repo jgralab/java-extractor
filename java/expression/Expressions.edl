@@ -10,7 +10,19 @@ imports
   java/Identifiers %% Id
   java/expression/Operations %% Expression
   java/expression/MethodsAndObjectCreations %% Expression
+  java/expression/FieldAccess
   java/expression/Priorities
+
+global actions
+	@Before
+	pattern _(*) -> Expression #
+		$isAmbiguousName = {return isAmbiguousName;};
+		{isAmbiguousName = false;}
+	#
+	
+	pattern _(*) -> Expression #{
+		isAmbiguousName = (Boolean) #$isAmbiguousName#;
+	}#
 
 exports
   sorts Expression ArrayAccess SubArrayAccess
@@ -37,8 +49,6 @@ exports
 	rule #$ = ThisConstant();#
 		(ClassifierType #ContainsQualifier($, $0);# ".")? "this" -> Expression
 
-	rule "(" Expression ")"          -> Expression #$ = $1;#
-
     %% todo JFR-30
     rule Expression CondMid Expression -> Expression {right} #
 		$ = ConditionalExpression();
@@ -47,121 +57,6 @@ exports
 		ContainsMismatch($, $2);
 	#
     rule "?" Expression ":" -> CondMid {bracket} #$ = $1;#
-	
-	rule FieldAccess -> Expression #$ = $0;#
-	
-	 %% variable, local field, type parameter, enum constant
-    rule Id  -> FieldAccess #{
-		if (currentElement.getParent().getParentApplicationOfDefinedRule().getAppliedRule() != currentElement.getAppliedRule()) {#
-			%% this id is a simple expression name
-			%% see section 6.5.6.1 in http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html
-			$name = lexem($0);
-			$identifier = name2Identifier.use($name);
-			{
-				if (#$identifier# == null) {#
-					$identifier = Identifier();
-					$identifier.name = $name;
-					name2Identifier.declare($name, $identifier);
-				#} else {
-					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-				}
-			}
-			$var = name2VariableDeclaration.use($name);
-			{
-				if(#$var# == null) {#
-					%% a field was found whose declaration in the same class was not yet read OR
-					%% a field was found, which was imported statically
-					%% $var = name2VariableDeclaration.useOrDeclare($name, Field);
-				#} else {#
-					$ = {return utilities.createVariableAccessForVariableDeclaration(#$var#, currentElement.getPosition());};
-				#}
-			}
-			expression.HasVariableName($, $identifier);
-			DeclaresAccessedVariable($, $var);
-		#} else {#
-			$ = FieldAccess();
-			$name = lexem($0);
-			$identifier = name2Identifier.use($name);
-			{
-				if (#$identifier# == null) {#
-					$identifier = Identifier();
-					$identifier.name = $name;
-					name2Identifier.declare($name, $identifier);
-				#} else {
-					getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-				}
-			}
-			expression.HasVariableName($, $identifier);
-		#}
-	}#
-	
-	rule                 Expression "." Id -> FieldAccess #
-		$ = FieldAccess();
-		$name = lexem($2);
-		$identifier = name2Identifier.use($name);
-		{
-			if (#$identifier# == null) {#
-				$identifier = Identifier();
-				$identifier.name = $name;
-				name2Identifier.declare($name, $identifier);
-			#} else {
-				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-			}
-		}
-		OwnsField($, $0);
-		expression.HasVariableName($, $identifier);
-	#
-    rule             Type "." Id -> FieldAccess {avoid} #
-		$ = FieldAccess();
-		$name = lexem($2);
-		$identifier = name2Identifier.use($name);
-		{
-			if (#$identifier# == null) {#
-				$identifier = Identifier();
-				$identifier.name = $name;
-				name2Identifier.declare($name, $identifier);
-			#} else {
-				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-			}
-		}
-		$classLiteral = ClassLiteral();
-		RefersToType($classLiteral, $0);
-		OwnsField($, $classLiteral);
-		expression.HasVariableName($, $identifier);
-	#
-    rule              "super" "." Id -> FieldAccess #
-		$ = SuperFieldAccess();
-		$name = lexem($2);
-		$identifier = name2Identifier.use($name);
-		{
-			if (#$identifier# == null) {#
-				$identifier = Identifier();
-				$identifier.name = $name;
-				name2Identifier.declare($name, $identifier);
-			#} else {
-				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-			}
-		}
-		expression.HasVariableName($, $identifier);
-	#
-    rule Type "." "super" "." Id -> FieldAccess #
-		$ = SuperFieldAccess();
-		$name = lexem($4);
-		$identifier = name2Identifier.use($name);
-		{
-			if (#$identifier# == null) {#
-				$identifier = Identifier();
-				$identifier.name = $name;
-				name2Identifier.declare($name, $identifier);
-			#} else {
-				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-			}
-		}
-		$classLiteral = ClassLiteral();
-		RefersToType($classLiteral, $0);
-		OwnsField($, $classLiteral);
-		expression.HasVariableName($, $identifier);
-	#
 	
     %% todo: JFR-29
 	rule ArrayAccess -> Expression #$ = $0;#
@@ -175,13 +70,4 @@ exports
   context-free priorities
 	Expression SubArrayAccess -> ArrayAccess
 	<0>>
-	SubArrayExpression ArrayInit? -> Expression,
-	
-	Expression "." Id -> FieldAccess
-	<0>>{
-		IntLiteral    -> Expression
-		FloatLiteral  -> Expression
-		BoolLiteral   -> Expression 
-		CharLiteral   -> Expression
-		NullLiteral   -> Expression
-	}
+	SubArrayExpression ArrayInit? -> Expression

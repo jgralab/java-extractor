@@ -33,7 +33,6 @@ exports
 		#
   
     %% statements without trailing substatements
-	@Symboltable{name2VariableDeclaration}
 	rule Block		-> ClosedStatement #
 		$ = Block();
 		ContainsBlockStatement($, $0);
@@ -60,7 +59,7 @@ exports
 			{isLocalVariable = (Boolean) #$isLocalVariable#;}
 			$ = $0;
 		#
-	@Symboltable{name2VariableDeclaration, name2Label}
+	@Symboltable{name2Label}
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}
@@ -70,20 +69,19 @@ exports
 		ContainsDefinedType($, $0);
 		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
-	@Symboltable{name2VariableDeclaration, name2Label}
-	rule #
-			$isLocalVariable = {return isLocalVariable;};
-			{isLocalVariable = false;}
-		#
-		EnumDeclaration -> ClosedStatement #
-		$ = TypeDefinitionStatement();
-		ContainsDefinedType($, $0);
-		{isLocalVariable = (Boolean) #$isLocalVariable#;}
-	#
+	%% @Symboltable{name2Label}
+	%% rule #
+			%% $isLocalVariable = {return isLocalVariable;};
+			%% {isLocalVariable = false;}
+		%% #
+		%% EnumDeclaration -> ClosedStatement #
+		%% $ = TypeDefinitionStatement();
+		%% ContainsDefinedType($, $0);
+		%% {isLocalVariable = (Boolean) #$isLocalVariable#;}
+	%% #
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
 	
-	@Symboltable{name2VariableDeclaration}
 	rule #$ = Switch();#
 		"switch"
 		"(" Expression ")" #ContainsSwitchArgument($, $2);#
@@ -135,7 +133,6 @@ exports
 		$ = Throw();
 		ThrowsExceptionCreatedBy($, $1);
 	#
-	@Symboltable{name2VariableDeclaration}
 	rule #$ = Synchronized();#
 		"synchronized" 
 		"(" Expression ")" #ContainsMonitor($, $2);#
@@ -152,20 +149,13 @@ exports
 	
     rule #
 			$ = Try();
-			name2VariableDeclaration.push();
 		#
 		"try" Block #
 			ContainsTryBlockStatement($, $1);
-			name2VariableDeclaration.pop();
 		#
 		CatchClause #ContainsExceptionHandler($, $0);# *
-		(#name2VariableDeclaration.push();# "finally" Block #
-				ContainsFinallyBlockStatement($, $1);
-				name2VariableDeclaration.pop();
-			#
-		)?
+		("finally" Block #ContainsFinallyBlockStatement($, $1);# )?
 		-> ClosedStatement
-	@Symboltable{name2VariableDeclaration}
     rule "catch" "(" ParamDeclaration ")" Block -> CatchClause #
 		$ = Catch();
 		DeclaresCaughtException($, $2);
@@ -211,7 +201,6 @@ exports
 		ContainsWhileBody($, $4);
 	#
 	
-	@Symboltable{name2VariableDeclaration}
 	rule #$ = TraditionalFor();#
 		"for" "("
 		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
@@ -221,7 +210,6 @@ exports
 		ClosedStatement #ContainsForBody($, $8);#
 		-> ClosedStatement
 	
-	@Symboltable{name2VariableDeclaration}
     rule "for" "(" ParamDeclaration ":" Expression ")" ClosedStatement -> ClosedStatement #
 		$ = ForEach();
 		$2 = LocalVariableDeclaration();
@@ -258,7 +246,6 @@ exports
 		ContainsWhileBody($, $4);
 	#
 	
-	@Symboltable{name2VariableDeclaration}
 	rule #$ = TraditionalFor();#
 		"for" "("
 		(VariableDeclaration | {Expression #lift($0);# ","}*) #ContainsRunVariableInitialization($, $2);#
@@ -268,7 +255,6 @@ exports
 		OpenStatement #ContainsForBody($, $8);#
 		-> OpenStatement
 
-	@Symboltable{name2VariableDeclaration}
     rule "for" "(" ParamDeclaration ":" Expression ")" OpenStatement -> OpenStatement #
 		$ = ForEach();
 		$2 = LocalVariableDeclaration();

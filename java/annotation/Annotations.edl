@@ -28,6 +28,8 @@ imports
 			$ = Annotation();
 			HasAnnotationType($, $qualifiedName);
 			ContainsAnnotationArgument($, $args);
+			
+			{linker.addTypeName((Vertex) #$qualifiedName#);}
 	#
 
 exports
@@ -54,6 +56,7 @@ exports
 			AssignesValue($elementValuePair, $3);
 			$args = list();
 			$args.add($elementValuePair);
+			{linker.addMethodName((Vertex) #$elementValuePair#);}
 		#
 		-> Annotation {avoid}
     rule "@" PlainClassifierType #$args = list();#                            -> Annotation
@@ -74,7 +77,22 @@ exports
 		$ = ElementValuePair();
 		SetsField($, $fieldAccess);
 		AssignesValue($, $2);
+		{linker.addMethodName((Vertex) #$elementValuePair#);}
 	#
 
-    rule Expression -> ElemVal #$ = $0;#
-    rule Annotation -> ElemVal #$ = $0;#
+    rule #
+			$isAmbiguousName = {return isAmbiguousName;};
+			{isAmbiguousName = true;}
+		# 
+		Expression -> ElemVal #
+			$ = $0;
+			{isAmbiguousName = (Boolean) #$isAmbiguousName#;}
+		#
+    rule #
+			$isAmbiguousName = {return isAmbiguousName;};
+			{isAmbiguousName = true;}
+		# 
+		Annotation -> ElemVal #
+			$ = $0;
+			{isAmbiguousName = (Boolean) #$isAmbiguousName#;}
+		#

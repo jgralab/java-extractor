@@ -6,13 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.uni_koblenz.edl.parser.Position;
-import de.uni_koblenz.edl.parser.stack.elements.StackElement;
 import de.uni_koblenz.edl.parser.symboltable.SymbolTableStack;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.EdgeDirection;
@@ -25,32 +22,25 @@ import de.uni_koblenz.jgralab.java_extractor.schema.expression.BooleanConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.CharConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.DoubleConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.Expression;
-import de.uni_koblenz.jgralab.java_extractor.schema.expression.FieldAccess;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.FloatConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.IntegerConstant;
-import de.uni_koblenz.jgralab.java_extractor.schema.expression.LocalVariableAccess;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.LongConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.Null;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.StringConstant;
-import de.uni_koblenz.jgralab.java_extractor.schema.expression.VariableAccess;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.EnumConstant;
-import de.uni_koblenz.jgralab.java_extractor.schema.member.Field;
+import de.uni_koblenz.jgralab.java_extractor.schema.member.HasEnumConstantType;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableAnnotation;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableModifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Member;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
-import de.uni_koblenz.jgralab.java_extractor.schema.member.ParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
 import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
-import de.uni_koblenz.jgralab.java_extractor.schema.statement.LocalVariableDeclaration;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.AnnotationDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ClassDefinition;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ContainsTypeMember;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeName;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ExtendsClass;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.InterfaceDefinition;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.SpecificType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.ArrayType;
@@ -76,7 +66,7 @@ public class SemanticActionUtilities {
 
 	public static String DEFAULT_PROGRAM_NAME = "program";
 
-	private final Java5Builder graphBuilder;
+	private Java5Builder graphBuilder = null;
 
 	public SemanticActionUtilities(Java5Builder java5Builder) {
 		graphBuilder = java5Builder;
@@ -561,111 +551,171 @@ public class SemanticActionUtilities {
 		return id;
 	}
 
-	/*
-	 * Linking
-	 */
-
-	public VariableAccess createVariableAccessForVariableDeclaration(
-			Object var, Position position) {
-		if (((Vertex) var).isTemporary()
-				|| ((Vertex) var).isInstanceOf(Field.VC)
-				|| ((Vertex) var).isInstanceOf(EnumConstant.VC)) {
-			return (VariableAccess) graphBuilder.createVertex(FieldAccess.VC,
-					position);
-		} else {
-			assert ((Vertex) var).isInstanceOf(ParameterDeclaration.VC)
-					|| ((Vertex) var).isInstanceOf(LocalVariableDeclaration.VC);
-			return (VariableAccess) graphBuilder.createVertex(
-					LocalVariableAccess.VC, position);
-		}
-	}
-
-	/*
-	 * a) LAZY
-	 */
-
-	private Set<Vertex> importedTypes = new HashSet<Vertex>();
-
-	public void addImportedType(Vertex qualifiedType) {
-		importedTypes.add(qualifiedType);
-	}
-
-	/*
-	 * b) EAGER & COMPLETE
-	 */
-
-	public Type resolveQualifiedType(StackElement currentElement,
-			SymbolTableStack qName2Type, SymbolTableStack name2Identifier,
-			String qualifiedName) {
-		Type type = (Type) qName2Type.use(qualifiedName);
-		String simpleName = qualifiedName.substring(qualifiedName
-				.lastIndexOf('.') + 1);
-		String qName = qualifiedName;
-		if (type == null) {
-			Position position = currentElement.getPosition();
-			SpecificType specificType = null;
-			Class<?> cls = null;
-			while (specificType == null) {
-				try {
-					cls = Class.forName(qName);
-					if (cls.isAnnotation()) {
-						specificType = (SpecificType) graphBuilder
-								.createVertex(AnnotationDefinition.VC, position);
-					} else if (cls.isInterface()) {
-						specificType = (SpecificType) graphBuilder
-								.createVertex(InterfaceDefinition.VC, position);
-					} else if (cls.isEnum()) {
-						specificType = (SpecificType) graphBuilder
-								.createVertex(EnumDefinition.VC, position);
-					} else {
-						// this is a class definition
-						specificType = (SpecificType) graphBuilder
-								.createVertex(ClassDefinition.VC, position);
-					}
-					simpleName = cls.getSimpleName();
-				} catch (ClassNotFoundException e) {
-					if (qName.contains(".")) {
-						qName = qName.substring(0, qName.lastIndexOf('.'))
-								+ "$"
-								+ qName.substring(qName.lastIndexOf('.') + 1);
-					} else {
-						specificType = (SpecificType) graphBuilder
-								.createVertex(ClassDefinition.VC, position);
-						qName = qualifiedName;
-						System.out
-								.println("WARNING: No type with qualified name "
-										+ qualifiedName
-										+ " could be found.\n\tThe following vertex was created as default: "
-										+ specificType
-										+ "\n\tcurrentFile: "
-										+ currentElement.getNameOfParsedFile()
-										+ "\n\t" + currentElement.getPosition());
-					}
+	public void handleEnumMembers(Vertex enumDef, Object enumMembers) {
+		EnumDefinition enumDef_ = (EnumDefinition) enumDef;
+		@SuppressWarnings("unchecked")
+		List<Member> enumMembers_ = (List<Member>) enumMembers;
+		for (Member member : enumMembers_) {
+			if (member.isInstanceOf(EnumConstant.VC)) {
+				EnumConstant enumConstant = (EnumConstant) member;
+				ClassDefinition anonymousClass = (ClassDefinition) enumConstant
+						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT)
+						.getThat();
+				if (anonymousClass == null) {
+					graphBuilder.createEdge(HasEnumConstantType.EC,
+							enumConstant, enumDef_);
+				} else {
+					graphBuilder.createEdge(ExtendsClass.EC, anonymousClass,
+							enumDef_);
 				}
 			}
-			specificType.set_external(true);
-			specificType.set_fullyQualifiedName(qName);
-			type = specificType;
-			type.set_name(simpleName);
-			Identifier id = (Identifier) name2Identifier.use(simpleName);
-			if (id == null) {
-				id = (Identifier) graphBuilder.createVertex(Identifier.VC,
-						position);
-				id.set_name(simpleName);
-				name2Identifier.declare(simpleName, id);
-			}
-			graphBuilder.createEdge(HasTypeName.EC, type, id);
-			qName2Type.declare(qualifiedName, type);
+			graphBuilder.createEdge(ContainsTypeMember.EC, enumDef_, member);
 		}
-		return type;
 	}
+
+	/*
+	 * Linking old
+	 */
+
+	// /**
+	// * These temporary vertices represent the accesses to variables. These
+	// * vertices do not access:
+	// * <ul>
+	// * <li>a local variable of the current scope</li>
+	// * <li>a parameter of the current scope</li>
+	// * <li>a field, which was declared before the access, of the class
+	// directly
+	// * enclosing the variable access</li>
+	// * </ul>
+	// */
+	// public Set<TemporaryVertex> yetUndeclaredVariableAccesses = new
+	// HashSet<TemporaryVertex>();
+	//
+	// public void addUndeclaredVariable(Object tempVertex) {
+	// yetUndeclaredVariableAccesses.add((TemporaryVertex) tempVertex);
+	// }
+	//
+	// public VariableAccess createVariableAccessForVariableDeclaration(
+	// Object var, Position position) {
+	// if (((Vertex) var).isTemporary()
+	// || ((Vertex) var).isInstanceOf(Field.VC)
+	// || ((Vertex) var).isInstanceOf(EnumConstant.VC)) {
+	// return (VariableAccess) graphBuilder.createVertex(FieldAccess.VC,
+	// position);
+	// } else {
+	// assert ((Vertex) var).isInstanceOf(ParameterDeclaration.VC)
+	// || ((Vertex) var).isInstanceOf(LocalVariableDeclaration.VC);
+	// return (VariableAccess) graphBuilder.createVertex(
+	// LocalVariableAccess.VC, position);
+	// }
+	// }
+	//
+	// public void link(Mode mode) {
+	// linkUndeclaredVariablesAccesses(mode);
+	// }
+	//
+	// private void linkUndeclaredVariablesAccesses(Mode mode) {
+	// for (TemporaryVertex tempVariableAccess : yetUndeclaredVariableAccesses)
+	// {
+	// // 1st: check if it is a field of the enclosing SpecificType
+	// SpecificType enclosingType =
+	// getEnclosingSpecificType(tempVariableAccess);
+	// // TODO Auto-generated method stub
+	// }
+	// }
+	//
+	// private SpecificType getEnclosingSpecificType(Vertex vertex) {
+	// // TODO Auto-generated method stub only AttributedEdge
+	// return null;
+	// }
+	//
+	// /*
+	// * a) LAZY
+	// */
+	//
+	// private Set<Vertex> importedTypes = new HashSet<Vertex>();
+	//
+	// public void addImportedType(Vertex qualifiedType) {
+	// importedTypes.add(qualifiedType);
+	// }
+	//
+	// /*
+	// * b) EAGER & COMPLETE
+	// */
+	//
+	// public Type resolveQualifiedType(StackElement currentElement,
+	// SymbolTableStack qName2Type, SymbolTableStack name2Identifier,
+	// String qualifiedName) {
+	// Type type = (Type) qName2Type.use(qualifiedName);
+	// String simpleName = qualifiedName.substring(qualifiedName
+	// .lastIndexOf('.') + 1);
+	// String qName = qualifiedName;
+	// if (type == null) {
+	// Position position = currentElement.getPosition();
+	// SpecificType specificType = null;
+	// Class<?> cls = null;
+	// while (specificType == null) {
+	// try {
+	// cls = Class.forName(qName);
+	// if (cls.isAnnotation()) {
+	// specificType = (SpecificType) graphBuilder
+	// .createVertex(AnnotationDefinition.VC, position);
+	// } else if (cls.isInterface()) {
+	// specificType = (SpecificType) graphBuilder
+	// .createVertex(InterfaceDefinition.VC, position);
+	// } else if (cls.isEnum()) {
+	// specificType = (SpecificType) graphBuilder
+	// .createVertex(EnumDefinition.VC, position);
+	// } else {
+	// // this is a class definition
+	// specificType = (SpecificType) graphBuilder
+	// .createVertex(ClassDefinition.VC, position);
+	// }
+	// simpleName = cls.getSimpleName();
+	// } catch (ClassNotFoundException e) {
+	// if (qName.contains(".")) {
+	// qName = qName.substring(0, qName.lastIndexOf('.'))
+	// + "$"
+	// + qName.substring(qName.lastIndexOf('.') + 1);
+	// } else {
+	// specificType = (SpecificType) graphBuilder
+	// .createVertex(ClassDefinition.VC, position);
+	// qName = qualifiedName;
+	// System.out
+	// .println("WARNING: No type with qualified name "
+	// + qualifiedName
+	// + " could be found.\n\tThe following vertex was created as default: "
+	// + specificType
+	// + "\n\tcurrentFile: "
+	// + currentElement.getNameOfParsedFile()
+	// + "\n\t" + currentElement.getPosition());
+	// }
+	// }
+	// }
+	// specificType.set_external(true);
+	// specificType.set_fullyQualifiedName(qName);
+	// type = specificType;
+	// type.set_name(simpleName);
+	// Identifier id = (Identifier) name2Identifier.use(simpleName);
+	// if (id == null) {
+	// id = (Identifier) graphBuilder.createVertex(Identifier.VC,
+	// position);
+	// id.set_name(simpleName);
+	// name2Identifier.declare(simpleName, id);
+	// }
+	// graphBuilder.createEdge(HasTypeName.EC, type, id);
+	// qName2Type.declare(qualifiedName, type);
+	// }
+	// return type;
+	// }
 
 	// TODO correct field access
 
 	// TODO check if the anonymous class extends a class or implements an
 	// interface
 
-	// TODO create simple name for anonymous class
+	// TODO create simple name for anonymous class (constructor and enum
+	// constants)
 
 	// TODO a.b.c.run() if a or b or c is a field
 
@@ -674,4 +724,9 @@ public class SemanticActionUtilities {
 
 	// TODO add comments
 
+	// TODO adapt enumerations (anonymous class)
+
+	// TODO rename qualifiedName into canonical Name
+
+	// TODO set graph name and version
 }
