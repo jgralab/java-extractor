@@ -2268,6 +2268,7 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_axmHo4GdEeKtQfbmXovTzA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_axmHooGdEeKtQfbmXovTzA"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Kxi7IP3CEeKF068EQcgQgA" name="qualifiedAccess" visibility="private" type="_OSel0NKBEeKSKrj7T_jYuw"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ConditionalExpression" name="ConditionalExpression">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ConditionalExpression" general="Expression"/>
@@ -2348,6 +2349,7 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_zq7306hBEeK7PbkcALvgcQ" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_zq730qhBEeK7PbkcALvgcQ"/>
       </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_fN3OUP3CEeKF068EQcgQgA" name="qualifiedInvokation" visibility="private" type="_OSel0NKBEeKSKrj7T_jYuw"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ObjectCreation" name="ConstructorCall">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ObjectCreation" general="Expression"/>
