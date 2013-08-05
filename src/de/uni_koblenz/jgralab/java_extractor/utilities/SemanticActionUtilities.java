@@ -36,7 +36,6 @@ import de.uni_koblenz.jgralab.java_extractor.schema.member.Modifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.member.VariableDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.program.Program;
 import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ClassDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ContainsTypeMember;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ExtendsClass;
@@ -558,15 +557,16 @@ public class SemanticActionUtilities {
 		for (Member member : enumMembers_) {
 			if (member.isInstanceOf(EnumConstant.VC)) {
 				EnumConstant enumConstant = (EnumConstant) member;
-				ClassDefinition anonymousClass = (ClassDefinition) enumConstant
-						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT)
-						.getThat();
-				if (anonymousClass == null) {
+				HasEnumConstantType typeOfEnumConstant = enumConstant
+						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT);
+				if (typeOfEnumConstant == null) {
+					// TODO adapt schema HasEnumConstantType has to end at Type
+					// and not at TypeSpecification
 					graphBuilder.createEdge(HasEnumConstantType.EC,
 							enumConstant, enumDef_);
 				} else {
-					graphBuilder.createEdge(ExtendsClass.EC, anonymousClass,
-							enumDef_);
+					graphBuilder.createEdge(ExtendsClass.EC,
+							typeOfEnumConstant.getThat(), enumDef_);
 				}
 			}
 			graphBuilder.createEdge(ContainsTypeMember.EC, enumDef_, member);
