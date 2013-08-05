@@ -1236,6 +1236,14 @@
     <packagedElement xmi:type="uml:Class" xmi:id="EnumConstant" name="EnumConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_EnumConstant" general="Member"/>
       <generalization xmi:type="uml:Generalization" xmi:id="_RhdHgHdhEeKil48b18T7iA" general="_9v2esHwVEeKsa4FpHvZurA"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_vL4hUf2uEeKF068EQcgQgA" name="enumType" visibility="private" type="TypeSpecification" association="_vL4hUP2uEeKF068EQcgQgA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vMCSUf2uEeKF068EQcgQgA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vMCSUP2uEeKF068EQcgQgA"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_fQ22wXdhEeKil48b18T7iA" name="declaredConstructor" visibility="private" type="Member" association="_fQ22wHdhEeKil48b18T7iA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fQ22w3dhEeKil48b18T7iA" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fQ22wndhEeKil48b18T7iA"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="ConstructorDefinition" name="ConstructorDefinition">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_ConstructorDefinition" general="Member"/>
@@ -1367,18 +1375,14 @@
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_TXduQ3deEeKil48b18T7iA"/>
       </ownedEnd>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_fQ22wHdhEeKil48b18T7iA" name="ContainsEnumMember" memberEnd="_fQ22wXdhEeKil48b18T7iA _fQ22xHdhEeKil48b18T7iA">
+    <packagedElement xmi:type="uml:Association" xmi:id="_fQ22wHdhEeKil48b18T7iA" name="DeclaresInvokedEnumConstructor" memberEnd="_fQ22wXdhEeKil48b18T7iA _fQ22xHdhEeKil48b18T7iA">
       <ownedComment xmi:type="uml:Comment" xmi:id="_aJVOAHwcEeKsa4FpHvZurA" annotatedElement="_fQ22wHdhEeKil48b18T7iA">
-        <body>: ContainsMember</body>
+        <body>&lt;p>:&amp;nbsp;Declares&lt;/p></body>
       </ownedComment>
-      <generalization xmi:type="uml:Generalization" xmi:id="_hgxLEHwbEeKsa4FpHvZurA" general="_g0kB0HwaEeKsa4FpHvZurA"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_fQ22xHdhEeKil48b18T7iA" name="containingEnumConstant" visibility="private" type="EnumConstant" association="_fQ22wHdhEeKil48b18T7iA">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fQ22xndhEeKil48b18T7iA" value="1"/>
+      <generalization xmi:type="uml:Generalization" xmi:id="_T73a0P2wEeKF068EQcgQgA" general="IsDeclarationOf"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_fQ22xHdhEeKil48b18T7iA" name="invocationOfConstructor" visibility="private" type="EnumConstant" association="_fQ22wHdhEeKil48b18T7iA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fQ22xndhEeKil48b18T7iA" value="*"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fQ22xXdhEeKil48b18T7iA"/>
-      </ownedEnd>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_fQ22wXdhEeKil48b18T7iA" name="" visibility="private" type="Member" aggregation="composite" association="_fQ22wHdhEeKil48b18T7iA">
-        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_fQ22w3dhEeKil48b18T7iA" value="*"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_fQ22wndhEeKil48b18T7iA"/>
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_l6OiAHdiEeKil48b18T7iA" name="ContainsEnumConstantArgument" memberEnd="_l6OiAXdiEeKil48b18T7iA _l6OiBHdiEeKil48b18T7iA">
@@ -1641,6 +1645,16 @@
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Realization" xmi:id="_QiTN8KdAEeKglYlCn7HbrA" supplier="AttributedEdge" client="_TXT9QHdeEeKil48b18T7iA"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_vL4hUP2uEeKF068EQcgQgA" name="HasEnumConstantType" memberEnd="_vL4hUf2uEeKF068EQcgQgA _vMCSUv2uEeKF068EQcgQgA">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_lmEoMP2vEeKF068EQcgQgA" annotatedElement="_vL4hUP2uEeKF068EQcgQgA">
+        <body>&lt;p>:&amp;nbsp;HasType&lt;/p></body>
+      </ownedComment>
+      <generalization xmi:type="uml:Generalization" xmi:id="_HXRuUP2vEeKF068EQcgQgA" general="_Vyu-wHB3EeKie9MLu0o9lQ"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_vMCSUv2uEeKF068EQcgQgA" name="" visibility="private" type="EnumConstant" association="_vL4hUP2uEeKF068EQcgQgA">
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vMCSVP2uEeKF068EQcgQgA" value="*"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vMCSU_2uEeKF068EQcgQgA"/>
+      </ownedEnd>
+    </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Package" xmi:id="_oJ8BsGn3EeKSmMk9GImLQA" name="statement">
     <ownedComment xmi:type="uml:Comment" xmi:id="_YLDWsIDuEeKnI79eddblXg" annotatedElement="_S_TEIHHzEeKMkawfmexbrA _Wbg6cIDoEeKnI79eddblXg">
