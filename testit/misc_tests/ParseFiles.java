@@ -16,10 +16,6 @@ public class ParseFiles {
 		// JavaGraphBuilder builder = new JavaGraphBuilder();//
 		// JavaSchema.instance());
 		parseAllJavaFiles(builder, new File("D:/JDK6SourceCode/"));
-		/*
-		 * + "langtools" + File.separator + "test" + File.separator + "tools" +
-		 * File.separator + "javac" + File.separator + "unicode"
-		 */
 		builder.link();
 	}
 
@@ -48,7 +44,7 @@ public class ParseFiles {
 											+ File.separator + "gc"
 											+ File.separator + "6845368"
 											+ File.separator + "bigobj.java")
-							// previous works but takes a very long time...
+							// previous file works but takes a very long time...
 							|| pathname.toString().endsWith(
 									"langtools" + File.separator + "test"
 											+ File.separator + "tools"
@@ -170,6 +166,12 @@ public class ParseFiles {
 											+ File.separator + "tools"
 											+ File.separator + "javac"
 											+ File.separator + "Digits.java")
+							|| pathname.toString().endsWith(
+									"langtools" + File.separator + "test"
+											+ File.separator + "tools"
+											+ File.separator + "javac"
+											+ File.separator
+											+ "NestedDuplicateLabels.java")
 							|| pathname.toString().contains(
 									"langtools" + File.separator + "test"
 											+ File.separator + "tools"

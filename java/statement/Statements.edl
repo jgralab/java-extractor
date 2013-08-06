@@ -69,16 +69,16 @@ exports
 		ContainsDefinedType($, $0);
 		{isLocalVariable = (Boolean) #$isLocalVariable#;}
 	#
-	%% @Symboltable{name2Label}
-	%% rule #
-			%% $isLocalVariable = {return isLocalVariable;};
-			%% {isLocalVariable = false;}
-		%% #
-		%% EnumDeclaration -> ClosedStatement #
-		%% $ = TypeDefinitionStatement();
-		%% ContainsDefinedType($, $0);
-		%% {isLocalVariable = (Boolean) #$isLocalVariable#;}
-	%% #
+	@Symboltable{name2Label}
+	rule #
+			$isLocalVariable = {return isLocalVariable;};
+			{isLocalVariable = false;}
+		#
+		EnumDeclaration -> ClosedStatement #
+		$ = TypeDefinitionStatement();
+		ContainsDefinedType($, $0);
+		{isLocalVariable = (Boolean) #$isLocalVariable#;}
+	#
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#
 	
