@@ -560,41 +560,46 @@ public class SemanticActionUtilities {
 		for (Member member : enumMembers_) {
 			if (member.isInstanceOf(EnumConstant.VC)) {
 				EnumConstant enumConstant = (EnumConstant) member;
+				QualifiedType qType = createQualifiedTypeForEnumDefinition(
+						name2Identifier_, enumDef_, member);
 				HasEnumConstantType typeOfEnumConstant = enumConstant
 						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT);
 				if (typeOfEnumConstant == null) {
-					Identifier idOfEnumDef = enumDef_.get_simpleName();
-					if (idOfEnumDef == null) {
-						idOfEnumDef = (Identifier) name2Identifier_
-								.use(enumDef_.get_name());
-						if (idOfEnumDef == null) {
-							idOfEnumDef = (Identifier) graphBuilder
-									.createVertex(Identifier.VC, graphBuilder
-											.getPositionsMap().get(enumDef_));
-							idOfEnumDef.set_name(enumDef_.get_name());
-							name2Identifier_.declare(idOfEnumDef.get_name(),
-									idOfEnumDef);
-						}
-						graphBuilder.createEdge(HasTypeName.EC, enumDef_,
-								idOfEnumDef);
-					}
-					QualifiedType qType = (QualifiedType) graphBuilder
-							.createVertex(QualifiedType.VC, graphBuilder
-									.getPositionsMap().get(member));
-					qType.set_fullyQualifiedName(enumDef_.get_canonicalName());
-					graphBuilder.createEdge(HasSimpleName.EC, qType,
-							idOfEnumDef);
-					graphBuilder
-							.createEdge(IsDefinedByType.EC, qType, enumDef_);
 					graphBuilder.createEdge(HasEnumConstantType.EC,
 							enumConstant, qType);
 				} else {
 					graphBuilder.createEdge(ExtendsClass.EC,
-							typeOfEnumConstant.getThat(), enumDef_);
+							((TypeSpecification) typeOfEnumConstant.getThat())
+									.getFirstIsDefinedByTypeIncidence()
+									.getThat(), qType);
 				}
 			}
 			graphBuilder.createEdge(ContainsTypeMember.EC, enumDef_, member);
 		}
+	}
+
+	private QualifiedType createQualifiedTypeForEnumDefinition(
+			SymbolTableStack name2Identifier_, EnumDefinition enumDef_,
+			Member member) {
+		Identifier idOfEnumDef = enumDef_.get_simpleName();
+		if (idOfEnumDef == null) {
+			idOfEnumDef = (Identifier) name2Identifier_
+					.use(enumDef_.get_name());
+			if (idOfEnumDef == null) {
+				idOfEnumDef = (Identifier) graphBuilder.createVertex(
+						Identifier.VC,
+						graphBuilder.getPositionsMap().get(enumDef_));
+				idOfEnumDef.set_name(enumDef_.get_name());
+				name2Identifier_.declare(idOfEnumDef.get_name(), idOfEnumDef);
+			}
+			graphBuilder.createEdge(HasTypeName.EC, enumDef_, idOfEnumDef);
+		}
+		QualifiedType qType = (QualifiedType) graphBuilder.createVertex(
+				QualifiedType.VC, graphBuilder.getPositionsMap().get(member));
+		qType.set_fullyQualifiedName(enumDef_.get_canonicalName());
+		graphBuilder.createEdge(HasSimpleName.EC, qType, idOfEnumDef);
+		graphBuilder.createEdge(IsDefinedByType.EC, qType, enumDef_);
+		return qType;
 	}
 
 	/*
