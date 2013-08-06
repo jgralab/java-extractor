@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.java_extractor.schema.statement.EmptyStatement;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ContainsTypeMember;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ExtendsClass;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
@@ -565,8 +566,7 @@ public class SemanticActionUtilities {
 							.createVertex(QualifiedType.VC, graphBuilder
 									.getPositionsMap().get(member));
 					qType.set_fullyQualifiedName(enumDef_.get_canonicalName());
-					graphBuilder.createEdge(HasSimpleName.EC, qType,
-							idOfEnumDef);
+					graphBuilder.createEdge(HasTypeName.EC, qType, idOfEnumDef);
 					graphBuilder
 							.createEdge(IsDefinedByType.EC, qType, enumDef_);
 					graphBuilder.createEdge(HasEnumConstantType.EC,
