@@ -137,6 +137,7 @@ user code {
 			System.out.println("\tLinking...");
 		}
 		linker.setPackageNames(#qName2Package#);
+		linker.setName2Identifier(#name2Identifier#);
 		linker.link(mode);
 		linker = null;
 		

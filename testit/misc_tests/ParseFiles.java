@@ -15,7 +15,8 @@ public class ParseFiles {
 		Java5Builder builder = new Java5Builder(Java5Schema.instance());
 		// JavaGraphBuilder builder = new JavaGraphBuilder();//
 		// JavaSchema.instance());
-		parseAllJavaFiles(builder, new File("D:/JDK6SourceCode/"));
+		parseAllJavaFiles(builder, new File("../common"));
+		// new File("D:/JDK6SourceCode/"));
 		builder.link();
 	}
 
