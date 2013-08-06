@@ -517,7 +517,7 @@
       <generalization xmi:type="uml:Generalization" xmi:id="_M0RscHBrEeKie9MLu0o9lQ" general="IsDeclarationOf"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_o6jIhHBIEeKie9MLu0o9lQ" name="declaringTranslationUnit" visibility="private" type="TranslationUnit" association="_o6jIgHBIEeKie9MLu0o9lQ">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_o6jIhnBIEeKie9MLu0o9lQ" value="1"/>
-        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_o6jIhXBIEeKie9MLu0o9lQ" value="1"/>
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_o6jIhXBIEeKie9MLu0o9lQ"/>
       </ownedEnd>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_IwNKIHBXEeKie9MLu0o9lQ" name="HasPackageAnnotation" memberEnd="_IwNKIXBXEeKie9MLu0o9lQ _IwNKJHBXEeKie9MLu0o9lQ">
