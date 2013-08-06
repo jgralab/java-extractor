@@ -77,7 +77,7 @@ exports
 		$ = ElementValuePair();
 		SetsField($, $fieldAccess);
 		AssignesValue($, $2);
-		{linker.addMethodName((Vertex) #$elementValuePair#);}
+		{linker.addMethodName((Vertex) #$#);}
 	#
 
     rule #
