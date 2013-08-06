@@ -560,10 +560,17 @@ public class SemanticActionUtilities {
 				HasEnumConstantType typeOfEnumConstant = enumConstant
 						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT);
 				if (typeOfEnumConstant == null) {
-					// TODO adapt schema HasEnumConstantType has to end at Type
-					// and not at TypeSpecification
+					Identifier idOfEnumDef = enumDef_.get_simpleName();
+					QualifiedType qType = (QualifiedType) graphBuilder
+							.createVertex(QualifiedType.VC, graphBuilder
+									.getPositionsMap().get(member));
+					qType.set_fullyQualifiedName(enumDef_.get_canonicalName());
+					graphBuilder.createEdge(HasSimpleName.EC, qType,
+							idOfEnumDef);
+					graphBuilder
+							.createEdge(IsDefinedByType.EC, qType, enumDef_);
 					graphBuilder.createEdge(HasEnumConstantType.EC,
-							enumConstant, enumDef_);
+							enumConstant, qType);
 				} else {
 					graphBuilder.createEdge(ExtendsClass.EC,
 							typeOfEnumConstant.getThat(), enumDef_);

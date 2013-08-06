@@ -8,6 +8,18 @@ imports
 global actions
 	pattern _ -> ClassifierDeclaration #
 		$ = $0;
+		$name = $.name;
+		$identifier = name2Identifier.use($name);
+		{
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = $name;
+				name2Identifier.declare($name, $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		HasTypeName($, $identifier);
 	#
 
 user code {
