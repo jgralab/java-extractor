@@ -112,7 +112,7 @@ exports
     rule "import" "static" PlainClassifierType "." Id ";" -> ImportDeclaration #
 			$qualifiedType = QualifiedType();
 			$qualifiedType.fullyQualifiedName = $2;
-			$simpleName = {return utilities.extractSimpleName((String) #$q2#);};
+			$simpleName = {return utilities.extractSimpleName((String) #$2#);};
 			$identifier = name2Identifier.use($simpleName);
 			{
 				if (#$identifier# == null) {#
