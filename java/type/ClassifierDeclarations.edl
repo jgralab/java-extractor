@@ -75,7 +75,7 @@ exports
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
-         EnumBody  #{utilities.handleEnumMembers((Vertex) #$#, #$4#);}#
+         EnumBody  #{utilities.handleEnumMembers((Vertex) #$#, #$4#, #name2Identifier#);}#
 		 -> EnumDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}

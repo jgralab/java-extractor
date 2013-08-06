@@ -134,7 +134,7 @@ user code {
 		}
 	
 		if (printDebugInformationToTheConsole) {
-			System.out.println("Linking...");
+			System.out.println("\tLinking...");
 		}
 		linker.setPackageNames(#qName2Package#);
 		linker.link(mode);

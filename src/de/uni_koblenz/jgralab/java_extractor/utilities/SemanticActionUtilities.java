@@ -551,7 +551,9 @@ public class SemanticActionUtilities {
 		return id;
 	}
 
-	public void handleEnumMembers(Vertex enumDef, Object enumMembers) {
+	public void handleEnumMembers(Vertex enumDef, Object enumMembers,
+			Object name2Identifier) {
+		SymbolTableStack name2Identifier_ = (SymbolTableStack) name2Identifier;
 		EnumDefinition enumDef_ = (EnumDefinition) enumDef;
 		@SuppressWarnings("unchecked")
 		List<Member> enumMembers_ = (List<Member>) enumMembers;
@@ -562,11 +564,26 @@ public class SemanticActionUtilities {
 						.getFirstHasEnumConstantTypeIncidence(EdgeDirection.OUT);
 				if (typeOfEnumConstant == null) {
 					Identifier idOfEnumDef = enumDef_.get_simpleName();
+					if (idOfEnumDef == null) {
+						idOfEnumDef = (Identifier) name2Identifier_
+								.use(enumDef_.get_name());
+						if (idOfEnumDef == null) {
+							idOfEnumDef = (Identifier) graphBuilder
+									.createVertex(Identifier.VC, graphBuilder
+											.getPositionsMap().get(enumDef_));
+							idOfEnumDef.set_name(enumDef_.get_name());
+							name2Identifier_.declare(idOfEnumDef.get_name(),
+									idOfEnumDef);
+						}
+						graphBuilder.createEdge(HasTypeName.EC, enumDef_,
+								idOfEnumDef);
+					}
 					QualifiedType qType = (QualifiedType) graphBuilder
 							.createVertex(QualifiedType.VC, graphBuilder
 									.getPositionsMap().get(member));
 					qType.set_fullyQualifiedName(enumDef_.get_canonicalName());
-					graphBuilder.createEdge(HasTypeName.EC, qType, idOfEnumDef);
+					graphBuilder.createEdge(HasSimpleName.EC, qType,
+							idOfEnumDef);
 					graphBuilder
 							.createEdge(IsDefinedByType.EC, qType, enumDef_);
 					graphBuilder.createEdge(HasEnumConstantType.EC,

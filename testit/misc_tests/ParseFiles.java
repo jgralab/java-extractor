@@ -44,6 +44,12 @@ public class ParseFiles {
 							|| pathname.getName().contains("-X")
 							|| pathname.getName().equals("BadSource.java")
 							|| pathname.toString().endsWith(
+									"hotspot" + File.separator + "test"
+											+ File.separator + "gc"
+											+ File.separator + "6845368"
+											+ File.separator + "bigobj.java")
+							// previous works but takes a very long time...
+							|| pathname.toString().endsWith(
 									"langtools" + File.separator + "test"
 											+ File.separator + "tools"
 											+ File.separator + "javac"
