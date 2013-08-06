@@ -87,6 +87,7 @@ exports
 				{isLocalVariable = (Boolean) #$isLocalVariable#;} 
 				{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 				{currentType = (Vertex) #$currentType#;}
+				{linker.registerSpecificType((Vertex) #$anonymousType#);}
 			#
 		)?
 		-> ConstructorSuffix #HasCreatedObjectType($, $type);#
@@ -190,36 +191,7 @@ exports
 		) -> MethodSuffix
 		
 		
-	rule #$prefix = null;{// TODO remove this}#
-		%% (
-			%% PlainClassifierType "." #
-				%% $prefix = ClassLiteral();
-				%% $qualifiedType = QualifiedType();
-				%% $qName = $0;
-				%% $qualifiedType.fullyQualifiedName = $qName;
-				%% $simpleName = {return utilities.extractSimpleName((String) #$qName#);};
-				%% $identifier = name2Identifier.use($simpleName);
-				%% {
-					%% if (#$identifier# == null) {#
-						%% $identifier = Identifier();
-						%% $identifier.name = $simpleName;
-						%% name2Identifier.declare($simpleName, $identifier);
-					%% #} else {
-						%% getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-					%% }
-				%% }
-				%% HasSimpleName($qualifiedType, $identifier);
-				%% RefersToType($prefix, $qualifiedType);
-			%% #
-		%% )? 
-		MethodSuffix -> MethodSpec #
-		%%$ = $1;
-		$ = $0;
-		{
-		if (#$prefix# != null) {#
-			ContainsCalledMethod($, $prefix);
-		#}
-	}#
+	rule MethodSuffix -> MethodSpec #$ = $0;#
 	rule #$prefix = null;#
 		(
 			Type "." #

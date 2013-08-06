@@ -55,6 +55,7 @@ exports
 		 -> ClassDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
+			{linker.registerSpecificType((Vertex) #$#);}
 		#
 
     %% Enums
@@ -79,6 +80,7 @@ exports
 		 -> EnumDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
+			{linker.registerSpecificType((Vertex) #$#);}
 		#
     rule "{" #$ = list();#  EnumConstants #$.addAll($1);# (";"
              %% All kinds of Members except for EnumConstants may follow
@@ -116,6 +118,7 @@ exports
 		 -> InterfaceDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
+			{linker.registerSpecificType((Vertex) #$#);}
 		#
 
     %% Annotations
@@ -139,6 +142,7 @@ exports
 		 -> AnnotationDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
+			{linker.registerSpecificType((Vertex) #$#);}
 		#
     %% Yes, there may be enums in annotations
     rule "{" #$ = list();# (AnnotationElementDecl | ClassifierDeclaration | FieldDeclaration ";"* #{

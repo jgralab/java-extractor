@@ -15,7 +15,9 @@ public class ParseFiles {
 		Java5Builder builder = new Java5Builder(Java5Schema.instance());
 		// JavaGraphBuilder builder = new JavaGraphBuilder();//
 		// JavaSchema.instance());
-		parseAllJavaFiles(builder, new File("../common"));
+		// parseAllJavaFiles(builder, new File("../common"));
+		parseAllJavaFiles(builder, new File(
+				"D:/JDK6SourceCode/langtools/test/tools/javac"));
 		// new File("D:/JDK6SourceCode/"));
 		builder.link();
 	}
@@ -149,6 +151,19 @@ public class ParseFiles {
 													+ "javac" + File.separator
 													+ "api" + File.separator
 													+ "T6265137a.java")
+							|| pathname.toString()
+									.endsWith(
+											"langtools" + File.separator
+													+ "test" + File.separator
+													+ "tools" + File.separator
+													+ "javac" + File.separator
+													+ "enum" + File.separator
+													+ "LocalEnum.java")
+							|| pathname.toString().endsWith(
+									"langtools" + File.separator + "test"
+											+ File.separator + "tools"
+											+ File.separator + "javac"
+											+ File.separator + "UseEnum.java")
 							|| (pathname.toString().contains(
 									"langtools" + File.separator + "test"
 											+ File.separator + "tools"

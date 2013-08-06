@@ -127,7 +127,7 @@
 
 1. Look for type definition in the current type body or in the statements before the current statement.
 2. Look for type definition which are inherited from classes or interfaces.
-3. In case of a nested type look for the searched type in the enclosing scope (block or type) and repead with 1.
+3. In case of a nested type look for the searched type in the enclosing scope (block or type) and repeat with 1.
 4. In case of a top level type look for other declarations in the same compilation unit.
 5. Single-type-import or single-static-import
 6. Top level type in another compilation unit of the same package
