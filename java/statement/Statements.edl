@@ -63,6 +63,8 @@ exports
 	rule #
 			$isLocalVariable = {return isLocalVariable;};
 			{isLocalVariable = false;}
+			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
+			{qualifiedNamePrefix = "";}
 		#
 		ClassDeclaration -> ClosedStatement #
 		$ = TypeDefinitionStatement();
@@ -70,6 +72,7 @@ exports
 		%% a local class has no canonical name
 		$0.canonicalName = null;
 		{isLocalVariable = (Boolean) #$isLocalVariable#;}
+		{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 	#
 	
 	rule Expression ";"   -> ClosedStatement {avoid} #$ = $0;#

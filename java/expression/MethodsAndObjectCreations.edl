@@ -56,12 +56,13 @@ exports
 				$anonymousType = ClassDefinition();
 				$currentType = {return currentType;};
 				{currentType = (Vertex) #$anonymousType#;}
-				$name = {return "";// TODO create simple name for anonymous class};
-				$anonymousType.name = $name;
-				$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
-				$anonymousType.canonicalName = $qName;
+				$name = null;%%{return "";// TODO create simple name for anonymous class};
+				%%$anonymousType.name = $name;
+				%%$qName = {return qualifiedNamePrefix + "." + #$name#;//TODO check};
+				%%$anonymousType.canonicalName = $qName;
 				$qualifiedNamePrefix= {return qualifiedNamePrefix;};
-				{qualifiedNamePrefix += "." + #$name#;}
+				%%{qualifiedNamePrefix += "." + #$name#;}
+				{qualifiedNamePrefix = "";}
 			#
 			ClassifierBody #
 				$identifier = name2Identifier.use($name);
@@ -75,12 +76,12 @@ exports
 					}
 				}
 				HasTypeName($anonymousType, $identifier);
-				ExtendsClass($anonymousType, $type);
+				ExtendsClass($anonymousType, $type);%% this could be an Interface, too
 				{linker.addAnonymousClass((Vertex) #$anonymousType#);}
 				ContainsTypeMember($anonymousType, $0);
 				%% create type specification
 				$type = QualifiedType();
-				$type.fullyQualifiedName = $qName;
+				$type.fullyQualifiedName = null;%%$qName;
 				HasSimpleName($type, $identifier);
 				IsDefinedByType($type, $anonymousType);
 				%% restore values

@@ -88,7 +88,7 @@ exports
 			HasSimpleName($qualifiedType, $identifier);
 			$ = SingleTypeImportDefinition();
 			DefinesImport($, $qualifiedType);
-			{linker.addTypeName((Vertex) #$#);}
+			{linker.addImport((Vertex) #$#);}
 		#
     rule "import" PackageName "." "*" ";" -> ImportDeclaration #
 			$qualifiedName = QualifiedName();
@@ -107,7 +107,7 @@ exports
 			HasSimpleName($qualifiedName, $identifier);
 			$ = TypeImportOnDemandDefinition();
 			DefinesImport($, $qualifiedName);
-			{linker.addPackageOrTypeName((Vertex) #$#);}
+			{linker.addImport((Vertex) #$#);}
 		#
     rule "import" "static" PlainClassifierType "." Id ";" -> ImportDeclaration #
 			$qualifiedType = QualifiedType();
@@ -130,10 +130,10 @@ exports
 			$temp = {
 				Vertex v = createTemporaryVertex(currentElement.getChild(4).getPosition());
 				v.setAttribute("name", #lexem($4)#);
-				linker.addTypeName((Vertex) #$#);
 				return v;
 			};
-			ImportsStaticMember($, $temp);
+			DeclaresImportedStaticMember($, $temp);
+			{linker.addImport((Vertex) #$#);}
 		#
     rule "import" "static" PlainClassifierType "." "*" ";" -> ImportDeclaration #
 			$qualifiedType = QualifiedType();
@@ -152,4 +152,5 @@ exports
 			HasSimpleName($qualifiedType, $identifier);
 			$ = StaticImportOnDemandDefinition();
 			DefinesImport($, $qualifiedType);
+			{linker.addImport((Vertex) #$#);}
 		#
