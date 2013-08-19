@@ -49,8 +49,30 @@ exports
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("<" {TypeParam #DeclaresClassTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
-         ("extends" ClassifierType #ExtendsClass($, $1);#)?
-         ("implements" {ClassifierType #ImplementedInterfacesFromClass($, $0);# ","}+)?
+         (
+			#
+				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
+				{isInSuperTypeDeclaration = true;}
+			#
+			"extends" ClassifierType #
+				ExtendsClass($, $1);
+				{isInSuperTypeDeclaration = (Boolean) #$isInSuperTypeDeclaration#;}
+			#
+		 )?
+         (
+			#
+				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
+				{isInSuperTypeDeclaration = true;}
+			#
+			"implements"
+			{
+				ClassifierType #
+					ImplementedInterfacesFromClass($, $0);
+					{isInSuperTypeDeclaration = (Boolean) #$isInSuperTypeDeclaration#;}
+				#
+				","
+			}+
+		)?
          ClassifierBody #ContainsTypeMember($, $6);#
 		 -> ClassDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
@@ -75,9 +97,22 @@ exports
 			$.external = false;
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
-         ("implements" {ClassifierType #ImplementedInterfacesFromEnum($, $0);# ","}+)?
-         EnumBody  #{utilities.handleEnumMembers((Vertex) #$#, #$4#, #name2Identifier#);}#
-		 -> EnumDeclaration #
+         (
+			#
+				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
+				{isInSuperTypeDeclaration = true;}
+			#
+			"implements"
+			{
+				ClassifierType #
+					ImplementedInterfacesFromEnum($, $0);
+					{isInSuperTypeDeclaration = (Boolean) #$isInSuperTypeDeclaration#;}
+				#
+				","
+			}+
+		)?
+        EnumBody  #{utilities.handleEnumMembers((Vertex) #$#, #$4#, #name2Identifier#);}#
+		-> EnumDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
 			{linker.registerSpecificType((Vertex) #$#);}
@@ -113,9 +148,22 @@ exports
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
          ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
-         ("extends" {ClassifierType #ExtendsInterfaces($, $0);# ","}+)?
-         ClassifierBody #ContainsTypeMember($, $5);#
-		 -> InterfaceDeclaration #
+         (
+			#
+				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
+				{isInSuperTypeDeclaration = true;}
+			#
+			"extends"
+			{
+				ClassifierType #
+					ExtendsInterfaces($, $0);
+					{isInSuperTypeDeclaration = (Boolean) #$isInSuperTypeDeclaration#;}
+				#
+				","
+			}+
+		)?
+        ClassifierBody #ContainsTypeMember($, $5);#
+		-> InterfaceDeclaration #
 			{qualifiedNamePrefix = (String) #$qualifiedNamePrefix#;}
 			{currentType = (Vertex) #$currentType#;}
 			{linker.registerSpecificType((Vertex) #$#);}

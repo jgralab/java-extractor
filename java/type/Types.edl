@@ -4,6 +4,17 @@ imports
   java/program/Packages          %% PackageName
   java/Identifiers       %% Id
 
+global actions
+	@Before
+	pattern _(*) -> TypeArg #
+		$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
+		{isInSuperTypeDeclaration = false;}
+	#
+
+	pattern _(*) -> TypeArg #
+		{isInSuperTypeDeclaration = (Boolean) #$isInSuperTypeDeclaration#;}
+	#
+
 exports
   sorts PrimType ArrayType ClassifierType TypeArg TypeParam PlainClassifierType
  
@@ -65,7 +76,7 @@ exports
 				}
 				HasSimpleName($, $identifier);
 				{
-					if (currentElement.getParentApplicationOfDefinedRule()
+					if (!currentElement.getParentApplicationOfDefinedRule()
 							.getParent().getParentApplicationOfDefinedRule()
 							.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 						// the QualifiedType is only linked, if it is not part of an EnclosedType
@@ -93,11 +104,15 @@ exports
 		}
 		HasSimpleName($, $identifier);
 		{
-			if (currentElement.getParentApplicationOfDefinedRule()
+			if (!currentElement.getParentApplicationOfDefinedRule()
 					.getParent().getParentApplicationOfDefinedRule()
 					.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 				// the QualifiedType is only linked, if it is not part of an EnclosedType
-				linker.addTypeName((Vertex) #$#);
+				if (isInSuperTypeDeclaration) {
+					linker.addSuperTypeName((Vertex) #$#);
+				} else {
+					linker.addTypeName((Vertex) #$#);
+				}
 			}
 		}
 	#
@@ -116,11 +131,15 @@ exports
 			}
 			HasSimpleName($, $identifier);
 			{
-				if (currentElement.getParentApplicationOfDefinedRule()
+				if (!currentElement.getParentApplicationOfDefinedRule()
 						.getParent().getParentApplicationOfDefinedRule()
 						.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 					// the QualifiedType is only linked, if it is not part of an EnclosedType
-					linker.addTypeName((Vertex) #$#);
+					if (isInSuperTypeDeclaration) {
+						linker.addSuperTypeName((Vertex) #$#);
+					} else {
+						linker.addTypeName((Vertex) #$#);
+					}
 				}
 			}
 		#
@@ -151,11 +170,15 @@ exports
 			}
 			HasSimpleName($, $identifier);
 			{
-				if (currentElement.getParentApplicationOfDefinedRule()
+				if (!currentElement.getParentApplicationOfDefinedRule()
 						.getParent().getParentApplicationOfDefinedRule()
 						.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 					// the QualifiedType is only linked, if it is not part of an EnclosedType
-					linker.addTypeName((Vertex) #$#);
+					if (isInSuperTypeDeclaration) {
+						linker.addSuperTypeName((Vertex) #$#);
+					} else {
+						linker.addTypeName((Vertex) #$#);
+					}
 				}
 			}
 		#
@@ -176,11 +199,15 @@ exports
 		HasEnclosingType($, $0);
 		HasEnclosedType($, $2);
 		{
-			if (currentElement.getParentApplicationOfDefinedRule()
+			if (!currentElement.getParentApplicationOfDefinedRule()
 					.getParent().getParentApplicationOfDefinedRule()
 					.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 				// the QualifiedType is only linked, if it is not part of an EnclosedType
-				linker.addTypeName((Vertex) #$#);
+				if (isInSuperTypeDeclaration) {
+					linker.addSuperTypeName((Vertex) #$#);
+				} else {
+					linker.addTypeName((Vertex) #$#);
+				}
 			}
 		}
 	#

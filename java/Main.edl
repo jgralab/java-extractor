@@ -31,6 +31,8 @@ user code {
 	
 	private boolean isAmbiguousName = false;
 	
+	private boolean isInSuperTypeDeclaration = false;
+	
 	static {
 		Option name = new Option("n", "name", true,
 				"(optional): defines the name of the parsed program."
