@@ -10702,14 +10702,14 @@
           </children>
           <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_BUctZHdhEeKil48b18T7iA" points="[963, -620, -4456, 12403]$[963, -12520, -4456, 503]$[4164, -12520, -1255, 503]"/>
         </edges>
-        <edges xmi:type="umlnotation:UMLConnector" xmi:id="_RhdHgXdhEeKil48b18T7iA" element="_RhdHgHdhEeKil48b18T7iA" source="_GgMvIGxhEeKYs9kdGHEfww" target="_9wSjkHwVEeKsa4FpHvZurA" routing="Rectilinear" jumpLinkStatus="All" jumpLinksReverse="true" lineColor="8421504" showStereotype="Text">
+        <edges xmi:type="umlnotation:UMLConnector" xmi:id="_RhdHgXdhEeKil48b18T7iA" element="_RhdHgHdhEeKil48b18T7iA" source="_GgMvIGxhEeKYs9kdGHEfww" target="_1u0HAHdgEeKil48b18T7iA" routing="Rectilinear" jumpLinkStatus="All" jumpLinksReverse="true" lineColor="8421504" showStereotype="Text">
           <children xmi:type="notation:DecorationNode" xmi:id="_RhdHhHdhEeKil48b18T7iA" type="NameLabel">
             <children xmi:type="notation:BasicDecorationNode" xmi:id="_RhdHhndhEeKil48b18T7iA" type="Stereotype"/>
             <children xmi:type="notation:BasicDecorationNode" xmi:id="_RhdHh3dhEeKil48b18T7iA" type="Name"/>
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RhdHhXdhEeKil48b18T7iA" y="-186"/>
           </children>
           <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_RhdHg3dhEeKil48b18T7iA" points="[-1374, 569, 7572, 168]$[-8206, 569, 740, 168]"/>
-          <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_IRfRcHwWEeKsa4FpHvZurA" id="(0.7943148,0.8222812)"/>
+          <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_IRfRcHwWEeKsa4FpHvZurA" id="(0.9576523031203567,0.6934984520123839)"/>
         </edges>
         <edges xmi:type="umlnotation:UMLConnector" xmi:id="_fRTisHdhEeKil48b18T7iA" element="_fQ22wHdhEeKil48b18T7iA" source="_GgMvIGxhEeKYs9kdGHEfww" target="_eQdxkWxfEeKYs9kdGHEfww" routing="Rectilinear" lineColor="0" showStereotype="Text">
           <children xmi:type="notation:DecorationNode" xmi:id="_fRTis3dhEeKil48b18T7iA" type="NameLabel">
@@ -13206,7 +13206,7 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="EnumConstant" name="EnumConstant">
       <generalization xmi:id="generalization_EnumConstant" general="Member"/>
-      <generalization xmi:id="_RhdHgHdhEeKil48b18T7iA" general="_9v2esHwVEeKsa4FpHvZurA"/>
+      <generalization xmi:id="_RhdHgHdhEeKil48b18T7iA" general="Field"/>
       <ownedAttribute xmi:id="_vL4hUf2uEeKF068EQcgQgA" name="enumType" visibility="private" type="TypeSpecification" association="_vL4hUP2uEeKF068EQcgQgA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vMCSUf2uEeKF068EQcgQgA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vMCSUP2uEeKF068EQcgQgA"/>

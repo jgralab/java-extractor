@@ -1236,7 +1236,7 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="EnumConstant" name="EnumConstant">
       <generalization xmi:type="uml:Generalization" xmi:id="generalization_EnumConstant" general="Member"/>
-      <generalization xmi:type="uml:Generalization" xmi:id="_RhdHgHdhEeKil48b18T7iA" general="_9v2esHwVEeKsa4FpHvZurA"/>
+      <generalization xmi:type="uml:Generalization" xmi:id="_RhdHgHdhEeKil48b18T7iA" general="Field"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_vL4hUf2uEeKF068EQcgQgA" name="enumType" visibility="private" type="TypeSpecification" association="_vL4hUP2uEeKF068EQcgQgA">
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vMCSUf2uEeKF068EQcgQgA" value="1"/>
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vMCSUP2uEeKF068EQcgQgA"/>
