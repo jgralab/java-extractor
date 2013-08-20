@@ -905,6 +905,7 @@ public class Linker {
 
 	private void resolveSingleStaticImport(Mode mode,
 			SingleStaticImportDefinition anImport) {
+		singleStaticImports.remove(anImport);
 		QualifiedName typeName = anImport.get_definedImportName();
 		SpecificType importedType = getTypeOrPackageWithName(mode,
 				typeName.get_fullyQualifiedName(), anImport, true,
