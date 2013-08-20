@@ -80,7 +80,11 @@ exports
 							.getParent().getParentApplicationOfDefinedRule()
 							.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
 						// the QualifiedType is only linked, if it is not part of an EnclosedType
-						linker.addTypeName((Vertex) #$#);
+						if (isInSuperTypeDeclaration) {
+							linker.addSuperTypeName((Vertex) #$#);
+						} else {
+							linker.addTypeName((Vertex) #$#);
+						}
 					}
 				}
 			#} else {#
