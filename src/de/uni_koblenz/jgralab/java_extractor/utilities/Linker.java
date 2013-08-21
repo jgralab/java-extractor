@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import de.uni_koblenz.edl.parser.Position;
 import de.uni_koblenz.edl.parser.symboltable.SymbolTableStack;
@@ -388,8 +389,8 @@ public class Linker {
 			// defined classes hide classes in the JDK
 		}
 		resolveTypeImports(mode);
-		resolveSingleStaticImports(mode);
 		resolveExtendsAndImplements(mode);
+		resolveSingleStaticImports(mode);
 		// TODO publish members of Object to types with no supertype??
 		// or implement a lazy lookup strategy for members (depending on mode)
 
@@ -482,12 +483,16 @@ public class Linker {
 		superTypeNames.remove(superType);
 		String name = getQualifiedName(superType);
 		SpecificType currentType = getCurrentSpecificType(superType);
+		// the super type may have been statically imported
+		for (SingleStaticImportDefinition anImport : getUnresolvedSingleStaticImportsWithName(
+				superType, currentType)) {
+			resolveSingleStaticImport(mode, anImport);
+		}
+
 		SpecificType specificSuperType = getTypeOrPackageWithName(mode, name,
 				currentType, false, SpecificType.class);
 		if (specificSuperType == null) {
-			// TODO resolve single static imports
-			// resolve containing package (outer scope)
-			// resolve on demand type import
+			// TODO resolve on demand type import
 			// resolve on demand static import
 		}
 		if (specificSuperType == null) {
@@ -500,6 +505,49 @@ public class Linker {
 			}
 			publishInheritedMembers(mode, currentType, specificSuperType);
 		}
+	}
+
+	/**
+	 * Finds all unresolved {@link SingleStaticImportDefinition}s of the
+	 * {@link TranslationUnit} in which <code>contextOfImports</code> is
+	 * contained. The simple name of the imported member has to occur in the
+	 * qualified name of <code>superType</code>.
+	 * 
+	 * @param superType
+	 * @param contextOfImports
+	 * @return
+	 */
+	private Set<SingleStaticImportDefinition> getUnresolvedSingleStaticImportsWithName(
+			TypeSpecification superType, JavaVertex contextOfImports) {
+		Set<SingleStaticImportDefinition> result = new HashSet<SingleStaticImportDefinition>();
+
+		List<JavaVertex> scopes = determineScopes(contextOfImports);
+		TranslationUnit translationUnit = (TranslationUnit) scopes.get(scopes
+				.size() - 2);
+		for (ExternalDeclaration exDecl : translationUnit
+				.get_declaredExternalDeclaration()) {
+			if (exDecl.isInstanceOf(SingleStaticImportDefinition.VC)) {
+				SingleStaticImportDefinition anImport = (SingleStaticImportDefinition) exDecl;
+				TemporaryVertex importedMemberName = null;
+				for (Edge edge : anImport.incidences(EdgeDirection.OUT)) {
+					if (edge.isTemporary()
+							&& ((TemporaryEdge) edge).getPreliminaryType() == DeclaresImportedStaticMember.EC) {
+						importedMemberName = (TemporaryVertex) edge.getThat();
+					}
+				}
+				String nameOfMember = getQualifiedName(superType);
+				if (importedMemberName == null
+						|| !nameOfMember.matches("(^|\\.)"
+								+ Pattern.quote((String) importedMemberName
+										.getAttribute("name")) + "($|\\.)")) {
+					// the single static import has already been resolved
+					continue;
+				} else {
+					result.add(anImport);
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -527,7 +575,7 @@ public class Linker {
 					addSpecificType(currentType, entry.getValue());
 				}
 			}
-			// TODO Auto-generated method stub
+			// TODO publish fields and methods
 		}
 	}
 
@@ -571,12 +619,11 @@ public class Linker {
 
 	private boolean isVisibleMember(JavaVertex context, Member member) {
 		SpecificType currentType = getCurrentSpecificType(context);
-		assert currentType != null;
 
 		// http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.6.1
 		SpecificType containingType = member.get_containingType();
 		if (containingType != null) {
-			if (containingType == currentType) {
+			if (currentType != null && containingType == currentType) {
 				// each member is visible in the type, in which it is defined
 				return true;
 			}
@@ -587,11 +634,12 @@ public class Linker {
 				} else if (modifier.get_type() == Modifiers.PRIVATE) {
 					return false;
 				} else if (modifier.get_type() == Modifiers.PROTECTED) {
-					if (getContainingPackage(currentType) == getContainingPackage(containingType)) {
+					if (getContainingPackage(context) == getContainingPackage(containingType)) {
 						// package visibility
 						return true;
 					}
-					if (member.isInstanceOf(SpecificType.VC)) {
+					if (currentType != null
+							&& member.isInstanceOf(SpecificType.VC)) {
 						return isSubtypeOf(currentType, containingType);
 					} else {
 						// TODO see
@@ -601,14 +649,15 @@ public class Linker {
 				}
 			}
 			// default visibility
-			if (currentType.isInstanceOf(InterfaceDefinition.VC)
-					|| currentType.isInstanceOf(AnnotationDefinition.VC)) {
+			if (currentType != null
+					&& (currentType.isInstanceOf(InterfaceDefinition.VC) || currentType
+							.isInstanceOf(AnnotationDefinition.VC))) {
 				// all members of interfaces and annotations are implicitly
 				// public
 				return true;
 			} else {
 				// package visibility
-				return getContainingPackage(currentType) == getContainingPackage(containingType);
+				return getContainingPackage(context) == getContainingPackage(containingType);
 			}
 		} else {
 			assert member.isInstanceOf(SpecificType.VC);
@@ -622,7 +671,7 @@ public class Linker {
 					}
 				}
 				// default visibility
-				if (getContainingPackage(currentType) == getContainingPackage(member)) {
+				if (getContainingPackage(context) == getContainingPackage(member)) {
 					// package visibility
 					return true;
 				}
@@ -899,25 +948,76 @@ public class Linker {
 		while (!singleStaticImports.isEmpty()) {
 			SingleStaticImportDefinition anImport = singleStaticImports.get(0);
 			resolveSingleStaticImport(mode, anImport);
-			// TODO Auto-generated method stub
 		}
 	}
 
 	private void resolveSingleStaticImport(Mode mode,
 			SingleStaticImportDefinition anImport) {
-		singleStaticImports.remove(anImport);
+		TemporaryVertex importedMemberName = null;
+		for (Edge edge : anImport.incidences(EdgeDirection.OUT)) {
+			if (edge.isTemporary()
+					&& ((TemporaryEdge) edge).getPreliminaryType() == DeclaresImportedStaticMember.EC) {
+				importedMemberName = (TemporaryVertex) edge.getThat();
+			}
+		}
+		if (importedMemberName == null) {
+			// the current single static import has already been resolved
+			return;
+		}
+
 		QualifiedName typeName = anImport.get_definedImportName();
 		SpecificType importedType = getTypeOrPackageWithName(mode,
 				typeName.get_fullyQualifiedName(), anImport, true,
 				SpecificType.class);
 
-		Set<TypeSpecification> definedSuperTypes = getDefinedSuperTypes(importedType);
+		SpecificType importedMemberType = visibleTypes.getMark(importedType)
+				.get(importedMemberName.getAttribute("name"));
+		boolean isInheritanceResolved = false;
+		if (importedMemberType == null
+				|| !(isStatic(importedMemberType) && isVisibleMember(anImport,
+						importedMemberType))) {
+			// no member type could be imported
+			// check if a member type could be imported which is inherited
+			for (TypeSpecification definedSuperType : getDefinedSuperTypes(importedType)) {
+				resolveSuperTypeHierarchy(mode, definedSuperType);
+			}
+			importedMemberType = visibleTypes.getMark(importedType).get(
+					importedMemberName.getAttribute("name"));
+			isInheritanceResolved = true;
+		}
+		if ((isInheritanceResolved || isInheritanceCompletlyResolved(importedType))
+				&& importedMemberName.isValid()) {
+			singleStaticImports.remove(anImport);
+			importedMemberName.delete();
+		}
 
-		List<JavaVertex> scopes = determineScopes(importedType);
-		TranslationUnit translationUnit = (TranslationUnit) scopes.get(scopes
-				.size() - 2);
-		// do you need the static import on demand?
-		// TODO find out the imported types
+		TranslationUnit translationUnit = anImport
+				.get_declaringTranslationUnit();
+		if (importedMemberType != null && isStatic(importedMemberType)
+				&& isVisibleMember(anImport, importedMemberType)) {
+			graphBuilder.createEdge(DeclaresImportedStaticMember.EC, anImport,
+					importedMemberType);
+			addSpecificType(translationUnit, importedMemberType);
+		}
+		// TODO import static fields and methods
+	}
+
+	private boolean isInheritanceCompletlyResolved(SpecificType specificType) {
+		for (TypeSpecification superType : getDefinedSuperTypes(specificType)) {
+			if (superType.getDegree(IsDefinedByType.EC, EdgeDirection.OUT) == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isStatic(Member aMember) {
+		for (Modifier modifier : aMember.get_modifiers()) {
+			if (modifier.get_type() == Modifiers.STATIC) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*
