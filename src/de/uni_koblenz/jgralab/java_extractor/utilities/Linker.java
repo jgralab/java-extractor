@@ -1016,8 +1016,10 @@ public class Linker {
 				typeName.get_fullyQualifiedName(), anImport, true,
 				SpecificType.class);
 
-		SpecificType importedMemberType = visibleTypes.getMark(importedType)
-				.get(importedMemberName.getAttribute("name"));
+		Map<String, SpecificType> memberTypes = visibleTypes
+				.getMark(importedType);
+		SpecificType importedMemberType = memberTypes == null ? null
+				: memberTypes.get(importedMemberName.getAttribute("name"));
 		boolean isInheritanceResolved = false;
 		if (importedMemberType == null
 				|| !(isStatic(importedMemberType) && isVisibleMember(anImport,
@@ -1027,8 +1029,8 @@ public class Linker {
 			for (TypeSpecification definedSuperType : getDefinedSuperTypes(importedType)) {
 				resolveSuperTypeHierarchy(mode, definedSuperType);
 			}
-			importedMemberType = visibleTypes.getMark(importedType).get(
-					importedMemberName.getAttribute("name"));
+			importedMemberType = memberTypes == null ? null : memberTypes
+					.get(importedMemberName.getAttribute("name"));
 			isInheritanceResolved = true;
 		}
 
@@ -1047,7 +1049,9 @@ public class Linker {
 				&& importedMemberName.isValid()) {
 			singleStaticImports.remove(anImport);
 			importedMemberName.delete();
-			// TODO import static fields and methods
+			if (importedMemberType != null) {
+				// TODO import static fields and methods
+			}
 		}
 	}
 
