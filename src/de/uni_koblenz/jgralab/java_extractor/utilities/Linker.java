@@ -1233,13 +1233,58 @@ public class Linker {
 		if (useOnDemandImports && translationUnit != null) {
 			resultType = findOnDemandTypeImport(mode, simpleName,
 					translationUnit);
-			// TODO find static on demand import
+			if (resultType != null) {
+				Set<Member> importedMembers = findStaticOnDemandImport(mode,
+						simpleName, translationUnit);
+				for (Member member : importedMembers) {
+					if (member.isInstanceOf(SpecificType.VC)) {
+						assert resultType == null;
+						resultType = (SpecificType) member;
+						break;
+					}
+				}
+			}
 		}
 		return resultType;
 	}
 
+	private Set<Member> findStaticOnDemandImport(Mode mode, String simpleName,
+			TranslationUnit translationUnit) {
+		// TODO does not work :-(
+		Set<Member> result = new HashSet<Member>();
+		if (visibleStaticOnDemandImports == null) {
+			return result;
+		}
+
+		Map<StaticImportOnDemandDefinition, SpecificType> registeredStaticOnDemandImports = visibleStaticOnDemandImports
+				.getMark(translationUnit);
+		if (registeredStaticOnDemandImports != null) {
+			for (Entry<StaticImportOnDemandDefinition, SpecificType> entry : registeredStaticOnDemandImports
+					.entrySet()) {
+				Map<String, SpecificType> visibleTypesOfCurrentOnDemandImport = visibleTypes
+						.getMark(entry.getValue());
+				if (visibleTypesOfCurrentOnDemandImport != null) {
+					Member member = visibleTypesOfCurrentOnDemandImport
+							.get(simpleName);
+					if (member != null && entry.getKey() != null) {
+						graphBuilder.createEdge(
+								DeclaresImportedStaticMember.EC,
+								entry.getKey(), member);
+					}
+					result.add(member);
+				}
+				// TODO add fields and methods
+				// TODO use reflection!!
+			}
+		}
+		return result;
+	}
+
 	private SpecificType findOnDemandTypeImport(Mode mode, String simpleName,
 			TranslationUnit translationUnit) {
+		if (visibleOnDemandTypeImports == null) {
+			return null;
+		}
 		SpecificType result = null;
 
 		Map<TypeImportOnDemandDefinition, JavaVertex> registeredOnDemandTypeImports = visibleOnDemandTypeImports
