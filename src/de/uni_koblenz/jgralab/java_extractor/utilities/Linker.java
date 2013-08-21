@@ -71,6 +71,7 @@ import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.IsDefined
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeSpecification;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class Linker {
@@ -389,6 +390,7 @@ public class Linker {
 			// defined classes hide classes in the JDK
 		}
 		resolveTypeImports(mode);
+		resolveStaticOnDemandImports(mode);
 		resolveExtendsAndImplements(mode);
 		resolveSingleStaticImports(mode);
 		// TODO publish members of Object to types with no supertype??
@@ -865,20 +867,39 @@ public class Linker {
 	 */
 	private GraphMarker<Map<TypeImportOnDemandDefinition, JavaVertex>> visibleOnDemandTypeImports;
 
+	/**
+	 * Each {@link TranslationUnit} which has at least one static on demand
+	 * import, is mapped on a {@link Map} <code>M</code> that maps the
+	 * corresponding {@link StaticImportOnDemandDefinition} on the imported
+	 * {@link SpecificType}. If the latter could not be identified, the
+	 * corresponding {@link StaticImportOnDemandDefinition} is not inserted in
+	 * <code>M</code><br>
+	 * TODO the {@link StaticImportOnDemandDefinition}s have to be connected via
+	 * {@link DeclaresImportedStaticMember} with the {@link SpecificType} that
+	 * has been actually used in the current {@link TranslationUnit}.
+	 */
+	private GraphMarker<Map<StaticImportOnDemandDefinition, SpecificType>> visibleStaticOnDemandImports;
+
+	private <K extends ImportDefinition, V extends JavaVertex> void addVisibleOnDemandImport(
+			GraphMarker<Map<K, V>> graphMarker,
+			TranslationUnit translationUnit, K importOnDemandDefinition,
+			V importedPackageOrType) {
+		if (graphMarker == null) {
+			graphMarker = new GraphMarker<Map<K, V>>(graphBuilder.getGraph());
+		}
+		Map<K, V> map = graphMarker.getMark(translationUnit);
+		if (map == null) {
+			map = new HashMap<K, V>();
+		}
+		assert !map.containsKey(importOnDemandDefinition);
+		map.put(importOnDemandDefinition, importedPackageOrType);
+	}
+
 	private void addVisibleOnDemandTypeImport(TranslationUnit translationUnit,
 			TypeImportOnDemandDefinition typeImportOnDemandDefinition,
 			JavaVertex importedPackageOrType) {
-		if (visibleOnDemandTypeImports == null) {
-			visibleOnDemandTypeImports = new GraphMarker<Map<TypeImportOnDemandDefinition, JavaVertex>>(
-					graphBuilder.getGraph());
-		}
-		Map<TypeImportOnDemandDefinition, JavaVertex> map = visibleOnDemandTypeImports
-				.getMark(translationUnit);
-		if (map == null) {
-			map = new HashMap<TypeImportOnDemandDefinition, JavaVertex>();
-		}
-		assert !map.containsKey(typeImportOnDemandDefinition);
-		map.put(typeImportOnDemandDefinition, importedPackageOrType);
+		addVisibleOnDemandImport(visibleOnDemandTypeImports, translationUnit,
+				typeImportOnDemandDefinition, importedPackageOrType);
 	}
 
 	private void resolveTypeImports(Mode mode) {
@@ -944,6 +965,31 @@ public class Linker {
 		}
 	}
 
+	private void addVisibleStaticOnDemandImport(
+			TranslationUnit translationUnit,
+			StaticImportOnDemandDefinition staticImportOnDemandDefinition,
+			SpecificType importedType) {
+		addVisibleOnDemandImport(visibleStaticOnDemandImports, translationUnit,
+				staticImportOnDemandDefinition, importedType);
+	}
+
+	private void resolveStaticOnDemandImports(Mode mode) {
+		for (StaticImportOnDemandDefinition anImport : onDemandStaticImports) {
+			QualifiedName nameOfPackageOrType = anImport
+					.get_definedImportName();
+			SpecificType importedType = getTypeOrPackageWithName(mode,
+					nameOfPackageOrType.get_fullyQualifiedName(), anImport,
+					true, SpecificType.class);
+			if (importedType == null) {
+				continue;
+			}
+			TranslationUnit translationUnit = anImport
+					.get_declaringTranslationUnit();
+			addVisibleStaticOnDemandImport(translationUnit, anImport,
+					importedType);
+		}
+	}
+
 	private void resolveSingleStaticImports(Mode mode) {
 		while (!singleStaticImports.isEmpty()) {
 			SingleStaticImportDefinition anImport = singleStaticImports.get(0);
@@ -985,21 +1031,33 @@ public class Linker {
 					importedMemberName.getAttribute("name"));
 			isInheritanceResolved = true;
 		}
-		if ((isInheritanceResolved || isInheritanceCompletlyResolved(importedType))
-				&& importedMemberName.isValid()) {
-			singleStaticImports.remove(anImport);
-			importedMemberName.delete();
-		}
 
 		TranslationUnit translationUnit = anImport
 				.get_declaringTranslationUnit();
 		if (importedMemberType != null && isStatic(importedMemberType)
 				&& isVisibleMember(anImport, importedMemberType)) {
-			graphBuilder.createEdge(DeclaresImportedStaticMember.EC, anImport,
-					importedMemberType);
+			if (!existsEdge(DeclaresImportedStaticMember.EC, anImport,
+					importedMemberType)) {
+				graphBuilder.createEdge(DeclaresImportedStaticMember.EC,
+						anImport, importedMemberType);
+			}
 			addSpecificType(translationUnit, importedMemberType);
 		}
-		// TODO import static fields and methods
+		if ((isInheritanceResolved || isInheritanceCompletlyResolved(importedType))
+				&& importedMemberName.isValid()) {
+			singleStaticImports.remove(anImport);
+			importedMemberName.delete();
+			// TODO import static fields and methods
+		}
+	}
+
+	private boolean existsEdge(EdgeClass ec, JavaVertex alpha, JavaVertex omega) {
+		for (Edge edge : alpha.incidences(ec, EdgeDirection.OUT)) {
+			if (edge.getOmega() == omega) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isInheritanceCompletlyResolved(SpecificType specificType) {
@@ -1033,9 +1091,7 @@ public class Linker {
 	 *            type A and a type B inherits it from A, then M can have the
 	 *            qualifiedNames A.M and B.M. If set to <code>true</code> then
 	 *            the name always states its declaration A.M
-	 * @param ensureType
-	 *            if <code>true</code> the result must be of type
-	 *            {@link SpecificType} or <code>null</code>
+	 * @param expectedResultType
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -1081,7 +1137,8 @@ public class Linker {
 					// if there exists the not necessarily canonical qualified
 					// name A.B.C, then C could be defined in any superclass or
 					// superinterface of B
-					// TODO implement
+					// TODO implement (possibly solved because inherited member
+					// classes are added to the scope of a class)
 				}
 				if (currentPackageOrType == null) {
 					// at least one part of the qualified name could not be
