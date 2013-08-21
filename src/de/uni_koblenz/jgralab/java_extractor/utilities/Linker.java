@@ -903,8 +903,6 @@ public class Linker {
 		}
 		addVisibleOnDemandImport(visibleOnDemandTypeImports, translationUnit,
 				typeImportOnDemandDefinition, importedPackageOrType);
-		System.out.println(translationUnit + " " + typeImportOnDemandDefinition
-				+ " " + importedPackageOrType);// TODO delete
 	}
 
 	private void resolveTypeImports(Mode mode) {
@@ -1246,8 +1244,6 @@ public class Linker {
 
 		Map<TypeImportOnDemandDefinition, JavaVertex> registeredOnDemandTypeImports = visibleOnDemandTypeImports
 				.getMark(translationUnit);
-		System.out.println(translationUnit + " "
-				+ registeredOnDemandTypeImports);// TODO delete
 		if (registeredOnDemandTypeImports != null) {
 			for (Entry<TypeImportOnDemandDefinition, JavaVertex> entry : registeredOnDemandTypeImports
 					.entrySet()) {
