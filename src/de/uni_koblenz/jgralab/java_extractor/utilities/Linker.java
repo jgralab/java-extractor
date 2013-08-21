@@ -884,22 +884,27 @@ public class Linker {
 			GraphMarker<Map<K, V>> graphMarker,
 			TranslationUnit translationUnit, K importOnDemandDefinition,
 			V importedPackageOrType) {
-		if (graphMarker == null) {
-			graphMarker = new GraphMarker<Map<K, V>>(graphBuilder.getGraph());
-		}
 		Map<K, V> map = graphMarker.getMark(translationUnit);
 		if (map == null) {
 			map = new HashMap<K, V>();
+			graphMarker.mark(translationUnit, map);
 		}
-		assert !map.containsKey(importOnDemandDefinition);
-		map.put(importOnDemandDefinition, importedPackageOrType);
+		if (!map.containsKey(importOnDemandDefinition)) {
+			map.put(importOnDemandDefinition, importedPackageOrType);
+		}
 	}
 
 	private void addVisibleOnDemandTypeImport(TranslationUnit translationUnit,
 			TypeImportOnDemandDefinition typeImportOnDemandDefinition,
 			JavaVertex importedPackageOrType) {
+		if (visibleOnDemandTypeImports == null) {
+			visibleOnDemandTypeImports = new GraphMarker<Map<TypeImportOnDemandDefinition, JavaVertex>>(
+					graphBuilder.getGraph());
+		}
 		addVisibleOnDemandImport(visibleOnDemandTypeImports, translationUnit,
 				typeImportOnDemandDefinition, importedPackageOrType);
+		System.out.println(translationUnit + " " + typeImportOnDemandDefinition
+				+ " " + importedPackageOrType);// TODO delete
 	}
 
 	private void resolveTypeImports(Mode mode) {
@@ -969,6 +974,10 @@ public class Linker {
 			TranslationUnit translationUnit,
 			StaticImportOnDemandDefinition staticImportOnDemandDefinition,
 			SpecificType importedType) {
+		if (visibleStaticOnDemandImports == null) {
+			visibleStaticOnDemandImports = new GraphMarker<Map<StaticImportOnDemandDefinition, SpecificType>>(
+					graphBuilder.getGraph());
+		}
 		addVisibleOnDemandImport(visibleStaticOnDemandImports, translationUnit,
 				staticImportOnDemandDefinition, importedType);
 	}
@@ -1109,9 +1118,11 @@ public class Linker {
 		if (isSimpleName) {
 			if (ensureType) {
 				// this is a simple name reflection is already done
-				result = getTypeWithSimpleName(name, context);
+				result = getTypeWithSimpleName(mode, name, context,
+						!isCanonical);
 			} else {
-				result = getTypeOrPackageWithSimpleName(mode, name, context);
+				result = getTypeOrPackageWithSimpleName(mode, name, context,
+						!isCanonical);
 			}
 		} else {
 			// this is a qualified name
@@ -1119,30 +1130,21 @@ public class Linker {
 			assert nameParts.length > 1;
 			JavaVertex currentPackageOrType = null;
 			for (int i = 0; i < nameParts.length; i++) {
-				JavaVertex previousPackageOrType = currentPackageOrType;
 				String namePart = nameParts[i];
+				boolean useOnDemandImports = !isCanonical && i == 0;
 				if ((ensureType && i == nameParts.length - 1)
 						|| (currentPackageOrType != null && currentPackageOrType
 								.isInstanceOf(SpecificType.VC))) {
 					// in the type name a.B.C.D, D has to be a type and
 					// everything following the first type B has to be a type
-					currentPackageOrType = getTypeWithSimpleName(namePart,
-							currentPackageOrType);
+					currentPackageOrType = getTypeWithSimpleName(mode,
+							namePart, currentPackageOrType, useOnDemandImports);
 				} else {
 					// a qualified name starts with ambiguous names (type or
 					// package)
 					currentPackageOrType = getTypeOrPackageWithSimpleName(mode,
-							namePart, i == 0 ? context : currentPackageOrType);
-				}
-				if (currentPackageOrType == null
-						&& previousPackageOrType != null
-						&& previousPackageOrType.isInstanceOf(SpecificType.VC)
-						&& !isCanonical && i < nameParts.length - 1) {
-					// if there exists the not necessarily canonical qualified
-					// name A.B.C, then C could be defined in any superclass or
-					// superinterface of B
-					// TODO implement (possibly solved because inherited member
-					// classes are added to the scope of a class)
+							namePart, i == 0 ? context : currentPackageOrType,
+							useOnDemandImports);
 				}
 				if (currentPackageOrType == null) {
 					// at least one part of the qualified name could not be
@@ -1156,10 +1158,11 @@ public class Linker {
 	}
 
 	private JavaVertex getTypeOrPackageWithSimpleName(Mode mode,
-			String simpleName, JavaVertex context) {
+			String simpleName, JavaVertex context, boolean useOnDemandImports) {
 		// http://docs.oracle.com/javase/specs/jls/se5.0/html/names.html#6.5.4
 		// 1. check if simpleName is a type
-		JavaVertex result = getTypeWithSimpleName(simpleName, context);
+		JavaVertex result = getTypeWithSimpleName(mode, simpleName, context,
+				useOnDemandImports);
 		if (result != null) {
 			return result;
 		}
@@ -1198,8 +1201,8 @@ public class Linker {
 		return null;
 	}
 
-	private SpecificType getTypeWithSimpleName(String simpleName,
-			JavaVertex context) {
+	private SpecificType getTypeWithSimpleName(Mode mode, String simpleName,
+			JavaVertex context, boolean useOnDemandImports) {
 		SpecificType resultType = null;
 		if (context.isInstanceOf(SpecificType.VC)) {
 			// determineScopes only resolves the enclosing SpecificTypes
@@ -1214,6 +1217,7 @@ public class Linker {
 				}
 			}
 		}
+		TranslationUnit translationUnit = null;
 		for (JavaVertex scope : determineScopes(context)) {
 			Map<String, SpecificType> visibleTypesInScope = visibleTypes
 					.getMark(scope);
@@ -1221,11 +1225,50 @@ public class Linker {
 				resultType = visibleTypesInScope.get(simpleName);
 				if (resultType != null) {
 					// this enables shadowing
-					break;
+					return resultType;
 				}
 			}
+			if (scope.isInstanceOf(TranslationUnit.VC)) {
+				translationUnit = (TranslationUnit) scope;
+			}
+		}
+		if (useOnDemandImports && translationUnit != null) {
+			resultType = findOnDemandTypeImport(mode, simpleName,
+					translationUnit);
+			// TODO find static on demand import
 		}
 		return resultType;
+	}
+
+	private SpecificType findOnDemandTypeImport(Mode mode, String simpleName,
+			TranslationUnit translationUnit) {
+		SpecificType result = null;
+
+		Map<TypeImportOnDemandDefinition, JavaVertex> registeredOnDemandTypeImports = visibleOnDemandTypeImports
+				.getMark(translationUnit);
+		System.out.println(translationUnit + " "
+				+ registeredOnDemandTypeImports);// TODO delete
+		if (registeredOnDemandTypeImports != null) {
+			for (Entry<TypeImportOnDemandDefinition, JavaVertex> entry : registeredOnDemandTypeImports
+					.entrySet()) {
+				Map<String, SpecificType> visibleTypesOfCurrentOnDemandImport = visibleTypes
+						.getMark(entry.getValue());
+				if (visibleTypesOfCurrentOnDemandImport != null) {
+					result = visibleTypesOfCurrentOnDemandImport
+							.get(simpleName);
+					if (result == null) {
+						// TODO use reflection!!
+					}
+					if (result != null && entry.getKey() != null) {
+						graphBuilder.createEdge(DeclaresImportedType.EC,
+								entry.getKey(), result);
+						break;
+					}
+				}
+
+			}
+		}
+		return result;
 	}
 
 	/**
