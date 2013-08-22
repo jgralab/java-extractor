@@ -1239,7 +1239,7 @@ public class Linker {
 		if (useOnDemandImports && translationUnit != null) {
 			resultType = findOnDemandTypeImport(mode, simpleName,
 					translationUnit);
-			if (resultType != null) {
+			if (resultType == null) {
 				Set<Member> importedMembers = findStaticOnDemandImport(mode,
 						simpleName, translationUnit);
 				for (Member member : importedMembers) {
@@ -1255,7 +1255,7 @@ public class Linker {
 	}
 
 	private Set<Member> findStaticOnDemandImport(Mode mode, String simpleName,
-			TranslationUnit translationUnit) {
+			TranslationUnit translationUnitWithImports) {
 		// TODO does not work :-(
 		Set<Member> result = new HashSet<Member>();
 		if (visibleStaticOnDemandImports == null) {
@@ -1263,7 +1263,7 @@ public class Linker {
 		}
 
 		Map<StaticImportOnDemandDefinition, SpecificType> registeredStaticOnDemandImports = visibleStaticOnDemandImports
-				.getMark(translationUnit);
+				.getMark(translationUnitWithImports);
 		if (registeredStaticOnDemandImports != null) {
 			for (Entry<StaticImportOnDemandDefinition, SpecificType> entry : registeredStaticOnDemandImports
 					.entrySet()) {
@@ -1287,14 +1287,14 @@ public class Linker {
 	}
 
 	private SpecificType findOnDemandTypeImport(Mode mode, String simpleName,
-			TranslationUnit translationUnit) {
+			TranslationUnit translationUnitWithImports) {
 		if (visibleOnDemandTypeImports == null) {
 			return null;
 		}
 		SpecificType result = null;
 
 		Map<TypeImportOnDemandDefinition, JavaVertex> registeredOnDemandTypeImports = visibleOnDemandTypeImports
-				.getMark(translationUnit);
+				.getMark(translationUnitWithImports);
 		if (registeredOnDemandTypeImports != null) {
 			for (Entry<TypeImportOnDemandDefinition, JavaVertex> entry : registeredOnDemandTypeImports
 					.entrySet()) {
