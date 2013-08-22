@@ -383,12 +383,6 @@ public class Linker {
 
 	public void link(Mode mode) {
 		determineScopesOfParsedTypes();
-		if (mode != Mode.LAZY) {
-			// TODO extend packages by types from the classpath
-			// e.g. if someone defines an own package java.lang then it is
-			// merged with the corresponding package from the JDK
-			// defined classes hide classes in the JDK
-		}
 		resolveTypeImports(mode);
 		resolveStaticOnDemandImports(mode);
 		resolveExtendsAndImplements(mode);
@@ -1230,6 +1224,14 @@ public class Linker {
 				translationUnit = (TranslationUnit) scope;
 			}
 		}
+
+		if (translationUnit == null && mode != Mode.LAZY) {
+			// TODO use reflection to find other classes in the same package
+			// e.g. if someone defines an own package java.lang then it is
+			// merged with the corresponding package from the JDK
+			// defined classes hide classes in the JDK
+		}
+
 		if (useOnDemandImports && translationUnit != null) {
 			resultType = findOnDemandTypeImport(mode, simpleName,
 					translationUnit);
