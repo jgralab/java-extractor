@@ -1210,6 +1210,7 @@ public class Linker {
 			}
 		}
 		TranslationUnit translationUnit = null;
+		JavaPackage jPackage = null;
 		for (JavaVertex scope : determineScopes(context)) {
 			Map<String, SpecificType> visibleTypesInScope = visibleTypes
 					.getMark(scope);
@@ -1222,14 +1223,17 @@ public class Linker {
 			}
 			if (scope.isInstanceOf(TranslationUnit.VC)) {
 				translationUnit = (TranslationUnit) scope;
+			} else if (scope.isInstanceOf(JavaPackage.VC)) {
+				jPackage = (JavaPackage) scope;
 			}
 		}
 
-		if (translationUnit == null && mode != Mode.LAZY) {
+		if (resultType == null && jPackage != null && mode != Mode.LAZY) {
 			// TODO use reflection to find other classes in the same package
 			// e.g. if someone defines an own package java.lang then it is
 			// merged with the corresponding package from the JDK
 			// defined classes hide classes in the JDK
+			// existing files in visibleTypes may not be overwritten!
 		}
 
 		if (useOnDemandImports && translationUnit != null) {
