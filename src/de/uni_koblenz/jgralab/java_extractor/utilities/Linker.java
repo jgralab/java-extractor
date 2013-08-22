@@ -307,7 +307,7 @@ public class Linker {
 	private final Set<Vertex> enumConstants = new HashSet<Vertex>();
 
 	/**
-	 * Contains the anonymous classes:<br>
+	 * Contains the anonymous classes (not enum classes):<br>
 	 * <code><strong>{@link ClassDefinition}</strong> --{@link ExtendsClass}-&gt; {@link QualifiedType}</code>
 	 * <br>
 	 * or<br>
@@ -466,7 +466,31 @@ public class Linker {
 			Vertex v = superTypeNames.remove(0);
 			resolveSuperTypeHierarchy(mode, (TypeSpecification) v);
 		}
-		// TODO handle anonymous classes
+		for (Vertex v : anonymousClasses) {
+			ClassDefinition anonymousClass = (ClassDefinition) v;
+			ExtendsClass extendsClass = anonymousClass
+					.getFirstExtendsClassIncidence(EdgeDirection.OUT);
+			TypeSpecification superTypeSpecification = extendsClass.getOmega();
+			if (superTypeSpecification.getDegree(IsDefinedByType.EC,
+					EdgeDirection.OUT) == 0) {
+				// the current type is yet unknown
+				JavaVertex context = anonymousClass
+						.getFirstIsDefinedByTypeIncidence(EdgeDirection.IN)
+						.getAlpha();
+				String nameOfSuperClass = getQualifiedName(superTypeSpecification);
+				SpecificType superType = getTypeOrPackageWithName(mode,
+						nameOfSuperClass, context, false, SpecificType.class);
+				if (superType.isInstanceOf(InterfaceDefinition.VC)
+						|| superType.isInstanceOf(AnnotationDefinition.VC)) {
+					extendsClass.delete();
+					graphBuilder.createEdge(ImplementedInterfacesFromClass.EC,
+							anonymousClass, superTypeSpecification);
+				}
+				graphBuilder.createEdge(IsDefinedByType.EC,
+						superTypeSpecification, superType);
+				typeNames.remove(superTypeSpecification);
+			}
+		}
 	}
 
 	private void resolveSuperTypeHierarchy(Mode mode,
