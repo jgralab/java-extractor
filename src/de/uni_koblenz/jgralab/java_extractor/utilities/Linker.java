@@ -383,7 +383,7 @@ public class Linker {
 
 	public void link(Mode mode) {
 		determineScopesOfParsedTypes();
-		resolveTypeImports(mode);
+		resolveSingleTypeAndOnDemandTypeImports(mode);
 		resolveStaticOnDemandImports(mode);
 		resolveExtendsAndImplements(mode);
 		resolveSingleStaticImports(mode);
@@ -487,10 +487,6 @@ public class Linker {
 
 		SpecificType specificSuperType = getTypeOrPackageWithName(mode, name,
 				currentType, false, SpecificType.class);
-		if (specificSuperType == null) {
-			// TODO resolve on demand type import
-			// resolve on demand static import
-		}
 		if (specificSuperType == null) {
 			// the super type is unknown
 		} else {
@@ -899,7 +895,7 @@ public class Linker {
 				typeImportOnDemandDefinition, importedPackageOrType);
 	}
 
-	private void resolveTypeImports(Mode mode) {
+	private void resolveSingleTypeAndOnDemandTypeImports(Mode mode) {
 		// single type imports shadow on demand imports
 		for (SingleTypeImportDefinition anImport : singleTypeImports) {
 			QualifiedName nameOfType = anImport.get_definedImportName();
@@ -1272,12 +1268,15 @@ public class Linker {
 				if (visibleTypesOfCurrentOnDemandImport != null) {
 					Member member = visibleTypesOfCurrentOnDemandImport
 							.get(simpleName);
-					if (member != null && entry.getKey() != null) {
-						graphBuilder.createEdge(
-								DeclaresImportedStaticMember.EC,
-								entry.getKey(), member);
+					if (isVisibleMember(translationUnitWithImports, member)
+							&& isStatic(member)) {
+						if (member != null && entry.getKey() != null) {
+							graphBuilder.createEdge(
+									DeclaresImportedStaticMember.EC,
+									entry.getKey(), member);
+						}
+						result.add(member);
 					}
-					result.add(member);
 				}
 				// TODO add fields and methods
 				// TODO use reflection!!
@@ -1303,6 +1302,9 @@ public class Linker {
 				if (visibleTypesOfCurrentOnDemandImport != null) {
 					result = visibleTypesOfCurrentOnDemandImport
 							.get(simpleName);
+					if (!isVisibleMember(translationUnitWithImports, result)) {
+						result = null;
+					}
 					if (result == null) {
 						// TODO use reflection!!
 					}
