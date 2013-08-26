@@ -232,7 +232,7 @@ exports
 			Modifier #HasMethodModifier($, $0);#
 			| (Annotation #HasMemberAnnotation($, $0);#)
 		)*
-        ("<" {TypeParam #DeclaresMethodTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+        ("<" {TypeParam #DeclaresMethodTypeParameter($, $0);# ","}+ ">")?
         Type  #
 			$type = $2;
 			$dimension = {return utilities.calculateDimensions((Vertex) #$2#);};
@@ -275,7 +275,7 @@ exports
 			Modifier #HasConstructorModifier($, $0);#
 			| (Annotation #HasMemberAnnotation($, $0);#)
 		)*
-        ("<" {TypeParam #DeclaresConstructorTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+        ("<" {TypeParam #DeclaresConstructorTypeParameter($, $0);# ","}+ ">")?
         Id #
 			$identifier = name2Identifier.use(lexem($2));
 			{

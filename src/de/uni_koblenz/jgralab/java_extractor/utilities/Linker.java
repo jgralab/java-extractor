@@ -66,10 +66,12 @@ import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Implements;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.InterfaceDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.SpecificType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.EnclosedType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.IsDefinedByType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedType;
+import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeParameterUsage;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeSpecification;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -89,25 +91,6 @@ public class Linker {
 	 * contained.
 	 */
 	private SymbolTableStack packageNames;
-
-	/**
-	 * <table>
-	 * <tbody>
-	 * <tr>
-	 * <td>all <code>ClassifierType</code>s except if they occur behind extends
-	 * or implements</td>
-	 * <td>=&gt;</td>
-	 * <td>{@link QualifiedType} or {@link EnclosedType}</td>
-	 * </tr>
-	 * <tr>
-	 * <td><code>@&lt;TypeName&gt;</code></td>
-	 * <td>=&gt;</td>
-	 * <td>{@link QualifiedType}</td>
-	 * </tr>
-	 * </tbody>
-	 * </table>
-	 */
-	private final Set<Vertex> typeNames = new HashSet<Vertex>();
 
 	/**
 	 * Contains the elements in nesting order, i.e., super type definitions of
@@ -186,6 +169,29 @@ public class Linker {
 	 * </table>
 	 */
 	private final Set<StaticImportOnDemandDefinition> onDemandStaticImports = new HashSet<StaticImportOnDemandDefinition>();
+
+	private final Set<TypeParameterDeclaration> typeParameters = new HashSet<TypeParameterDeclaration>();
+
+	/**
+	 * <table>
+	 * <tbody>
+	 * <tr>
+	 * <td>all <code>ClassifierType</code>s except if they occur behind extends
+	 * or implements</td>
+	 * <td>=&gt;</td>
+	 * <td>{@link QualifiedType} or {@link EnclosedType}</td>
+	 * </tr>
+	 * <tr>
+	 * <td><code>@&lt;TypeName&gt;</code></td>
+	 * <td>=&gt;</td>
+	 * <td>{@link QualifiedType}</td>
+	 * </tr>
+	 * </tbody>
+	 * </table>
+	 * {@link QualifiedType}s have to be replaced by {@link TypeParameterUsage}
+	 * if they refer to a {@link TypeParameterDeclaration}.
+	 */
+	private final Set<Vertex> typeNames = new HashSet<Vertex>();
 
 	/**
 	 * <table>
@@ -334,6 +340,10 @@ public class Linker {
 		typeNames.add(typeName);
 	}
 
+	public void addTypeParameterDeclaration(Vertex typeParameterDeclaration) {
+		typeParameters.add((TypeParameterDeclaration) typeParameterDeclaration);
+	}
+
 	public void addSuperTypeName(Vertex superTypeName) {
 		assert !superTypeNames.contains(superTypeName);
 		superTypeNames.add(superTypeName);
@@ -383,10 +393,12 @@ public class Linker {
 
 	public void link(Mode mode) {
 		determineScopesOfParsedTypes();
+		publishTypeParameters();
 		resolveSingleTypeAndOnDemandTypeImports(mode);
 		resolveStaticOnDemandImports(mode);
 		resolveExtendsAndImplements(mode);
 		resolveSingleStaticImports(mode);
+		resolveTypeNames(mode);
 		// TODO publish members of Object to types with no supertype??
 		// or implement a lazy lookup strategy for members (depending on mode)
 
@@ -402,37 +414,6 @@ public class Linker {
 
 		// below all temporary vertices are blessed
 		// TODO delete this code when Linker is finished
-		for (Vertex v : singleTypeImports) {
-			if (v.isInstanceOf(SingleStaticImportDefinition.VC)) {
-				TemporaryVertex importedMember = null;
-				for (Edge e : v.incidences(EdgeDirection.OUT)) {
-					if (e.isTemporary()
-							&& ((TemporaryEdge) e).getPreliminaryType() == DeclaresImportedStaticMember.EC) {
-						importedMember = (TemporaryVertex) e.getThat();
-						break;
-					}
-				}
-				if (importedMember != null) {
-					String name = importedMember.getAttribute("name");
-					importedMember.deleteAttribute("name");
-					Field importedField = (Field) blessVertex(importedMember,
-							Field.VC);
-					Identifier id = (Identifier) name2Identifier.use(name);
-					if (id == null) {
-						Position position = graphBuilder.getPositionsMap().get(
-								importedField);
-						id = (Identifier) graphBuilder.createVertex(
-								Identifier.VC, position);
-						id.set_name(name);
-						name2Identifier.declare(name, id);
-					}
-					graphBuilder
-							.createEdge(
-									de.uni_koblenz.jgralab.java_extractor.schema.member.HasVariableName.EC,
-									importedField, id);
-				}
-			}
-		}
 		for (Vertex v : ambiguousNames) {
 			TemporaryVertex tv = (TemporaryVertex) v;
 			String name = v.getAttribute("lexem");
@@ -459,6 +440,54 @@ public class Linker {
 			}
 		}
 	}
+
+	private void resolveTypeNames(Mode mode) {
+		for (Vertex typeName : typeNames) {
+			String name = getQualifiedName((TypeSpecification) typeName);
+			System.out.println(name);// TODO delete
+			Type referedType = getTypeOrPackageWithName(mode, name,
+					(JavaVertex) typeName, false, Type.class);
+			if (referedType.isInstanceOf(SpecificType.VC)) {
+				graphBuilder.createEdge(IsDefinedByType.EC, typeName,
+						referedType);
+			} else {
+				assert referedType.isInstanceOf(TypeParameterDeclaration.VC);
+				// this is the use of a type parameter
+				// it is modeled as a qualified type wrongly
+				TypeParameterUsage typeParameterUsage = (TypeParameterUsage) graphBuilder
+						.createVertex(TypeParameterUsage.VC, graphBuilder
+								.getPositionsMap().get(typeName));
+				Edge edge2Parent = ((JavaVertex) typeName)
+						.getFirstAttributedEdgeIncidence(EdgeDirection.IN)
+						.getReversedEdge();
+				Edge newEdge2Parent = graphBuilder.createEdge(
+						edge2Parent.getAttributedElementClass(),
+						edge2Parent.getAlpha(), typeParameterUsage);
+				newEdge2Parent.putIncidenceBefore(edge2Parent);
+				graphBuilder.createEdge(IsDefinedByType.EC, typeParameterUsage,
+						referedType);
+				typeName.delete();
+			}
+			// TODO Test it
+		}
+	}
+
+	/*
+	 * publish type parameters
+	 */
+
+	private void publishTypeParameters() {
+		for (TypeParameterDeclaration typeParameterDeclaration : typeParameters) {
+			Vertex genericMember = typeParameterDeclaration
+					.get_genericElement();
+			assert genericMember != null;
+			addType(genericMember, typeParameterDeclaration);
+		}
+	}
+
+	/*
+	 * resolve super type hierarchy consisting of extends and implements
+	 */
 
 	private void resolveExtendsAndImplements(Mode mode) {
 		while (!superTypeNames.isEmpty()) {
@@ -580,15 +609,14 @@ public class Linker {
 		if (superType == null) {
 			// handle java.lang.Object
 		} else {
-			Map<String, SpecificType> visibleTypesOfSuperType = visibleTypes
+			Map<String, Type> visibleTypesOfSuperType = visibleTypes
 					.getMark(superType);
 			assert visibleTypesOfSuperType != null;
-			for (Entry<String, SpecificType> entry : visibleTypesOfSuperType
-					.entrySet()) {
+			for (Entry<String, Type> entry : visibleTypesOfSuperType.entrySet()) {
 				if (isVisibleMember(currentType, entry.getValue())
 						&& !isHidden(currentType, entry.getValue())) {
 					// realizes implicit shadowing
-					addSpecificType(currentType, entry.getValue());
+					addType(currentType, entry.getValue());
 				}
 			}
 			// TODO publish fields and methods
@@ -792,7 +820,7 @@ public class Linker {
 
 	private final Set<SpecificType> parsedSpecificTypes = new HashSet<SpecificType>();
 
-	private GraphMarker<Map<String, SpecificType>> visibleTypes;
+	private GraphMarker<Map<String, Type>> visibleTypes;
 
 	public void registerSpecificType(Vertex specificType) {
 		assert specificType.isInstanceOf(SpecificType.VC);
@@ -800,11 +828,10 @@ public class Linker {
 		parsedSpecificTypes.add(specType);
 	}
 
-	private void addSpecificType(Vertex context, SpecificType type) {
-		Map<String, SpecificType> visibleSpecificTypes = visibleTypes
-				.getMark(context);
+	private void addType(Vertex context, Type type) {
+		Map<String, Type> visibleSpecificTypes = visibleTypes.getMark(context);
 		if (visibleSpecificTypes == null) {
-			visibleSpecificTypes = new HashMap<String, SpecificType>();
+			visibleSpecificTypes = new HashMap<String, Type>();
 			visibleTypes.mark(context, visibleSpecificTypes);
 		}
 		String simpleName = type.get_name();
@@ -812,30 +839,30 @@ public class Linker {
 	}
 
 	private void determineScopesOfParsedTypes() {
-		visibleTypes = new GraphMarker<Map<String, SpecificType>>(
+		visibleTypes = new GraphMarker<Map<String, Type>>(
 				graphBuilder.getGraph());
 		for (SpecificType specificType : parsedSpecificTypes) {
 			// each type is visible in its own body
-			addSpecificType(specificType, specificType);
+			addType(specificType, specificType);
 			TranslationUnit translationUnit = specificType
 					.get_declaringTranslationUnit();
 			if (translationUnit != null) {
 				// specificType is a top level type
 				// a top level type is visible in the translation unit in which
 				// it is defined
-				addSpecificType(translationUnit, specificType);
+				addType(translationUnit, specificType);
 				// a top level type is visible in the package in which the
 				// translation unit is located in which it is defined
 				JavaPackage containingPackage = translationUnit
 						.get_containingPackage();
-				addSpecificType(containingPackage, specificType);
+				addType(containingPackage, specificType);
 			} else {
 				SpecificType containingType = specificType.get_containingType();
 				if (containingType != null) {
 					// specificType is a member type or a static nested type
 					// a member type is visible in the body of the type in which
 					// it is contained
-					addSpecificType(containingType, specificType);
+					addType(containingType, specificType);
 				} else {
 					TypeDefinitionStatement tdStatement = specificType
 							.get_definingStatement();
@@ -850,7 +877,7 @@ public class Linker {
 						cs = cs.getNextContainsStatementIncidence(EdgeDirection.OUT);
 						while (cs != null) {
 							Statement statement = cs.getOmega();
-							addSpecificType(statement, specificType);
+							addType(statement, specificType);
 							cs = cs.getNextContainsStatementIncidence(EdgeDirection.OUT);
 						}
 					} else {
@@ -941,7 +968,7 @@ public class Linker {
 			if (visibleTypes.getMark(translationUnit).containsKey(simpleName)) {
 				continue;
 			}
-			addSpecificType(translationUnit, importedType);
+			addType(translationUnit, importedType);
 		}
 
 		// imports on demand may not shadow anything
@@ -1037,10 +1064,9 @@ public class Linker {
 				typeName.get_fullyQualifiedName(), anImport, true,
 				SpecificType.class);
 
-		Map<String, SpecificType> memberTypes = visibleTypes
-				.getMark(importedType);
-		SpecificType importedMemberType = memberTypes == null ? null
-				: memberTypes.get(importedMemberName.getAttribute("name"));
+		Map<String, Type> memberTypes = visibleTypes.getMark(importedType);
+		Type importedMemberType = memberTypes == null ? null : memberTypes
+				.get(importedMemberName.getAttribute("name"));
 		boolean isInheritanceResolved = false;
 		if (importedMemberType == null
 				|| !(isStatic(importedMemberType) && isVisibleMember(anImport,
@@ -1064,7 +1090,7 @@ public class Linker {
 				graphBuilder.createEdge(DeclaresImportedStaticMember.EC,
 						anImport, importedMemberType);
 			}
-			addSpecificType(translationUnit, importedMemberType);
+			addType(translationUnit, importedMemberType);
 		}
 		if ((isInheritanceResolved || isInheritanceCompletlyResolved(importedType))
 				&& importedMemberName.isValid()) {
@@ -1124,8 +1150,7 @@ public class Linker {
 			String name, JavaVertex context, boolean isCanonical,
 			Class<V> expectedResultType) {
 		boolean isSimpleName = !name.contains(".");
-		boolean ensureType = SpecificType.class
-				.isAssignableFrom(expectedResultType);
+		boolean ensureType = Type.class.isAssignableFrom(expectedResultType);
 		JavaVertex result = null;
 		if (isSimpleName) {
 			if (ensureType) {
@@ -1213,14 +1238,14 @@ public class Linker {
 		return null;
 	}
 
-	private SpecificType getTypeWithSimpleName(Mode mode, String simpleName,
+	private Type getTypeWithSimpleName(Mode mode, String simpleName,
 			JavaVertex context, boolean useOnDemandImports) {
-		SpecificType resultType = null;
-		if (context.isInstanceOf(SpecificType.VC)) {
-			// determineScopes only resolves the enclosing SpecificTypes
+		Type resultType = null;
+		if (context.isInstanceOf(Type.VC)) {
+			// determineScopes only resolves the enclosing Types
 			// the check if the simpleName is contained in the scope of the
 			// current context
-			Map<String, SpecificType> visibleTypesInScope = visibleTypes
+			Map<String, Type> visibleTypesInScope = visibleTypes
 					.getMark(context);
 			if (visibleTypesInScope != null) {
 				resultType = visibleTypesInScope.get(simpleName);
@@ -1232,8 +1257,7 @@ public class Linker {
 		TranslationUnit translationUnit = null;
 		JavaPackage jPackage = null;
 		for (JavaVertex scope : determineScopes(context)) {
-			Map<String, SpecificType> visibleTypesInScope = visibleTypes
-					.getMark(scope);
+			Map<String, Type> visibleTypesInScope = visibleTypes.getMark(scope);
 			if (visibleTypesInScope != null) {
 				resultType = visibleTypesInScope.get(simpleName);
 				if (resultType != null) {
@@ -1276,7 +1300,6 @@ public class Linker {
 
 	private Set<Member> findStaticOnDemandImport(Mode mode, String simpleName,
 			TranslationUnit translationUnitWithImports) {
-		// TODO does not work :-(
 		Set<Member> result = new HashSet<Member>();
 		if (visibleStaticOnDemandImports == null) {
 			return result;
@@ -1287,7 +1310,7 @@ public class Linker {
 		if (registeredStaticOnDemandImports != null) {
 			for (Entry<StaticImportOnDemandDefinition, SpecificType> entry : registeredStaticOnDemandImports
 					.entrySet()) {
-				Map<String, SpecificType> visibleTypesOfCurrentOnDemandImport = visibleTypes
+				Map<String, Type> visibleTypesOfCurrentOnDemandImport = visibleTypes
 						.getMark(entry.getValue());
 				if (visibleTypesOfCurrentOnDemandImport != null) {
 					Member member = visibleTypesOfCurrentOnDemandImport
@@ -1321,10 +1344,10 @@ public class Linker {
 		if (registeredOnDemandTypeImports != null) {
 			for (Entry<TypeImportOnDemandDefinition, JavaVertex> entry : registeredOnDemandTypeImports
 					.entrySet()) {
-				Map<String, SpecificType> visibleTypesOfCurrentOnDemandImport = visibleTypes
+				Map<String, Type> visibleTypesOfCurrentOnDemandImport = visibleTypes
 						.getMark(entry.getValue());
 				if (visibleTypesOfCurrentOnDemandImport != null) {
-					result = visibleTypesOfCurrentOnDemandImport
+					result = (SpecificType) visibleTypesOfCurrentOnDemandImport
 							.get(simpleName);
 					if (!isVisibleMember(translationUnitWithImports, result)) {
 						result = null;
@@ -1348,6 +1371,8 @@ public class Linker {
 	 * Determines all the scopes of <code>context</code>:
 	 * <ul>
 	 * <li>The first containing Statement</li>
+	 * <li>The first enclosing MethodDeclaration or ConstructorDefinition (for
+	 * type parameter declarations)</li>
 	 * <li>The first enclosing(!) SpecificType</li>
 	 * <li>The TranslationUnit</li>
 	 * <li>The JavaPackage</li>
@@ -1398,6 +1423,8 @@ public class Linker {
 				.isInstanceOf(Expression.VC))
 				|| currentVertex.isInstanceOf(SpecificType.VC)
 				|| currentVertex.isInstanceOf(TranslationUnit.VC)
-				|| currentVertex.isInstanceOf(JavaPackage.VC);
+				|| currentVertex.isInstanceOf(JavaPackage.VC)
+				|| currentVertex.isInstanceOf(MethodDeclaration.VC)
+				|| currentVertex.isInstanceOf(ConstructorDefinition.VC);
 	}
 }

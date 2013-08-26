@@ -59,38 +59,30 @@ exports
 
     %% ClassifierType
     rule Id                             -> ClassifierType #%% This could be a simple name of a Classifier or a type parameter name.
-		$typeParamDecl = name2TypeParameter.use(lexem($0));
+		$ = QualifiedType();
+		$.fullyQualifiedName = {return utilities.resolveQualifiedName(#lexem($0)#);};
+		$identifier = name2Identifier.use(lexem($0));
 		{
-			if (#$typeParamDecl# == null) {#
-				$ = QualifiedType();
-				$.fullyQualifiedName = {return utilities.resolveQualifiedName(#lexem($0)#);};
-				$identifier = name2Identifier.use(lexem($0));
-				{
-					if (#$identifier# == null) {#
-						$identifier = Identifier();
-						$identifier.name = lexem($0);
-						name2Identifier.declare(lexem($0), $identifier);
-					#} else {
-						getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
-					}
+			if (#$identifier# == null) {#
+				$identifier = Identifier();
+				$identifier.name = lexem($0);
+				name2Identifier.declare(lexem($0), $identifier);
+			#} else {
+				getPositionsMap().put((Vertex) #$identifier#, currentElement.getChild(0).getPosition());
+			}
+		}
+		HasSimpleName($, $identifier);
+		{
+			if (!currentElement.getParentApplicationOfDefinedRule()
+					.getParent().getParentApplicationOfDefinedRule()
+					.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
+				// the QualifiedType is only linked, if it is not part of an EnclosedType
+				if (isInSuperTypeDeclaration) {
+					linker.addSuperTypeName((Vertex) #$#);
+				} else {
+					linker.addTypeName((Vertex) #$#);
 				}
-				HasSimpleName($, $identifier);
-				{
-					if (!currentElement.getParentApplicationOfDefinedRule()
-							.getParent().getParentApplicationOfDefinedRule()
-							.getAppliedRule().getDefinedRepresentation().trim().startsWith("ClassifierType \".\" ClassifierType -> ClassifierType")) {
-						// the QualifiedType is only linked, if it is not part of an EnclosedType
-						if (isInSuperTypeDeclaration) {
-							linker.addSuperTypeName((Vertex) #$#);
-						} else {
-							linker.addTypeName((Vertex) #$#);
-						}
-					}
-				}
-			#} else {#
-				$ = TypeParameterUsage();
-				IsDefinedByType($, $typeParamDecl);
-			#}
+			}
 		}
 	#
     rule PackageName "." Id             -> ClassifierType #
@@ -243,7 +235,7 @@ exports
     %% TypeParam
     rule #$ = TypeParameterDeclaration();#	
 		Id #
-			$.name = {return qualifiedNamePrefix;}.concat(".").concat(lexem($0));
+			$.name = lexem($0);
 			$identifier = name2Identifier.use(lexem($0));
 			{
 				if (#$identifier# == null) {#
@@ -256,6 +248,7 @@ exports
 			}
 			HasTypeParameterName($, $identifier);
 			name2TypeParameter.declare(lexem($0), $);
+			{linker.addTypeParameterDeclaration((Vertex) #$#);}
 		#
 		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+ )?  -> TypeParam
 	

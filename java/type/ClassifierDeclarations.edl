@@ -48,7 +48,7 @@ exports
 			$.external = false;
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
-         ("<" {TypeParam #DeclaresClassTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+         ("<" {TypeParam #DeclaresClassTypeParameter($, $0);# ","}+ ">")?
          (
 			#
 				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};
@@ -147,7 +147,7 @@ exports
 			$.external = false;
 			$.canonicalName = {return qualifiedNamePrefix;};
 		 #
-         ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ #{utilities.correctTypeParameterUsage((SymbolTableStack) #name2TypeParameter#, (Vertex) #$#);}# ">")?
+         ("<" {TypeParam #DeclaresInterfaceTypeParameter($, $0);# ","}+ ">")?
          (
 			#
 				$isInSuperTypeDeclaration = {return isInSuperTypeDeclaration;};

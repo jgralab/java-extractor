@@ -11,12 +11,10 @@ import java.util.Map;
 
 import de.uni_koblenz.edl.parser.Position;
 import de.uni_koblenz.edl.parser.symboltable.SymbolTableStack;
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.java_extractor.builder.Java5Builder;
 import de.uni_koblenz.jgralab.java_extractor.schema.annotation.Annotation;
-import de.uni_koblenz.jgralab.java_extractor.schema.common.AttributedEdge;
 import de.uni_koblenz.jgralab.java_extractor.schema.common.Identifier;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.BooleanConstant;
 import de.uni_koblenz.jgralab.java_extractor.schema.expression.CharConstant;
@@ -40,27 +38,16 @@ import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ContainsType
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.EnumDefinition;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.ExtendsClass;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeName;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.HasTypeParameterUpperBound;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.Type;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.definition.TypeParameterDeclaration;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.ArrayType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.BuiltInType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.BuiltInTypes;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.EnclosedType;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasEnclosedType;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasEnclosingType;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasLowerBound;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasSimpleArgumentType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasSimpleName;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.HasUpperBound;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.IsDefinedByType;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedName;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.QualifiedType;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.SimpleArgument;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeArgument;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeParameterUsage;
 import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.TypeSpecification;
-import de.uni_koblenz.jgralab.java_extractor.schema.type.specification.WildcardArgument;
 
 public class SemanticActionUtilities {
 
@@ -374,140 +361,6 @@ public class SemanticActionUtilities {
 	public String resolveQualifiedName(Object simpleName) {
 		// TODO extend complete name resolution
 		return (String) simpleName;
-	}
-
-	/**
-	 * If a type parameter is used in the type parameter declaration before its
-	 * own declaration, then the type parameter is represented as
-	 * {@link QualifiedType} instead of {@link TypeParameterUsage}.
-	 * 
-	 * @param name2TypeParameter
-	 * @param typeDefinitionOrMember
-	 */
-	public void correctTypeParameterUsage(SymbolTableStack name2TypeParameter,
-			Vertex typeDefinitionOrMember) {
-		assert typeDefinitionOrMember.isInstanceOf(Type.VC)
-				|| typeDefinitionOrMember.isInstanceOf(Member.VC);
-		for (TypeParameterDeclaration typeParamDecl : typeDefinitionOrMember
-				.isInstanceOf(Type.VC) ? ((Type) typeDefinitionOrMember)
-				.get_typeParameters() : ((Member) typeDefinitionOrMember)
-				.get_typeParameters()) {
-			HasTypeParameterUpperBound htpub = typeParamDecl
-					.getFirstHasTypeParameterUpperBoundIncidence(EdgeDirection.OUT);
-			while (htpub != null) {
-				HasTypeParameterUpperBound next = htpub
-						.getNextHasTypeParameterUpperBoundIncidence(EdgeDirection.OUT);
-				TypeSpecification typeSpecification = (TypeSpecification) htpub
-						.getThat();
-				checkAndCorrectQualifiedTyps(name2TypeParameter, htpub,
-						typeSpecification);
-				htpub = next;
-			}
-		}
-	}
-
-	/**
-	 * @param name2TypeParameter
-	 * @param edge2WrongQualifiedType
-	 * @param possiblyWrongQualifiedType
-	 */
-	private void checkAndCorrectQualifiedTyps(
-			SymbolTableStack name2TypeParameter,
-			AttributedEdge edge2WrongQualifiedType,
-			TypeSpecification possiblyWrongQualifiedType) {
-		// correct type arguments
-		for (TypeArgument typeArgument : possiblyWrongQualifiedType
-				.get_typeArguments()) {
-			for (Vertex argument : typeArgument.get_arguments()) {
-				if (argument.isInstanceOf(SimpleArgument.VC)) {
-					HasSimpleArgumentType hsat = (HasSimpleArgumentType) argument
-							.getFirstIncidence(HasSimpleArgumentType.EC);
-					checkAndCorrectQualifiedTyps(name2TypeParameter, hsat,
-							hsat.getOmega());
-				} else if (argument.isInstanceOf(WildcardArgument.VC)) {
-					HasUpperBound hub = (HasUpperBound) argument
-							.getFirstIncidence(HasUpperBound.EC);
-					if (hub != null) {
-						checkAndCorrectQualifiedTyps(name2TypeParameter, hub,
-								hub.getOmega());
-					}
-					HasLowerBound hlb = (HasLowerBound) argument
-							.getFirstIncidence(HasLowerBound.EC);
-					if (hlb != null) {
-						checkAndCorrectQualifiedTyps(name2TypeParameter, hlb,
-								hlb.getOmega());
-					}
-				}
-			}
-		}
-		if (possiblyWrongQualifiedType.isInstanceOf(QualifiedType.VC)) {
-			TypeParameterDeclaration declarationOfUsedTypeParameter = (TypeParameterDeclaration) name2TypeParameter
-					.use(((QualifiedType) possiblyWrongQualifiedType)
-							.get_fullyQualifiedName());
-			if (declarationOfUsedTypeParameter != null) {
-				correctQualifiedType(edge2WrongQualifiedType,
-						(QualifiedType) possiblyWrongQualifiedType,
-						declarationOfUsedTypeParameter);
-			}
-		} else if (possiblyWrongQualifiedType.isInstanceOf(EnclosedType.VC)) {
-			HasEnclosedType hasEnclosedType = (HasEnclosedType) possiblyWrongQualifiedType
-					.getFirstIncidence(HasEnclosedType.EC);
-			checkAndCorrectQualifiedTyps(name2TypeParameter, hasEnclosedType,
-					hasEnclosedType.getOmega());
-			HasEnclosingType hasEnclosingType = (HasEnclosingType) possiblyWrongQualifiedType
-					.getFirstIncidence(HasEnclosingType.EC);
-			checkAndCorrectQualifiedTyps(name2TypeParameter, hasEnclosingType,
-					hasEnclosingType.getOmega());
-		} else if (possiblyWrongQualifiedType
-				.isInstanceOf(TypeParameterUsage.VC)) {
-			// public class TestClass<V> {
-			// public interface TestClass<W extends V, V> {
-			// }
-			// }
-			// In this case the "W extends V" uses the wrong V
-			IsDefinedByType idbt = (IsDefinedByType) possiblyWrongQualifiedType
-					.getFirstIncidence(IsDefinedByType.EC);
-			TypeParameterDeclaration usedTypeParamDecl = (TypeParameterDeclaration) idbt
-					.getOmega();
-			Vertex correctTypeParamDecl = name2TypeParameter
-					.use(usedTypeParamDecl.get_simpleName().get_name());
-			if (correctTypeParamDecl != usedTypeParamDecl) {
-				idbt.setOmega(correctTypeParamDecl);
-			}
-		}
-	}
-
-	/**
-	 * @param edge2WrongQualifiedType
-	 * @param wrongQualifiedType
-	 * @param declarationOfUsedTypeParameter
-	 */
-	private void correctQualifiedType(AttributedEdge edge2WrongQualifiedType,
-			QualifiedType wrongQualifiedType,
-			TypeParameterDeclaration declarationOfUsedTypeParameter) {
-		Position pos = new Position(edge2WrongQualifiedType.get_offset(),
-				edge2WrongQualifiedType.get_length(),
-				edge2WrongQualifiedType.get_line(),
-				edge2WrongQualifiedType.get_column());
-		TypeParameterUsage newUsage = (TypeParameterUsage) graphBuilder
-				.createVertex(TypeParameterUsage.VC, pos);
-		Edge edge = wrongQualifiedType.getFirstIncidence();
-		while (edge != null) {
-			Edge next = edge.getNextIncidence();
-			if (edge.isInstanceOf(HasSimpleName.EC)) {
-				edge.delete();
-				graphBuilder.createEdge(IsDefinedByType.EC, newUsage,
-						declarationOfUsedTypeParameter);
-			} else if (edge.getAlpha() == wrongQualifiedType) {
-				edge.setAlpha(newUsage);
-			} else {
-				assert edge.getOmega() == wrongQualifiedType;
-				edge.setOmega(newUsage);
-			}
-			edge = next;
-		}
-		assert wrongQualifiedType.getDegree() == 0;
-		wrongQualifiedType.delete();
 	}
 
 	public int calculateDimensions(Vertex typeSpecification) {
