@@ -441,39 +441,42 @@ public class Linker {
 		}
 	}
 
+	/*
+	 * resolve type names
+	 */
+
 	private void resolveTypeNames(Mode mode) {
 		for (Vertex typeName : typeNames) {
-			String name = getQualifiedName((TypeSpecification) typeName);
-			Type referedType = getTypeOrPackageWithName(mode, name,
-					(JavaVertex) typeName, false, Type.class);
-			assert referedType != null;
-			if (referedType.isInstanceOf(SpecificType.VC)) {
-				graphBuilder.createEdge(IsDefinedByType.EC, typeName,
-						referedType);
-			} else {
-				assert referedType.isInstanceOf(TypeParameterDeclaration.VC);
-				// this is the use of a type parameter
-				// it is modeled as a qualified type wrongly
-				TypeParameterUsage typeParameterUsage = (TypeParameterUsage) graphBuilder
-						.createVertex(TypeParameterUsage.VC, graphBuilder
-								.getPositionsMap().get(typeName));
-				Edge edge2Parent = ((JavaVertex) typeName)
-						.getFirstAttributedEdgeIncidence(EdgeDirection.IN)
-						.getReversedEdge();
-				Edge newEdge2Parent = graphBuilder.createEdge(
-						edge2Parent.getAttributedElementClass(),
-						edge2Parent.getAlpha(), typeParameterUsage);
-				newEdge2Parent.putIncidenceBefore(edge2Parent);
-				graphBuilder.createEdge(IsDefinedByType.EC, typeParameterUsage,
-						referedType);
-				typeName.delete();
-			}
+			resolveTypeName(mode, (TypeSpecification) typeName);
 		}
 	}
 
-	/*
-	 * publish type parameters
-	 */
+	private void resolveTypeName(Mode mode, TypeSpecification typeName) {
+		String name = getQualifiedName(typeName);
+		Type referedType = getTypeOrPackageWithName(mode, name, typeName,
+				false, Type.class);
+		assert referedType != null;
+		if (referedType.isInstanceOf(SpecificType.VC)) {
+			graphBuilder.createEdge(IsDefinedByType.EC, typeName, referedType);
+		} else {
+			assert referedType.isInstanceOf(TypeParameterDeclaration.VC);
+			// this is the use of a type parameter
+			// it is modeled as a qualified type wrongly
+			TypeParameterUsage typeParameterUsage = (TypeParameterUsage) graphBuilder
+					.createVertex(TypeParameterUsage.VC, graphBuilder
+							.getPositionsMap().get(typeName));
+			Edge edge2Parent = ((JavaVertex) typeName)
+					.getFirstAttributedEdgeIncidence(EdgeDirection.IN)
+					.getReversedEdge();
+			Edge newEdge2Parent = graphBuilder.createEdge(
+					edge2Parent.getAttributedElementClass(),
+					edge2Parent.getAlpha(), typeParameterUsage);
+			newEdge2Parent.putIncidenceBefore(edge2Parent);
+			graphBuilder.createEdge(IsDefinedByType.EC, typeParameterUsage,
+					referedType);
+			typeName.delete();
+		}
+	}
 
 	private void publishTypeParameters() {
 		for (TypeParameterDeclaration typeParameterDeclaration : typeParameters) {
