@@ -247,7 +247,6 @@ exports
 				}
 			}
 			HasTypeParameterName($, $identifier);
-			name2TypeParameter.declare(lexem($0), $);
 			{linker.addTypeParameterDeclaration((Vertex) #$#);}
 		#
 		("extends" {Type #HasTypeParameterUpperBound($, $0);# "&"}+ )?  -> TypeParam

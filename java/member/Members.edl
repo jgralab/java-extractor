@@ -226,7 +226,6 @@ exports
          -> ParamDeclaration
 
     %% MethodDeclaration
-	@Symboltable{name2TypeParameter}
     rule #$ = MethodDefinition();# 
 		(
 			Modifier #HasMethodModifier($, $0);#
@@ -269,7 +268,6 @@ exports
     rule MethodDeclaration -> Member #$ = $0;#
 
     %% ConstructorDeclaration
-	@Symboltable{name2TypeParameter}
     rule #$ = ConstructorDefinition();#
 		(
 			Modifier #HasConstructorModifier($, $0);#

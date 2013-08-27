@@ -16,7 +16,6 @@ import declarations
 symbol tables
 	qName2Package<JavaPackage>
 	name2Identifier<Identifier>
-	name2TypeParameter<TypeParameterDeclaration> %% uses simple names as keys
 user code {
 
 	public static enum Mode{

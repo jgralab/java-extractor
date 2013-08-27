@@ -444,9 +444,9 @@ public class Linker {
 	private void resolveTypeNames(Mode mode) {
 		for (Vertex typeName : typeNames) {
 			String name = getQualifiedName((TypeSpecification) typeName);
-			System.out.println(name);// TODO delete
 			Type referedType = getTypeOrPackageWithName(mode, name,
 					(JavaVertex) typeName, false, Type.class);
+			assert referedType != null;
 			if (referedType.isInstanceOf(SpecificType.VC)) {
 				graphBuilder.createEdge(IsDefinedByType.EC, typeName,
 						referedType);
@@ -468,7 +468,6 @@ public class Linker {
 						referedType);
 				typeName.delete();
 			}
-			// TODO Test it
 		}
 	}
 

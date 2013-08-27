@@ -32,7 +32,6 @@ exports
   context-free syntax
 
     %% Classes
-	@Symboltable{name2TypeParameter}
     rule #
 			$ = ClassDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -81,7 +80,6 @@ exports
 		#
 
     %% Enums
-	@Symboltable{name2TypeParameter}
     rule  #
 			$ = EnumDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -131,7 +129,6 @@ exports
 		}#)*)? "}" -> EnumBody
 
     %% Interfaces
-	@Symboltable{name2TypeParameter}
     rule #
 			$ = InterfaceDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
@@ -170,7 +167,6 @@ exports
 		#
 
     %% Annotations
-	@Symboltable{name2TypeParameter}
     rule  #
 			$ = AnnotationDefinition();
 			$qualifiedNamePrefix= {return qualifiedNamePrefix;};
