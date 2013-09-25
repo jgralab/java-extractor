@@ -2,10 +2,11 @@
 
 <project name="jex" basedir="." default="build">
 
-	<property name="projectname" value="java-extractor" />
+	<property name="projectname" value="java-extractor2" />
 	<property name="main" value="" />
 	<property name="rsa2tg.n" value="true" />
 	<property name="rsa2tg.c" value="true" />
+	<property name="compileexcludes" value="de/uni_koblenz/jgralab/java_extractor/utilities/**" />
 
 	<import file="../jgralab/common.xml" />
 
@@ -42,7 +43,7 @@
 	    <arg value="-n"/> <!-- no default mappings -->
 	  </java>
 	  <javac includeantruntime="false" fork="true"
-		 classpathref="classpath" debug="true"
+		 classpathref="classpath" debug="true" includes="de/uni_koblenz/jgralab/java_extractor/utilities/**"
 		 srcdir="src" destdir="build/classes"/>
 	</target>
 	
