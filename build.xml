@@ -2,7 +2,7 @@
 
 <project name="jex" basedir="." default="build">
 
-	<property name="projectname" value="java-extractor2" />
+	<property name="projectname" value="java-extractor" />
 	<property name="main" value="" />
 	<property name="rsa2tg.n" value="true" />
 	<property name="rsa2tg.c" value="true" />
