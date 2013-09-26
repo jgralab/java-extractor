@@ -455,7 +455,9 @@ public class Linker {
 		String name = getQualifiedName(typeName);
 		Type referedType = getTypeOrPackageWithName(mode, name, typeName,
 				false, Type.class);
-		assert referedType != null;
+		if (referedType == null) {
+			return;
+		}
 		if (referedType.isInstanceOf(SpecificType.VC)) {
 			graphBuilder.createEdge(IsDefinedByType.EC, typeName, referedType);
 		} else {

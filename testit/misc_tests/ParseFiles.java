@@ -16,8 +16,7 @@ public class ParseFiles {
 		// JavaGraphBuilder builder = new JavaGraphBuilder();//
 		// JavaSchema.instance());
 		// parseAllJavaFiles(builder, new File("../common"));
-		parseAllJavaFiles(builder, new File(
-				"D:/JDK6SourceCode/langtools/test/tools/javac"));
+		parseAllJavaFiles(builder, new File("D:/Teams"));
 		// new File("D:/JDK6SourceCode/"));
 		builder.link();
 	}
