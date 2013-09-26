@@ -39,7 +39,6 @@
 	    <arg value="-m"/> <arg value="java/Main"/>
 	    <arg value="-o"/> <arg value="src/de/uni_koblenz/jgralab/java_extractor/builder"/>
 	    <arg value="-p"/> <arg value="de.uni_koblenz.jgralab.java_extractor.builder"/>
-	    <arg value="-s"/> <arg value="java5schema.rsa.tg"/>
 	    <arg value="-n"/> <!-- no default mappings -->
 	  </java>
 	  <javac includeantruntime="false" fork="true"

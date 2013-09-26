@@ -1,9 +1,4 @@
-bin
-
-build
-
-/java5schema.rsa.tg
-
-builder
-
-schema
+bin/
+build/
+src/de/uni_koblenz/jgralab/java_extractor/builder/
+src/de/uni_koblenz/jgralab/java_extractor/schema/
