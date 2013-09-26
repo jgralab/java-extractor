@@ -42,7 +42,8 @@
 	    <arg value="-n"/> <!-- no default mappings -->
 	  </java>
 	  <javac includeantruntime="false" fork="true"
-		 classpathref="classpath" debug="true" includes="de/uni_koblenz/jgralab/java_extractor/utilities/**"
+		 classpathref="classpath" debug="true"
+		 includes="de/uni_koblenz/jgralab/java_extractor/utilities/** de/uni_koblenz/jgralab/java_extractor/builder/**"
 		 srcdir="src" destdir="build/classes"/>
 	</target>
 	
