@@ -513,6 +513,12 @@ public class Linker {
 				String nameOfSuperClass = getQualifiedName(superTypeSpecification);
 				SpecificType superType = getTypeOrPackageWithName(mode,
 						nameOfSuperClass, context, false, SpecificType.class);
+				if (superType == null) {
+					System.err.println("Couldn't resolve supertype "
+							+ nameOfSuperClass + " of anonymous class "
+							+ anonymousClass.get_canonicalName());
+					continue;
+				}
 				if (superType.isInstanceOf(InterfaceDefinition.VC)
 						|| superType.isInstanceOf(AnnotationDefinition.VC)) {
 					extendsClass.delete();
@@ -744,7 +750,7 @@ public class Linker {
 					directSuperType = (SpecificType) type;
 				}
 				if (directSuperType != null
-						&& isSubtypeOf(currentType, directSuperType)) {
+						&& isSubtypeOf(directSuperType, superType)) {
 					return true;
 				}
 			}
